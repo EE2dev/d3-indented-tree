@@ -9,12 +9,14 @@ export default function (_myData) {
   ///////////////////////////////////////////////////
   let options = {};
   // 1. ADD all options that should be accessible to caller
-  options.connector = "straight"; // alternative is "curved"
-  options.connectorWidth = 30;
-  options.connectorHeight = 50;
+  options.linkFunction = "straight"; // alternative is "curved"
+  options.linkWidth = 30;
+  options.linkHeight = 50;
+  options.linkStrength = (d, i) => { return (1 + i / 10) + "px";};
+  options.transitionDuration = 750;
+  options.maxNameLength = 20;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
   
-
   options.barPadding = 1;
   options.fillColor = "coral";
   options.debugOn = false;
@@ -26,11 +28,23 @@ export default function (_myData) {
     return chartAPI;
   };  
 
-  chartAPI.connector = function(_) {
-    if (!arguments.length) return options.connector;
-    options.connector = _;
+  chartAPI.linkFunction = function(_) {
+    if (!arguments.length) return options.linkFunction;
+    options.linkFunction = _;
     return chartAPI;
   }; 
+
+  chartAPI.transitionDuration = function(_) {
+    if (!arguments.length) return options.transitionDuration;
+    options.transitionDuration = _;
+    return chartAPI;
+  }; 
+
+  chartAPI.maxNameLength = function(_) {
+    if (!arguments.length) return options.maxNameLength;
+    options.maxNameLength = _;
+    return chartAPI;
+  };
 
   chartAPI.margin = function(_) {
     if (!arguments.length) return options.margin;
@@ -39,17 +53,24 @@ export default function (_myData) {
   };  
 
   // 3. ADD getter-setter methods with updateable functions here
-  chartAPI.connectorWidth = function(_) {
-    if (!arguments.length) return options.connectorWidth;
-    options.connectorWidth = _;
-    if (typeof options.updateConnectorWidth === "function") options.updateConnectorWidth();
+  chartAPI.linkWidth = function(_) {
+    if (!arguments.length) return options.linkWidth;
+    options.linkWidth = _;
+    if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
     return chartAPI;
   };
 
-  chartAPI.connectorHeight = function(_) {
-    if (!arguments.length) return options.connectorHeight;
-    options.connectorHeight = _;
-    if (typeof options.updateConnectorHeight === "function") options.updateConnectorHeight();
+  chartAPI.linkHeight = function(_) {
+    if (!arguments.length) return options.linkHeight;
+    options.linkHeight = _;
+    if (typeof options.updateLinkHeight === "function") options.updateLinkHeight();
+    return chartAPI;
+  };
+
+  chartAPI.linkStrength = function(_) {
+    if (!arguments.length) return options.linkStrength;
+    options.linkStrength = _;
+    if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
     return chartAPI;
   };
   
