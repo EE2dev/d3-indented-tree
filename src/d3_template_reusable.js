@@ -1,6 +1,7 @@
 
 import { readData } from "./preprocessing/processingData";
 import { myChart } from "./visualization/myChart.js";
+import * as d3 from "d3";
 
 export default function (_myData) {
     
@@ -12,7 +13,22 @@ export default function (_myData) {
   options.linkFunction = "straight"; // alternative is "curved"
   options.linkWidth = 30;
   options.linkHeight = 50;
-  options.linkStrength = (d, i) => { return (1 + i / 10) + "px";};
+  // options.linkStrengthValue = (d, i) => { return (1 + i / 10) ;};
+  options.linkStrengthValue = 1;
+  options.linkStrength = function (d,i) {
+    if (typeof (options.linkStrengthValue) === "function") {  
+      return (options.linkStrengthValue(d,i) + "px");
+    } else if (typeof (options.linkStrengthValue) === "number") { 
+      return options.linkStrengthValue + "px";
+    } else {
+      return "1px";
+    }
+  };
+  options.propagate = false; // default: no propagation
+  options.propagateField = "value"; // default field for propagation
+
+  options.linkScale = d3.scaleLinear();
+
   options.transitionDuration = 750;
   options.maxNameLength = 20;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
@@ -26,7 +42,7 @@ export default function (_myData) {
     if (!arguments.length) return options.debugOn;
     options.debugOn = _;
     return chartAPI;
-  };  
+  }; 
 
   chartAPI.linkFunction = function(_) {
     if (!arguments.length) return options.linkFunction;
@@ -37,6 +53,13 @@ export default function (_myData) {
   chartAPI.transitionDuration = function(_) {
     if (!arguments.length) return options.transitionDuration;
     options.transitionDuration = _;
+    return chartAPI;
+  }; 
+
+  chartAPI.propagateValue = function(_) {
+    if (!arguments.length) return options.propagate + ": " + options.propagateField;
+    options.propagate = true;
+    options.propagateField = _;
     return chartAPI;
   }; 
 
@@ -67,9 +90,10 @@ export default function (_myData) {
     return chartAPI;
   };
 
-  chartAPI.linkStrength = function(_) {
-    if (!arguments.length) return options.linkStrength;
-    options.linkStrength = _;
+  chartAPI.linkStrength = function(_, s = options.linkScale) {
+    if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkScale;
+    options.linkStrengthValue = _;
+    options.linkScale = s;
     if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
     return chartAPI;
   };

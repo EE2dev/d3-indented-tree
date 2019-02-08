@@ -1,8 +1,7 @@
 <!DOCTYPE html>
   <meta charset="utf-8"> <!-- also save this file as unicode-8 ! -->
   <head>
-    <script src="../node_modules/d3/dist/d3.js"></script>
-    <!--script src="http://d3js.org/d3.v5.js"></script-->
+    <script src="http://d3js.org/d3.v5.js"></script>
     <link rel="stylesheet" type="text/css" href="css/d3_template_reusable.css">
     <script src="js/reusableChart.js"></script>
   </head>
@@ -15,8 +14,12 @@
   
     <script>
     
-      const myChart = reusableChart.chart("flare.json").debugOn(true); // no parameter when data is embedded in <aside> tag, otherwise reUsableChart(file);
-      // const myChart = reusableChart.chart();
+      const myChart = reusableChart.chart("flare.json") // no parameter when data is embedded in <aside> tag, otherwise reUsableChart(file);
+        .debugOn(true)
+        .propagateValue("size")
+        .linkStrength((d, i) => (1 + i / 10)) // passing a function for setting a dynamic link strength
+      ;
+        // const myChart = reusableChart.chart();
       showChart(); // for preprocessing data see below
       
       window.setTimeout(function() {
