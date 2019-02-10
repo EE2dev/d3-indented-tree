@@ -10,39 +10,48 @@ export default function (_myData) {
   ///////////////////////////////////////////////////
   let options = {};
   // 1. ADD all options that should be accessible to caller
+  options.debugOn = false;
+  options.margin = {top: 20, right: 10, bottom: 20, left: 10};
+  options.maxNameLength = 20;
+  options.transitionDuration = 750;
+
   options.linkFunction = "straight"; // alternative is "curved"
   options.linkWidth = 30;
+  options.linkWidthScale = d3.scaleLog().domain([264, 432629]).range([15,100]);
+  options.linkWidthField = "value";
   options.linkHeight = 50;
   
-  // options.linkStrengthValue = (d, i) => { return (1 + i / 10) ;};
+  options.linkStrengthStatic = true; // if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
   options.linkStrengthValue = 1;
-  options.linkStrengthMaxValue = 10;
-  options.linkStrength = function (d,i) {
-    if (typeof (options.linkStrengthValue) === "function") {  
-      return (options.linkStrengthValue(d,i) + "px");
-    } else if (typeof (options.linkStrengthValue) === "number") { 
-      return options.linkStrengthValue + "px";
-    } else {
-      return "1px";
-    }
-  };
+  options.linkStrengthScale = d3.scaleLinear();
+  options.linkStrengthField = "value";
+  options.linkStrengthRange = [1, 10];
+
   options.propagate = false; // default: no propagation
   options.propagateField = "value"; // default field for propagation
-
-  options.linkScale = d3.scaleLinear();
-
-  options.transitionDuration = 750;
-  options.maxNameLength = 20;
-  options.margin = {top: 20, right: 10, bottom: 20, left: 10};
-  
-  options.barPadding = 1;
-  options.fillColor = "coral";
-  options.debugOn = false;
 
   // 2. ADD getter-setter methods here
   chartAPI.debugOn = function(_) {
     if (!arguments.length) return options.debugOn;
     options.debugOn = _;
+    return chartAPI;
+  }; 
+  
+  chartAPI.margin = function(_) {
+    if (!arguments.length) return options.margin;
+    options.margin = _;
+    return chartAPI;
+  }; 
+    
+  chartAPI.maxNameLength = function(_) {
+    if (!arguments.length) return options.maxNameLength;
+    options.maxNameLength = _;
+    return chartAPI;
+  };
+
+  chartAPI.transitionDuration = function(_) {
+    if (!arguments.length) return options.transitionDuration;
+    options.transitionDuration = _;
     return chartAPI;
   }; 
 
@@ -52,30 +61,12 @@ export default function (_myData) {
     return chartAPI;
   }; 
 
-  chartAPI.transitionDuration = function(_) {
-    if (!arguments.length) return options.transitionDuration;
-    options.transitionDuration = _;
-    return chartAPI;
-  }; 
-
   chartAPI.propagateValue = function(_) {
     if (!arguments.length) return options.propagate + ": " + options.propagateField;
     options.propagate = true;
     options.propagateField = _;
     return chartAPI;
   }; 
-
-  chartAPI.maxNameLength = function(_) {
-    if (!arguments.length) return options.maxNameLength;
-    options.maxNameLength = _;
-    return chartAPI;
-  };
-
-  chartAPI.margin = function(_) {
-    if (!arguments.length) return options.margin;
-    options.margin = _;
-    return chartAPI;
-  };  
 
   // 3. ADD getter-setter methods with updateable functions here
   chartAPI.linkWidth = function(_) {
@@ -92,10 +83,19 @@ export default function (_myData) {
     return chartAPI;
   };
 
-  chartAPI.linkStrength = function(_, s = options.linkScale) {
-    if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkScale;
-    options.linkStrengthValue = _;
-    options.linkScale = s;
+  chartAPI.linkStrength = function(_, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
+    if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkStrengthScale;
+    if (typeof (_) === "number") { 
+      options.linkStrengthStatic = true;
+      options.linkStrengthValue = _;
+    }
+    else if (typeof(_) === "string") {
+      options.linkStrengthStatic = false;
+      options.linkStrengthField = _;
+      options.linkStrengthScale = scale;
+      options.linkStrengthRange = range;
+    }
+    
     if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
     return chartAPI;
   };

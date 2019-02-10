@@ -17,7 +17,8 @@
       const myChart = reusableChart.chart("flare.json") // no parameter when data is embedded in <aside> tag, otherwise reUsableChart(file);
         .debugOn(true)
         .propagateValue("size")
-        .linkStrength("value") // passing a function for setting a dynamic link strength
+        .linkStrength((d, i) => (1 + i / 10))
+        .linkFunction("curved") 
       ;
         // const myChart = reusableChart.chart();
       showChart(); // for preprocessing data see below

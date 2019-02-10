@@ -80,25 +80,26 @@
     });
     config.root.x0 = config.root.x;
     config.root.y0 = config.root.y;
+
     if (options.debugOn) {
       console.log("Data:");console.log(data);
       console.log("Tree:");console.log(config.root);
     }
 
-    createScale(options, config);
-
     config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
+    createScale(options, config);
     createUpdateFunctions(options, config);
     // root.children.forEach(collapse);
     update(config.root, options, config);
   }
 
   function createScale(options, config) {
+    if (options.linkStrengthStatic) return;
     var nodes = config.root.descendants();
-    options.linkScale.domain(d3.extent(nodes.slice(1), function (d) {
-      return +d.value;
-    })).range([1, options.linkStrengthMaxValue]);
+    options.linkStrengthScale.domain(d3.extent(nodes.slice(1), function (d) {
+      return +d[options.linkStrengthField];
+    })).range(options.linkStrengthRange);
   }
 
   function createUpdateFunctions(options, config) {
@@ -159,6 +160,9 @@
     // Compute the "layout".
     nodesSort.forEach(function (n, i) {
       n.x = i * options.linkHeight;
+      if (i !== 0) {
+        n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+      }
     });
 
     d3.select("svg").transition().duration(options.transitionDuration).attr("height", config.height);
@@ -239,7 +243,7 @@
     })
     // .style("stroke-width", options.linkStrength) 
     .style("stroke-width", function (d) {
-      return options.linkScale(d.value) + "px";
+      return options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.value) + "px";
     });
 
     // // Transition exiting nodes to the parent's new position.
@@ -262,34 +266,25 @@
     ///////////////////////////////////////////////////
     var options = {};
     // 1. ADD all options that should be accessible to caller
+    options.debugOn = false;
+    options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
+    options.maxNameLength = 20;
+    options.transitionDuration = 750;
+
     options.linkFunction = "straight"; // alternative is "curved"
     options.linkWidth = 30;
+    options.linkWidthScale = d3.scaleLog().domain([264, 432629]).range([15, 100]);
+    options.linkWidthField = "value";
     options.linkHeight = 50;
 
-    // options.linkStrengthValue = (d, i) => { return (1 + i / 10) ;};
+    options.linkStrengthStatic = true; // if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
     options.linkStrengthValue = 1;
-    options.linkStrengthMaxValue = 10;
-    options.linkStrength = function (d, i) {
-      if (typeof options.linkStrengthValue === "function") {
-        return options.linkStrengthValue(d, i) + "px";
-      } else if (typeof options.linkStrengthValue === "number") {
-        return options.linkStrengthValue + "px";
-      } else {
-        return "1px";
-      }
-    };
+    options.linkStrengthScale = d3.scaleLinear();
+    options.linkStrengthField = "value";
+    options.linkStrengthRange = [1, 10];
+
     options.propagate = false; // default: no propagation
     options.propagateField = "value"; // default field for propagation
-
-    options.linkScale = d3.scaleLinear();
-
-    options.transitionDuration = 750;
-    options.maxNameLength = 20;
-    options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
-
-    options.barPadding = 1;
-    options.fillColor = "coral";
-    options.debugOn = false;
 
     // 2. ADD getter-setter methods here
     chartAPI.debugOn = function (_) {
@@ -298,22 +293,9 @@
       return chartAPI;
     };
 
-    chartAPI.linkFunction = function (_) {
-      if (!arguments.length) return options.linkFunction;
-      options.linkFunction = _;
-      return chartAPI;
-    };
-
-    chartAPI.transitionDuration = function (_) {
-      if (!arguments.length) return options.transitionDuration;
-      options.transitionDuration = _;
-      return chartAPI;
-    };
-
-    chartAPI.propagateValue = function (_) {
-      if (!arguments.length) return options.propagate + ": " + options.propagateField;
-      options.propagate = true;
-      options.propagateField = _;
+    chartAPI.margin = function (_) {
+      if (!arguments.length) return options.margin;
+      options.margin = _;
       return chartAPI;
     };
 
@@ -323,9 +305,22 @@
       return chartAPI;
     };
 
-    chartAPI.margin = function (_) {
-      if (!arguments.length) return options.margin;
-      options.margin = _;
+    chartAPI.transitionDuration = function (_) {
+      if (!arguments.length) return options.transitionDuration;
+      options.transitionDuration = _;
+      return chartAPI;
+    };
+
+    chartAPI.linkFunction = function (_) {
+      if (!arguments.length) return options.linkFunction;
+      options.linkFunction = _;
+      return chartAPI;
+    };
+
+    chartAPI.propagateValue = function (_) {
+      if (!arguments.length) return options.propagate + ": " + options.propagateField;
+      options.propagate = true;
+      options.propagateField = _;
       return chartAPI;
     };
 
@@ -345,11 +340,20 @@
     };
 
     chartAPI.linkStrength = function (_) {
-      var s = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkScale;
+      var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkStrengthScale;
+      var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkStrengthRange;
 
-      if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkScale;
-      options.linkStrengthValue = _;
-      options.linkScale = s;
+      if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkStrengthScale;
+      if (typeof _ === "number") {
+        options.linkStrengthStatic = true;
+        options.linkStrengthValue = _;
+      } else if (typeof _ === "string") {
+        options.linkStrengthStatic = false;
+        options.linkStrengthField = _;
+        options.linkStrengthScale = scale;
+        options.linkStrengthRange = range;
+      }
+
       if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
       return chartAPI;
     };

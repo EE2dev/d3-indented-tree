@@ -22,12 +22,11 @@ export function myChart(selection, data, options){
   });
   config.root.x0 = config.root.x;
   config.root.y0 = config.root.y;
+
   if (options.debugOn) {
     console.log("Data:"); console.log(data);
     console.log("Tree:"); console.log(config.root);
   } 
-
-  createScale(options, config);
 
   config.svg = selection.append("svg")
     .attr("width", config.width + options.margin.right + options.margin.left)
@@ -35,16 +34,18 @@ export function myChart(selection, data, options){
     .append("g")
     .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
+  createScale(options, config);
   createUpdateFunctions(options, config);
   // root.children.forEach(collapse);
   update(config.root, options, config);
 }
 
 function createScale(options, config) {
+  if (options.linkStrengthStatic) return;
   let nodes = config.root.descendants();
-  options.linkScale
-    .domain(d3.extent(nodes.slice(1), function(d) { return +d.value;}))
-    .range([1, options.linkStrengthMaxValue]);
+  options.linkStrengthScale
+    .domain(d3.extent(nodes.slice(1), function(d) { return +d[options.linkStrengthField];}))
+    .range(options.linkStrengthRange);
 }
 
 function createUpdateFunctions(options, config){
@@ -111,6 +112,9 @@ function update(source, options, config){
   // Compute the "layout".
   nodesSort.forEach ((n,i)=> {
     n.x = i * options.linkHeight;
+    if (i !== 0) {
+      n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+    } 
   });
 
   d3.select("svg").transition()
@@ -215,7 +219,8 @@ function update(source, options, config){
     .duration(options.transitionDuration)
     .attr("d", (d) => { return linkPath(d, options.linkFunction); })
     // .style("stroke-width", options.linkStrength) 
-    .style("stroke-width", d => options.linkScale(d.value) + "px");
+    .style("stroke-width", 
+      d => options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.value) + "px");
 
   // // Transition exiting nodes to the parent's new position.
   link.exit().transition()
