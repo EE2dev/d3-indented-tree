@@ -85,16 +85,20 @@
       console.log("Tree:");console.log(config.root);
     }
 
-    options.linkScale.domain(d3.extent(d3.values(data, function (d) {
-      return d[options.propagateField];
-    }))).range([1, options.linkWidth]);
-    //.clamp();
+    createScale(options, config);
 
     config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
     createUpdateFunctions(options, config);
     // root.children.forEach(collapse);
     update(config.root, options, config);
+  }
+
+  function createScale(options, config) {
+    var nodes = config.root.descendants();
+    options.linkScale.domain(d3.extent(nodes.slice(1), function (d) {
+      return +d.value;
+    })).range([1, options.linkStrengthMaxValue]);
   }
 
   function createUpdateFunctions(options, config) {
@@ -108,6 +112,7 @@
     };
 
     options.updateLinkStrength = function () {
+      createScale(options, config);
       update(config.root, options, config);
     };
   }
@@ -231,7 +236,11 @@
     // Transition links to their new position.
     link.merge(linkEnter).transition().duration(options.transitionDuration).attr("d", function (d) {
       return linkPath(d, options.linkFunction);
-    }).style("stroke-width", options.linkStrength);
+    })
+    // .style("stroke-width", options.linkStrength) 
+    .style("stroke-width", function (d) {
+      return options.linkScale(d.value) + "px";
+    });
 
     // // Transition exiting nodes to the parent's new position.
     link.exit().transition().duration(options.transitionDuration).attr("d", function () {
@@ -256,8 +265,10 @@
     options.linkFunction = "straight"; // alternative is "curved"
     options.linkWidth = 30;
     options.linkHeight = 50;
+
     // options.linkStrengthValue = (d, i) => { return (1 + i / 10) ;};
     options.linkStrengthValue = 1;
+    options.linkStrengthMaxValue = 10;
     options.linkStrength = function (d, i) {
       if (typeof options.linkStrengthValue === "function") {
         return options.linkStrengthValue(d, i) + "px";

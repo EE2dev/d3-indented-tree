@@ -13,8 +13,10 @@ export default function (_myData) {
   options.linkFunction = "straight"; // alternative is "curved"
   options.linkWidth = 30;
   options.linkHeight = 50;
+  
   // options.linkStrengthValue = (d, i) => { return (1 + i / 10) ;};
   options.linkStrengthValue = 1;
+  options.linkStrengthMaxValue = 10;
   options.linkStrength = function (d,i) {
     if (typeof (options.linkStrengthValue) === "function") {  
       return (options.linkStrengthValue(d,i) + "px");

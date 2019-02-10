@@ -27,10 +27,7 @@ export function myChart(selection, data, options){
     console.log("Tree:"); console.log(config.root);
   } 
 
-  options.linkScale
-    .domain(d3.extent(d3.values(data, d => d[options.propagateField])))
-    .range([1, options.linkWidth]);
-  //.clamp();
+  createScale(options, config);
 
   config.svg = selection.append("svg")
     .attr("width", config.width + options.margin.right + options.margin.left)
@@ -41,6 +38,13 @@ export function myChart(selection, data, options){
   createUpdateFunctions(options, config);
   // root.children.forEach(collapse);
   update(config.root, options, config);
+}
+
+function createScale(options, config) {
+  let nodes = config.root.descendants();
+  options.linkScale
+    .domain(d3.extent(nodes.slice(1), function(d) { return +d.value;}))
+    .range([1, options.linkStrengthMaxValue]);
 }
 
 function createUpdateFunctions(options, config){
@@ -54,6 +58,7 @@ function createUpdateFunctions(options, config){
   };
 
   options.updateLinkStrength = function() {
+    createScale(options, config);
     update(config.root, options, config);
   };
 }
@@ -209,7 +214,8 @@ function update(source, options, config){
   link.merge(linkEnter).transition()
     .duration(options.transitionDuration)
     .attr("d", (d) => { return linkPath(d, options.linkFunction); })
-    .style("stroke-width", options.linkStrength); 
+    // .style("stroke-width", options.linkStrength) 
+    .style("stroke-width", d => options.linkScale(d.value) + "px");
 
   // // Transition exiting nodes to the parent's new position.
   link.exit().transition()
