@@ -9,38 +9,76 @@
   //////////////////////////////////////////////////// 
 
   // XHR to load data   
-  function readData(file, selection, debugOn, createChart) {
-    if (typeof file !== "undefined") {
+  function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
+    if (typeof file !== "undefined" && !Array.isArray(file)) {
+      // read data from file 
       if (file.endsWith(".json")) {
+        // JSON Format
         d3.json(file).then(function (data) {
-          console.log(data);
-          createChart(selection, data);
+          if (debugOn) {
+            console.log(data);
+          }
+          var hierarchy = d3.hierarchy(data);
+          if (debugOn) {
+            console.log("hierarchy: ");console.log(hierarchy);
+          }
+          createChart(selection, hierarchy);
         });
       } else if (file.endsWith(".csv")) {
-        // to do
-        // d3.dsv(",", csvFile, convertToNumber).then(function(data) {
-        var data = [];
-        console.log(data);
-        createChart(selection, data);
+        if (typeof _hierarchyLevels === "undefined") {
+          // CSV Format 1
+          d3.dsv(",", file).then(function (data) {
+            if (debugOn) {
+              console.log(data);
+            }
+            var hierarchy = createHierarchy(data);
+            if (debugOn) {
+              console.log("hierarchy: ");console.log(hierarchy);
+            }
+            createChart(selection, hierarchy);
+          });
+        }
       } else {
         console.log("File must end with .json or csv");
       }
     } else {
-      var inputData = d3.select("aside#data").text();
-      var _file = d3.csvParse(removeWhiteSpaces(inputData));
-      _file.forEach(function (row) {
-        convertToNumber(row);
-      });
-      if (debugOn) {
-        console.log(_file);
+      // read data from DOM
+      if (typeof file === "undefined") {
+        // CSV Format 1
+        var myData = readDataFromDOM();
+        var hierarchy = createHierarchy(myData);
+        if (debugOn) {
+          console.log("embedded data: ");console.log(hierarchy);
+        }
+        createChart(selection, hierarchy);
+      } else if (Array.isArray(file)) ; else {
+        console.log("Data is not specified correctly");
       }
-      createChart(selection, _file);
     }
+  }
+
+  function readDataFromDOM() {
+    var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "aside#data";
+
+    var inputData = d3.select(selector).text();
+    var inputData_cleaned = inputData.trim();
+    var file = d3.csvParse(inputData_cleaned);
+    return file;
+  }
+
+  function createHierarchy(data) {
+    var root = d3.stratify().id(function (d) {
+      return d.name;
+    }).parentId(function (d) {
+      return d.parent;
+    })(data);
+    return root;
   }
 
   // helper to delete extra white spaces 
   // from -> https://stackoverflow.com/questions/18065807/regular-expression-for-removing-whitespaces
-  function removeWhiteSpaces(str) {
+  /*
+  function removeWhiteSpaces (str) {
     return str.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
   }
 
@@ -50,9 +88,10 @@
       if (Object.prototype.hasOwnProperty.call(d, perm)) {
         d[perm] = +d[perm];
       }
-    }
+    }  
     return d;
-  }
+  } 
+  */
 
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
@@ -63,14 +102,29 @@
     config.width = 1400 - options.margin.right - options.margin.left;
     config.height = 800 - options.margin.top - options.margin.bottom;
     config.i = 0; // counter for numerical IDs
-    config.tree = d3.tree().size([config.width, config.height]).nodeSize([0, options.linkWidth]);
-    config.root = config.tree(d3.hierarchy(data));
+    config.tree = undefined;
+    config.root = undefined;
+    config.svg = undefined;
+
+    config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
+
+    createTree(options, config, data);
+    createScale(options, config);
+    createUpdateFunctions(options, config, data);
+    // root.children.forEach(collapse);
+    update(config.root, options, config);
+  }
+
+  function createTree(options, config, data) {
+    config.tree = options.alignLeaves ? d3.cluster() : d3.tree();
+    config.tree.size([config.width, config.height]).nodeSize([0, options.linkWidthValue]);
+    // config.root = options.dataEmbedded ? config.tree(data) : config.tree(d3.hierarchy(data));
+    config.root = config.tree(data);
     if (options.propagate) {
       config.root.sum(function (d) {
         return d[options.propagateField];
       });
     }
-    config.svg = undefined;
 
     // baroptions.width = options.width *.8;
     config.root.each(function (d) {
@@ -85,26 +139,29 @@
       console.log("Data:");console.log(data);
       console.log("Tree:");console.log(config.root);
     }
-
-    config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
-
-    createScale(options, config);
-    createUpdateFunctions(options, config);
-    // root.children.forEach(collapse);
-    update(config.root, options, config);
   }
 
   function createScale(options, config) {
-    if (options.linkStrengthStatic) return;
     var nodes = config.root.descendants();
-    options.linkStrengthScale.domain(d3.extent(nodes.slice(1), function (d) {
-      return +d[options.linkStrengthField];
-    })).range(options.linkStrengthRange);
+    if (!options.linkStrengthStatic) {
+      options.linkStrengthScale.domain(d3.extent(nodes.slice(1), function (d) {
+        return +d[options.linkStrengthField];
+      })).range(options.linkStrengthRange);
+    }
+    if (!options.linkWidthStatic) {
+      options.linkWidthScale.domain(d3.extent(nodes.slice(1), function (d) {
+        return +d[options.linkWidthField];
+      })).range(options.linkWidthRange);
+    }
   }
 
-  function createUpdateFunctions(options, config) {
+  function createUpdateFunctions(options, config, data) {
     options.updateLinkWidth = function () {
-      config.tree.nodeSize([0, options.linkWidth]);
+      if (options.linkWidthStatic) {
+        config.tree.nodeSize([0, options.linkWidthValue]);
+      } else {
+        createScale(options, config);
+      }
       update(config.root, options, config);
     };
 
@@ -114,6 +171,11 @@
 
     options.updateLinkStrength = function () {
       createScale(options, config);
+      update(config.root, options, config);
+    };
+
+    options.updateAlignLeaves = function () {
+      createTree(options, config, data);
       update(config.root, options, config);
     };
   }
@@ -160,8 +222,10 @@
     // Compute the "layout".
     nodesSort.forEach(function (n, i) {
       n.x = i * options.linkHeight;
-      if (i !== 0) {
-        n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+      if (!options.linkWidthStatic) {
+        if (i !== 0) {
+          n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+        }
       }
     });
 
@@ -260,6 +324,7 @@
   }
 
   function d3_template_reusable (_myData) {
+    var _hierarchyLevels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
     ///////////////////////////////////////////////////
     // 1.0 ADD visualization specific variables here //
@@ -267,17 +332,27 @@
     var options = {};
     // 1. ADD all options that should be accessible to caller
     options.debugOn = false;
+    options.dataEmbedded = typeof _myData !== "undefined" ? false : true;
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
-    options.maxNameLength = 20;
+    options.maxNameLength = 50;
     options.transitionDuration = 750;
 
     options.linkFunction = "straight"; // alternative is "curved"
+    options.linkHeight = 20;
+    /*
     options.linkWidth = 30;
-    options.linkWidthScale = d3.scaleLog().domain([264, 432629]).range([15, 100]);
+    options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
     options.linkWidthField = "value";
-    options.linkHeight = 50;
+    */
+    // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
+    options.linkWidthStatic = true;
+    options.linkWidthValue = 30;
+    options.linkWidthScale = d3.scaleLinear();
+    options.linkWidthField = "value";
+    options.linkWidthRange = [15, 100];
 
-    options.linkStrengthStatic = true; // if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
+    // true if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
+    options.linkStrengthStatic = true;
     options.linkStrengthValue = 1;
     options.linkStrengthScale = d3.scaleLinear();
     options.linkStrengthField = "value";
@@ -285,6 +360,8 @@
 
     options.propagate = false; // default: no propagation
     options.propagateField = "value"; // default field for propagation
+
+    options.alignLeaves = false; // use tree layout as default, otherwise cluster layout
 
     // 2. ADD getter-setter methods here
     chartAPI.debugOn = function (_) {
@@ -325,17 +402,29 @@
     };
 
     // 3. ADD getter-setter methods with updateable functions here
-    chartAPI.linkWidth = function (_) {
-      if (!arguments.length) return options.linkWidth;
-      options.linkWidth = _;
-      if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
-      return chartAPI;
-    };
-
     chartAPI.linkHeight = function (_) {
       if (!arguments.length) return options.linkHeight;
       options.linkHeight = _;
       if (typeof options.updateLinkHeight === "function") options.updateLinkHeight();
+      return chartAPI;
+    };
+
+    chartAPI.linkWidth = function (_) {
+      var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkWidthScale;
+      var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkWidthRange;
+
+      if (!arguments.length) return options.linkWidthValue + ", scale: " + options.linkWidthScale;
+      if (typeof _ === "number") {
+        options.linkWidthStatic = true;
+        options.linkWidthValue = _;
+      } else if (typeof _ === "string") {
+        options.linkWidthStatic = false;
+        options.linkWidthField = _;
+        options.linkWidthScale = scale;
+        options.linkWidthRange = range;
+      }
+
+      if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
       return chartAPI;
     };
 
@@ -358,6 +447,13 @@
       return chartAPI;
     };
 
+    chartAPI.alignLeaves = function (_) {
+      if (!arguments.length) return options.alignLeaves;
+      options.alignLeaves = _;
+      if (typeof options.updateAlignLeaves === "function") options.updateAlignLeaves();
+      return chartAPI;
+    };
+
     ////////////////////////////////////////////////////
     // API for external access                        //
     //////////////////////////////////////////////////// 
@@ -372,7 +468,7 @@
           createChart(selection, d);
         } else {
           // data processing here
-          readData(_myData, selection, options.debugOn, createChart);
+          readData(_myData, _hierarchyLevels, selection, options.debugOn, createChart);
         }
       });
     }

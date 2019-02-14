@@ -3,7 +3,7 @@ import { readData } from "./preprocessing/processingData";
 import { myChart } from "./visualization/myChart.js";
 import * as d3 from "d3";
 
-export default function (_myData) {
+export default function (_myData, _hierarchyLevels = undefined) {
     
   ///////////////////////////////////////////////////
   // 1.0 ADD visualization specific variables here //
@@ -11,17 +11,27 @@ export default function (_myData) {
   let options = {};
   // 1. ADD all options that should be accessible to caller
   options.debugOn = false;
+  options.dataEmbedded = (typeof _myData !== "undefined") ? false : true;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
-  options.maxNameLength = 20;
+  options.maxNameLength = 50;
   options.transitionDuration = 750;
 
   options.linkFunction = "straight"; // alternative is "curved"
+  options.linkHeight = 20;
+  /*
   options.linkWidth = 30;
-  options.linkWidthScale = d3.scaleLog().domain([264, 432629]).range([15,100]);
+  options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
   options.linkWidthField = "value";
-  options.linkHeight = 50;
-  
-  options.linkStrengthStatic = true; // if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
+  */
+  // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
+  options.linkWidthStatic = true; 
+  options.linkWidthValue = 30;
+  options.linkWidthScale = d3.scaleLinear();
+  options.linkWidthField = "value";
+  options.linkWidthRange = [15, 100];
+
+  // true if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
+  options.linkStrengthStatic = true; 
   options.linkStrengthValue = 1;
   options.linkStrengthScale = d3.scaleLinear();
   options.linkStrengthField = "value";
@@ -29,6 +39,8 @@ export default function (_myData) {
 
   options.propagate = false; // default: no propagation
   options.propagateField = "value"; // default field for propagation
+
+  options.alignLeaves = false; // use tree layout as default, otherwise cluster layout
 
   // 2. ADD getter-setter methods here
   chartAPI.debugOn = function(_) {
@@ -69,17 +81,27 @@ export default function (_myData) {
   }; 
 
   // 3. ADD getter-setter methods with updateable functions here
-  chartAPI.linkWidth = function(_) {
-    if (!arguments.length) return options.linkWidth;
-    options.linkWidth = _;
-    if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
-    return chartAPI;
-  };
-
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;
     options.linkHeight = _;
     if (typeof options.updateLinkHeight === "function") options.updateLinkHeight();
+    return chartAPI;
+  };
+
+  chartAPI.linkWidth = function(_, scale = options.linkWidthScale, range = options.linkWidthRange) {
+    if (!arguments.length) return options.linkWidthValue + ", scale: " + options.linkWidthScale;
+    if (typeof (_) === "number") { 
+      options.linkWidthStatic = true;
+      options.linkWidthValue = _;
+    }
+    else if (typeof(_) === "string") {
+      options.linkWidthStatic = false;
+      options.linkWidthField = _;
+      options.linkWidthScale = scale;
+      options.linkWidthRange = range;
+    }
+    
+    if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
     return chartAPI;
   };
 
@@ -99,6 +121,13 @@ export default function (_myData) {
     if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
     return chartAPI;
   };
+
+  chartAPI.alignLeaves = function(_) {
+    if (!arguments.length) return options.alignLeaves;
+    options.alignLeaves = _;
+    if (typeof options.updateAlignLeaves === "function") options.updateAlignLeaves();
+    return chartAPI;
+  }; 
   
   ////////////////////////////////////////////////////
   // API for external access                        //
@@ -113,7 +142,7 @@ export default function (_myData) {
         createChart(selection, d);
       }
       else { // data processing here
-        readData(_myData, selection, options.debugOn, createChart);
+        readData(_myData, _hierarchyLevels, selection, options.debugOn, createChart);
       }
     });
   }  

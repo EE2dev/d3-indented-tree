@@ -9,10 +9,29 @@ export function myChart(selection, data, options){
   config.width = 1400 - options.margin.right - options.margin.left;
   config.height = 800 - options.margin.top - options.margin.bottom;
   config.i = 0; // counter for numerical IDs
-  config.tree = d3.tree().size([config.width, config.height]).nodeSize([0, options.linkWidth]); 
-  config.root = config.tree(d3.hierarchy(data));
-  if (options.propagate) { config.root.sum(d => d[options.propagateField]);}
+  config.tree = undefined;
+  config.root = undefined;
   config.svg = undefined;
+
+  config.svg = selection.append("svg")
+    .attr("width", config.width + options.margin.right + options.margin.left)
+    .attr("height", config.height + options.margin.top + options.margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
+ 
+  createTree(options, config, data);
+  createScale(options, config);
+  createUpdateFunctions(options, config, data);
+  // root.children.forEach(collapse);
+  update(config.root, options, config);
+}
+
+function createTree(options, config, data) {
+  config.tree = options.alignLeaves ? d3.cluster() : d3.tree();
+  config.tree.size([config.width, config.height]).nodeSize([0, options.linkWidthValue]);  
+  // config.root = options.dataEmbedded ? config.tree(data) : config.tree(d3.hierarchy(data));
+  config.root = config.tree(data);
+  if (options.propagate) { config.root.sum(d => d[options.propagateField]);}
   
   // baroptions.width = options.width *.8;
   config.root.each((d)=> {
@@ -27,30 +46,29 @@ export function myChart(selection, data, options){
     console.log("Data:"); console.log(data);
     console.log("Tree:"); console.log(config.root);
   } 
-
-  config.svg = selection.append("svg")
-    .attr("width", config.width + options.margin.right + options.margin.left)
-    .attr("height", config.height + options.margin.top + options.margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
-
-  createScale(options, config);
-  createUpdateFunctions(options, config);
-  // root.children.forEach(collapse);
-  update(config.root, options, config);
 }
 
 function createScale(options, config) {
-  if (options.linkStrengthStatic) return;
   let nodes = config.root.descendants();
-  options.linkStrengthScale
-    .domain(d3.extent(nodes.slice(1), function(d) { return +d[options.linkStrengthField];}))
-    .range(options.linkStrengthRange);
+  if (!options.linkStrengthStatic) {    
+    options.linkStrengthScale
+      .domain(d3.extent(nodes.slice(1), function(d) { return +d[options.linkStrengthField];}))
+      .range(options.linkStrengthRange);
+  }
+  if (!options.linkWidthStatic) {    
+    options.linkWidthScale
+      .domain(d3.extent(nodes.slice(1), function(d) { return +d[options.linkWidthField];}))
+      .range(options.linkWidthRange);
+  }
 }
 
-function createUpdateFunctions(options, config){
+function createUpdateFunctions(options, config, data){
   options.updateLinkWidth = function() {
-    config.tree.nodeSize([0, options.linkWidth]);
+    if (options.linkWidthStatic) {  
+      config.tree.nodeSize([0, options.linkWidthValue]);
+    } else {
+      createScale(options, config);
+    }
     update(config.root, options, config);
   };
 
@@ -60,6 +78,11 @@ function createUpdateFunctions(options, config){
 
   options.updateLinkStrength = function() {
     createScale(options, config);
+    update(config.root, options, config);
+  };
+
+  options.updateAlignLeaves = function() {
+    createTree(options, config, data);
     update(config.root, options, config);
   };
 }
@@ -112,9 +135,11 @@ function update(source, options, config){
   // Compute the "layout".
   nodesSort.forEach ((n,i)=> {
     n.x = i * options.linkHeight;
-    if (i !== 0) {
-      n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
-    } 
+    if (!options.linkWidthStatic){
+      if (i !== 0) {
+        n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+      } 
+    }
   });
 
   d3.select("svg").transition()
