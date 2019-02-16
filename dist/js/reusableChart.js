@@ -9,14 +9,15 @@
   //////////////////////////////////////////////////// 
 
   // XHR to load data   
-  function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
-    if (typeof file !== "undefined" && !Array.isArray(file)) {
+  function readData(myData, selection, debugOn, createChart) {
+    // export function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
+    if (myData.fromFile) {
       // read data from file 
-      if (file.endsWith(".json")) {
+      if (myData.data.endsWith(".json")) {
         // JSON Format
-        d3.json(file).then(function (data) {
+        d3.json(myData.data).then(function (data) {
           if (debugOn) {
-            console.log(data);
+            console.log("Initial Data: ");console.log(data);
           }
           var hierarchy = d3.hierarchy(data);
           if (debugOn) {
@@ -24,14 +25,14 @@
           }
           createChart(selection, hierarchy);
         });
-      } else if (file.endsWith(".csv")) {
-        if (typeof _hierarchyLevels === "undefined") {
-          // CSV Format 1
-          d3.dsv(",", file).then(function (data) {
+      } else if (myData.data.endsWith(".csv")) {
+        if (myData.flatData) ; else {
+          // CSV Format 2
+          d3.dsv(",", myData.data).then(function (data) {
             if (debugOn) {
               console.log(data);
             }
-            var hierarchy = createHierarchy(data);
+            var hierarchy = createHierarchy(data, myData.keyField);
             if (debugOn) {
               console.log("hierarchy: ");console.log(hierarchy);
             }
@@ -43,16 +44,14 @@
       }
     } else {
       // read data from DOM
-      if (typeof file === "undefined") {
-        // CSV Format 1
-        var myData = readDataFromDOM();
-        var hierarchy = createHierarchy(myData);
+      if (myData.flatData) ; else {
+        // CSV Format 2
+        var _myData = readDataFromDOM();
+        var hierarchy = createHierarchy(_myData, _myData.keyField);
         if (debugOn) {
           console.log("embedded data: ");console.log(hierarchy);
         }
         createChart(selection, hierarchy);
-      } else if (Array.isArray(file)) ; else {
-        console.log("Data is not specified correctly");
       }
     }
   }
@@ -66,9 +65,9 @@
     return file;
   }
 
-  function createHierarchy(data) {
+  function createHierarchy(data, key) {
     var root = d3.stratify().id(function (d) {
-      return d.name;
+      return d[key];
     }).parentId(function (d) {
       return d.parent;
     })(data);
@@ -105,6 +104,7 @@
     config.tree = undefined;
     config.root = undefined;
     config.svg = undefined;
+    config.counter = 0;
 
     config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
@@ -253,15 +253,15 @@
     // .attr("dy", ".35em")
     // .attr("text-anchor", "middle") 
     .text(function (d) {
-      if (d.data.name.length > options.maxNameLength) {
-        return d.data.name.substring(0, options.maxNameLength) + "...";
+      if (d.data[options.keyField].length > options.maxNameLength) {
+        return d.data[options.keyField].substring(0, options.maxNameLength) + "...";
       } else {
-        return d.data.name;
+        return d.data[options.keyField];
       }
     }).style("fill-opacity", 1e-6);
 
     nodeEnter.append("svg:title").text(function (d) {
-      return d.data.name;
+      return d.data[options.keyField];
     });
 
     // Transition nodes to their new position.
@@ -323,8 +323,7 @@
     });
   }
 
-  function d3_template_reusable (_myData) {
-    var _hierarchyLevels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+  function d3_template_reusable (_myData, dataSpec) {
 
     ///////////////////////////////////////////////////
     // 1.0 ADD visualization specific variables here //
@@ -362,6 +361,7 @@
     options.propagateField = "value"; // default field for propagation
 
     options.alignLeaves = false; // use tree layout as default, otherwise cluster layout
+    options.keyField = undefined;
 
     // 2. ADD getter-setter methods here
     chartAPI.debugOn = function (_) {
@@ -468,9 +468,22 @@
           createChart(selection, d);
         } else {
           // data processing here
-          readData(_myData, _hierarchyLevels, selection, options.debugOn, createChart);
+          var myData = createDataInfo();
+          readData(myData, selection, options.debugOn, createChart);
         }
       });
+    }
+
+    function createDataInfo() {
+      var myData = {};
+      myData.data = _myData;
+      myData.fromFile = typeof _myData === "undefined" ? false : true;
+      myData.flatData = Array.isArray(dataSpec) ? true : false;
+      myData.hierarchyLevels = Array.isArray(dataSpec) ? dataSpec : "undefined";
+      // myData.nodeData = (typeof dataSpec === "string") ? true : false;
+      myData.keyField = typeof dataSpec === "string" ? dataSpec : "name";
+      options.keyField = myData.keyField;
+      return myData;
     }
 
     // call visualization entry function

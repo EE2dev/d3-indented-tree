@@ -12,6 +12,7 @@ export function myChart(selection, data, options){
   config.tree = undefined;
   config.root = undefined;
   config.svg = undefined;
+  config.counter = 0;
 
   config.svg = selection.append("svg")
     .attr("width", config.width + options.margin.right + options.margin.left)
@@ -175,16 +176,16 @@ function update(source, options, config){
     // .attr("dy", ".35em")
     // .attr("text-anchor", "middle") 
     .text(function (d) {
-      if (d.data.name.length > options.maxNameLength) {
-        return d.data.name.substring(0, options.maxNameLength) + "...";
+      if (d.data[options.keyField].length > options.maxNameLength) {
+        return d.data[options.keyField].substring(0, options.maxNameLength) + "...";
       } else {
-        return d.data.name;
+        return d.data[options.keyField];
       }
     })
     .style("fill-opacity", 1e-6);
 
   nodeEnter.append("svg:title").text(function (d) {
-    return d.data.name;
+    return d.data[options.keyField];
   });
 
   // Transition nodes to their new position.

@@ -5,41 +5,40 @@ import * as d3 from "d3";
 //////////////////////////////////////////////////// 
 
 // XHR to load data   
-export function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
-  if (typeof file !== "undefined" && !Array.isArray(file)) { // read data from file 
-    if (file.endsWith(".json")) { // JSON Format
-      d3.json(file).then(function(data){
-        if (debugOn) { console.log(data);}
+export function readData(myData, selection, debugOn, createChart) {
+// export function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
+  if (myData.fromFile) { // read data from file 
+    if (myData.data.endsWith(".json")) { // JSON Format
+      d3.json(myData.data).then(function(data){
+        if (debugOn) { console.log("Initial Data: ");console.log(data);}
         const hierarchy = d3.hierarchy(data);
         if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
         createChart(selection, hierarchy);
       });
-    } else if (file.endsWith(".csv")) {
-      if (typeof _hierarchyLevels === "undefined"){ // CSV Format 1
-        d3.dsv(",", file).then(function(data) {
+    } else if (myData.data.endsWith(".csv")) {
+      if (myData.flatData){ // CSV Format 1
+        // TO DO
+      } else { // CSV Format 2
+        d3.dsv(",", myData.data).then(function(data) {
           if (debugOn) { console.log(data);}
-          const hierarchy = createHierarchy(data);
+          const hierarchy = createHierarchy(data, myData.keyField);
           if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
           createChart(selection, hierarchy);
         });
-      } else if (Array.isArray(_hierarchyLevels)){ // CSV Format 2
-        // TO DO
       }
     } else {
       console.log("File must end with .json or csv");
     }
   } 
   else { // read data from DOM
-    if (typeof file === "undefined") { // CSV Format 1
+    if (myData.flatData) { // CSV Format 1
+      // TO DO
+    } else { // CSV Format 2
       const myData = readDataFromDOM();
-      const hierarchy = createHierarchy(myData);
+      const hierarchy = createHierarchy(myData, myData.keyField);
       if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
       createChart(selection, hierarchy);
-    } else if (Array.isArray(file)) { // CSV Format 2
-      // TO DO
-    } else {
-      console.log("Data is not specified correctly");
-    }
+    } 
   }
 }
 
@@ -50,9 +49,9 @@ function readDataFromDOM(selector = "aside#data") {
   return file; 
 }
 
-function createHierarchy(data) {
+function createHierarchy(data, key) {
   var root = d3.stratify()
-    .id(function(d) { return d.name; })
+    .id(function(d) { return d[key]; })
     .parentId(function(d) { return d.parent; })(data);
   return root;
 }

@@ -3,7 +3,7 @@ import { readData } from "./preprocessing/processingData";
 import { myChart } from "./visualization/myChart.js";
 import * as d3 from "d3";
 
-export default function (_myData, _hierarchyLevels = undefined) {
+export default function (_myData, dataSpec) {
     
   ///////////////////////////////////////////////////
   // 1.0 ADD visualization specific variables here //
@@ -41,6 +41,7 @@ export default function (_myData, _hierarchyLevels = undefined) {
   options.propagateField = "value"; // default field for propagation
 
   options.alignLeaves = false; // use tree layout as default, otherwise cluster layout
+  options.keyField = undefined;
 
   // 2. ADD getter-setter methods here
   chartAPI.debugOn = function(_) {
@@ -142,10 +143,23 @@ export default function (_myData, _hierarchyLevels = undefined) {
         createChart(selection, d);
       }
       else { // data processing here
-        readData(_myData, _hierarchyLevels, selection, options.debugOn, createChart);
+        const myData = createDataInfo();
+        readData(myData, selection, options.debugOn, createChart);
       }
     });
   }  
+
+  function createDataInfo() {
+    let myData = {};
+    myData.data = _myData;
+    myData.fromFile = (typeof _myData === "undefined") ? false : true;
+    myData.flatData = Array.isArray(dataSpec) ? true : false;
+    myData.hierarchyLevels = Array.isArray(dataSpec) ? dataSpec : "undefined";
+    // myData.nodeData = (typeof dataSpec === "string") ? true : false;
+    myData.keyField = (typeof dataSpec === "string") ? dataSpec : "name";
+    options.keyField = myData.keyField;
+    return myData;
+  }
 
   // call visualization entry function
   function createChart(selection, data) {

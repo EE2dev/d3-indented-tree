@@ -1,0 +1,10 @@
+first_name,parent,color
+Eve,,2
+Cain,Eve,3
+Seth,Eve,3
+Enos,Seth,4
+Noam,Seth,5
+Abel,Eve,4
+Awan,Eve,3
+Enoch,Awan,7
+Azura,Eve,2
