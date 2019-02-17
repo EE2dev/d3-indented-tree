@@ -7,6 +7,7 @@
 * check updateable function with collapsed nodes
 * selectio.each() ?
 * support csv file and inline csv file
+* propagate for both csv files
 * all nodes with square + cross when collapsed
 * -| when expanded
 * square when leaf
@@ -23,3 +24,4 @@
 * additional info (quatity) right aligned, title, colored bar on top optionally, moveover -> set opacity 0.9 for other nodes/links
 * allow graphics before text for each node
 * option: save as pgn/svg in function call to add buttons
+* change data input to just object

@@ -26,9 +26,22 @@
           createChart(selection, hierarchy);
         });
       } else if (myData.data.endsWith(".csv")) {
-        if (myData.flatData) ; else {
+        if (myData.flatData) {
+          // CSV Format 1
+          d3.dsv(myData.delimiter, myData.data).then(function (data) {
+            if (debugOn) {
+              console.log(data);
+            }
+            var hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels);
+            if (debugOn) {
+              console.log("hierarchy: ");console.log(hierarchy);
+            }
+            createChart(selection, hierarchy);
+          });
+          // TO DO
+        } else {
           // CSV Format 2
-          d3.dsv(",", myData.data).then(function (data) {
+          d3.dsv(myData.delimiter, myData.data).then(function (data) {
             if (debugOn) {
               console.log(data);
             }
@@ -46,8 +59,8 @@
       // read data from DOM
       if (myData.flatData) ; else {
         // CSV Format 2
-        var _myData = readDataFromDOM();
-        var hierarchy = createHierarchy(_myData, _myData.keyField);
+        var data = readDataFromDOM();
+        var hierarchy = createHierarchy(data, myData.keyField);
         if (debugOn) {
           console.log("embedded data: ");console.log(hierarchy);
         }
@@ -71,6 +84,37 @@
     }).parentId(function (d) {
       return d.parent;
     })(data);
+    return root;
+  }
+
+  function createHierarchyFromFlatData(data, keys) {
+    var entries = d3.nest();
+    keys.forEach(function (key) {
+      return entries.key(function (d) {
+        return d[key];
+      });
+    });
+    entries = entries.entries(data);
+
+    var root = d3.hierarchy(entries[0], function (d) {
+      var children = d.values;
+      if (typeof children === "undefined") {
+        return null;
+      }
+      children = children.filter(function (child) {
+        if (typeof child.key === "undefined") {
+          return false;
+        }
+        if (child.key.length !== 0) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+      console.log("Key: " + d.key + " Children: " + children.length);
+      return children.length === 0 ? null : children;
+      // return (!d.values.key || d.values.key.length === 0) ? undefined : d.values; 
+    });
     return root;
   }
 
@@ -323,7 +367,13 @@
     });
   }
 
-  function d3_template_reusable (_myData, dataSpec) {
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+  function d3_template_reusable (_dataSpec) {
 
     ///////////////////////////////////////////////////
     // 1.0 ADD visualization specific variables here //
@@ -331,7 +381,6 @@
     var options = {};
     // 1. ADD all options that should be accessible to caller
     options.debugOn = false;
-    options.dataEmbedded = typeof _myData !== "undefined" ? false : true;
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.maxNameLength = 50;
     options.transitionDuration = 750;
@@ -462,26 +511,56 @@
     function chartAPI(selection) {
       selection.each(function (d) {
         console.log(d);
-        console.log("_myData " + _myData);
+        console.log("dataSpec: ");console.log(_dataSpec);
         if (typeof d !== "undefined") {
           // data processing from outside
           createChart(selection, d);
         } else {
           // data processing here
-          var myData = createDataInfo();
+          var myData = createDataInfo(_dataSpec);
           readData(myData, selection, options.debugOn, createChart);
         }
       });
     }
 
-    function createDataInfo() {
-      var myData = {};
+    /*
+    function createOldDataInfo() {
+      let myData = {};
       myData.data = _myData;
-      myData.fromFile = typeof _myData === "undefined" ? false : true;
-      myData.flatData = Array.isArray(dataSpec) ? true : false;
-      myData.hierarchyLevels = Array.isArray(dataSpec) ? dataSpec : "undefined";
-      // myData.nodeData = (typeof dataSpec === "string") ? true : false;
-      myData.keyField = typeof dataSpec === "string" ? dataSpec : "name";
+      // default settings
+      myData.keyField = "name"; // default key name
+      myData.delimiter = ",";
+        if (Array.isArray(dataSpec)) {
+        myData.hierarchyLevels = dataSpec;
+      } else if (typeof dataSpec === "string"){
+        myData.keyField = dataSpec;
+        options.keyField = myData.keyField;
+      } else if (typeof dataSpec === "object"){ // Arrays are objects, too, but this is else case so here is no Array possible
+        myData.data = dataSpec.source;
+        myData.keyField = dataSpec.key;
+        myData.hierarchyLevels = dataSpec.hierarchyLevels;
+        myData.delimiter = dataSpec.delimiter;
+      }
+        myData.fromFile = (typeof myData.data === "undefined") ? false : true;
+      options.keyField = myData.keyField;
+      myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
+      return myData;
+    }
+    */
+
+    function createDataInfo(dataSpec) {
+      var myData = {};
+
+      if ((typeof dataSpec === "undefined" ? "undefined" : _typeof(dataSpec)) === "object") {
+        myData.data = dataSpec.source;
+        myData.keyField = dataSpec.key ? dataSpec.key : "name";
+        myData.hierarchyLevels = dataSpec.hierarchyLevels;
+        myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
+      } else {
+        console.log("dataspec is not an object!");
+      }
+      myData.fromFile = typeof myData.data === "undefined" ? false : true;
+      myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
       options.keyField = myData.keyField;
       return myData;
     }

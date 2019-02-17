@@ -3,7 +3,7 @@ import { readData } from "./preprocessing/processingData";
 import { myChart } from "./visualization/myChart.js";
 import * as d3 from "d3";
 
-export default function (_myData, dataSpec) {
+export default function (_dataSpec) {
     
   ///////////////////////////////////////////////////
   // 1.0 ADD visualization specific variables here //
@@ -11,7 +11,6 @@ export default function (_myData, dataSpec) {
   let options = {};
   // 1. ADD all options that should be accessible to caller
   options.debugOn = false;
-  options.dataEmbedded = (typeof _myData !== "undefined") ? false : true;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
   options.maxNameLength = 50;
   options.transitionDuration = 750;
@@ -138,25 +137,57 @@ export default function (_myData, dataSpec) {
   function chartAPI(selection) {
     selection.each( function (d) {
       console.log(d);
-      console.log("_myData "+ _myData);
+      console.log("dataSpec: "); console.log(_dataSpec);
       if (typeof d !== "undefined") { // data processing from outside
         createChart(selection, d);
       }
       else { // data processing here
-        const myData = createDataInfo();
+        const myData = createDataInfo(_dataSpec);
         readData(myData, selection, options.debugOn, createChart);
       }
     });
   }  
 
-  function createDataInfo() {
+  /*
+  function createOldDataInfo() {
     let myData = {};
     myData.data = _myData;
-    myData.fromFile = (typeof _myData === "undefined") ? false : true;
-    myData.flatData = Array.isArray(dataSpec) ? true : false;
-    myData.hierarchyLevels = Array.isArray(dataSpec) ? dataSpec : "undefined";
-    // myData.nodeData = (typeof dataSpec === "string") ? true : false;
-    myData.keyField = (typeof dataSpec === "string") ? dataSpec : "name";
+    // default settings
+    myData.keyField = "name"; // default key name
+    myData.delimiter = ",";
+
+    if (Array.isArray(dataSpec)) {
+      myData.hierarchyLevels = dataSpec;
+    } else if (typeof dataSpec === "string"){
+      myData.keyField = dataSpec;
+      options.keyField = myData.keyField;
+    } else if (typeof dataSpec === "object"){ // Arrays are objects, too, but this is else case so here is no Array possible
+      myData.data = dataSpec.source;
+      myData.keyField = dataSpec.key;
+      myData.hierarchyLevels = dataSpec.hierarchyLevels;
+      myData.delimiter = dataSpec.delimiter;
+    }
+
+    myData.fromFile = (typeof myData.data === "undefined") ? false : true;
+    options.keyField = myData.keyField;
+    myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
+    return myData;
+  }
+  */
+
+  function createDataInfo(dataSpec) {
+    let myData = {};
+
+    if (typeof dataSpec === "object"){ 
+      myData.data = dataSpec.source;
+      myData.keyField = dataSpec.key ? dataSpec.key : "name";
+      myData.hierarchyLevels = dataSpec.hierarchyLevels;
+      myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
+    } else {
+      console.log("dataspec is not an object!");
+    }
+    myData.fromFile = (typeof myData.data === "undefined") ? false : true;
+    myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
     options.keyField = myData.keyField;
     return myData;
   }
