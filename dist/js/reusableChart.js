@@ -123,6 +123,7 @@
           return false;
         }
       });
+
       if (debugOn) {
         console.log("Key: " + d.key + " Children: " + children.length);
       }
@@ -156,7 +157,6 @@
   function createTree(options, config, data) {
     config.tree = options.alignLeaves ? d3.cluster() : d3.tree();
     config.tree.size([config.width, config.height]).nodeSize([0, options.linkWidthValue]);
-    // config.root = options.dataEmbedded ? config.tree(data) : config.tree(d3.hierarchy(data));
     config.root = config.tree(data);
     if (options.propagate) {
       config.root.sum(function (d) {
@@ -547,8 +547,8 @@
 
       if ((typeof dataSpec === "undefined" ? "undefined" : _typeof(dataSpec)) === "object") {
         myData.data = dataSpec.source;
-        myData.keyField = dataSpec.key ? dataSpec.key : "name";
         myData.hierarchyLevels = dataSpec.hierarchyLevels;
+        myData.keyField = dataSpec.key ? dataSpec.key : myData.hierarchyLevels ? "key" : "name";
         myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
       } else {
         console.log("dataspec is not an object!");
