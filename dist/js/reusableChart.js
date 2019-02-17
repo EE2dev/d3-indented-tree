@@ -10,7 +10,6 @@
 
   // XHR to load data   
   function readData(myData, selection, debugOn, createChart) {
-    // export function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
     if (myData.fromFile) {
       // read data from file 
       if (myData.data.endsWith(".json")) {
@@ -32,13 +31,12 @@
             if (debugOn) {
               console.log(data);
             }
-            var hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels);
+            var hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn);
             if (debugOn) {
               console.log("hierarchy: ");console.log(hierarchy);
             }
             createChart(selection, hierarchy);
           });
-          // TO DO
         } else {
           // CSV Format 2
           d3.dsv(myData.delimiter, myData.data).then(function (data) {
@@ -57,24 +55,36 @@
       }
     } else {
       // read data from DOM
-      if (myData.flatData) ; else {
-        // CSV Format 2
-        var data = readDataFromDOM();
-        var hierarchy = createHierarchy(data, myData.keyField);
-        if (debugOn) {
-          console.log("embedded data: ");console.log(hierarchy);
-        }
-        createChart(selection, hierarchy);
+      var data = readDataFromDOM(myData.delimiter);
+      var hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn) : createHierarchy(data, myData.keyField);
+      if (debugOn) {
+        console.log("embedded data: ");console.log(hierarchy);
       }
+      createChart(selection, hierarchy);
+      /*
+      if (myData.flatData) { // CSV Format 1
+        const data = readDataFromDOM(myData.delimiter);
+        const hierarchy = createHierarchyFromFlatData(data, myData.keyField, debugOn);
+        if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+        createChart(selection, hierarchy);
+      } else { // CSV Format 2
+        const data = readDataFromDOM(myData.delimiter);
+        const hierarchy = createHierarchy(data, myData.keyField);
+        if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+        createChart(selection, hierarchy);
+      } 
+      */
     }
   }
 
-  function readDataFromDOM() {
-    var selector = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "aside#data";
+  function readDataFromDOM(delimiter) {
+    var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "aside#data";
 
     var inputData = d3.select(selector).text();
     var inputData_cleaned = inputData.trim();
-    var file = d3.csvParse(inputData_cleaned);
+    // const file = d3.csvParse(inputData_cleaned);
+    var parser = d3.dsvFormat(delimiter);
+    var file = parser.parse(inputData_cleaned);
     return file;
   }
 
@@ -87,7 +97,7 @@
     return root;
   }
 
-  function createHierarchyFromFlatData(data, keys) {
+  function createHierarchyFromFlatData(data, keys, debugOn) {
     var entries = d3.nest();
     keys.forEach(function (key) {
       return entries.key(function (d) {
@@ -95,8 +105,10 @@
       });
     });
     entries = entries.entries(data);
+    var root = d3.hierarchy(entries[0], getChildren);
+    return root;
 
-    var root = d3.hierarchy(entries[0], function (d) {
+    function getChildren(d) {
       var children = d.values;
       if (typeof children === "undefined") {
         return null;
@@ -111,30 +123,12 @@
           return false;
         }
       });
-      console.log("Key: " + d.key + " Children: " + children.length);
-      return children.length === 0 ? null : children;
-      // return (!d.values.key || d.values.key.length === 0) ? undefined : d.values; 
-    });
-    return root;
-  }
-
-  // helper to delete extra white spaces 
-  // from -> https://stackoverflow.com/questions/18065807/regular-expression-for-removing-whitespaces
-  /*
-  function removeWhiteSpaces (str) {
-    return str.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
-  }
-
-  // helper for XHR
-  function convertToNumber(d) {
-    for (var perm in d) {
-      if (Object.prototype.hasOwnProperty.call(d, perm)) {
-        d[perm] = +d[perm];
+      if (debugOn) {
+        console.log("Key: " + d.key + " Children: " + children.length);
       }
-    }  
-    return d;
-  } 
-  */
+      return children.length === 0 ? null : children;
+    }
+  }
 
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //

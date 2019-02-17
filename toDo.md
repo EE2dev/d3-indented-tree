@@ -5,8 +5,9 @@
 [ok] put d3.hierarchy (in vis to data processing)
 [ok] dynamic linkWidth
 * check updateable function with collapsed nodes
-* selectio.each() ?
+* selection.each() ?
 * support csv file and inline csv file
+[ok] add csv flat embedded
 * propagate for both csv files
 * all nodes with square + cross when collapsed
 * -| when expanded

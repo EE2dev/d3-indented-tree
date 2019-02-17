@@ -30,7 +30,6 @@ export function myChart(selection, data, options){
 function createTree(options, config, data) {
   config.tree = options.alignLeaves ? d3.cluster() : d3.tree();
   config.tree.size([config.width, config.height]).nodeSize([0, options.linkWidthValue]);  
-  // config.root = options.dataEmbedded ? config.tree(data) : config.tree(d3.hierarchy(data));
   config.root = config.tree(data);
   if (options.propagate) { config.root.sum(d => d[options.propagateField]);}
   

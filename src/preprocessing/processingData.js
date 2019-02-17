@@ -6,7 +6,6 @@ import * as d3 from "d3";
 
 // XHR to load data   
 export function readData(myData, selection, debugOn, createChart) {
-// export function readData(file, _hierarchyLevels, selection, debugOn, createChart) {
   if (myData.fromFile) { // read data from file 
     if (myData.data.endsWith(".json")) { // JSON Format
       d3.json(myData.data).then(function(data){
@@ -23,7 +22,6 @@ export function readData(myData, selection, debugOn, createChart) {
           if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
           createChart(selection, hierarchy);
         });
-        // TO DO
       } else { // CSV Format 2
         d3.dsv(myData.delimiter, myData.data).then(function(data) {
           if (debugOn) { console.log(data);}
@@ -37,21 +35,33 @@ export function readData(myData, selection, debugOn, createChart) {
     }
   } 
   else { // read data from DOM
+    const data = readDataFromDOM(myData.delimiter);
+    const hierarchy = (myData.flatData) ? 
+      createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn) : createHierarchy(data, myData.keyField);
+    if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+    createChart(selection, hierarchy);
+    /*
     if (myData.flatData) { // CSV Format 1
-      // TO DO
+      const data = readDataFromDOM(myData.delimiter);
+      const hierarchy = createHierarchyFromFlatData(data, myData.keyField, debugOn);
+      if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+      createChart(selection, hierarchy);
     } else { // CSV Format 2
-      const data = readDataFromDOM();
-      const hierarchy = createHierarchy(data, myData.keyField, debugOn);
+      const data = readDataFromDOM(myData.delimiter);
+      const hierarchy = createHierarchy(data, myData.keyField);
       if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
       createChart(selection, hierarchy);
     } 
+    */
   }
 }
 
-function readDataFromDOM(selector = "aside#data") {
+function readDataFromDOM(delimiter, selector = "aside#data") {
   const inputData = d3.select(selector).text();
   const inputData_cleaned = inputData.trim();
-  const file = d3.csvParse(inputData_cleaned);
+  // const file = d3.csvParse(inputData_cleaned);
+  const parser = d3.dsvFormat(delimiter);
+  const file = parser.parse(inputData_cleaned);
   return file; 
 }
 
@@ -66,8 +76,10 @@ function createHierarchyFromFlatData(data, keys, debugOn) {
   let entries = d3.nest();
   keys.forEach(key => entries.key(d => d[key]));
   entries = entries.entries(data);
+  let root = d3.hierarchy(entries[0], getChildren);
+  return root;
 
-  let root = d3.hierarchy(entries[0],function(d) { 
+  function getChildren(d){
     let children = d.values;
     if (typeof (children) === "undefined") {
       return null;
@@ -83,26 +95,8 @@ function createHierarchyFromFlatData(data, keys, debugOn) {
         return false;
       }
     }); 
+    
     if (debugOn) { console.log("Key: " + d.key + " Children: " + children.length);}
     return (children.length === 0) ? null : children;
-  });
-  return root;
+  }
 }
-
-// helper to delete extra white spaces 
-// from -> https://stackoverflow.com/questions/18065807/regular-expression-for-removing-whitespaces
-/*
-function removeWhiteSpaces (str) {
-  return str.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
-}
-
-// helper for XHR
-function convertToNumber(d) {
-  for (var perm in d) {
-    if (Object.prototype.hasOwnProperty.call(d, perm)) {
-      d[perm] = +d[perm];
-    }
-  }  
-  return d;
-} 
-*/
