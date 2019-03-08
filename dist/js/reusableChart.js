@@ -212,6 +212,10 @@
       update(config.root, options, config);
     };
 
+    options.updateLinkColor = function () {
+      update(config.root, options, config);
+    };
+
     options.updateAlignLeaves = function () {
       createTree(options, config, data);
       update(config.root, options, config);
@@ -342,10 +346,10 @@
     // Transition links to their new position.
     link.merge(linkEnter).transition().duration(options.transitionDuration).attr("d", function (d) {
       return linkPath(d, options.linkFunction);
-    })
-    // .style("stroke-width", options.linkStrength) 
-    .style("stroke-width", function (d) {
-      return options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.value) + "px";
+    }).style("stroke-width", function (d) {
+      return options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
+    }).style("stroke", options.linkColorStatic ? "grey" : function (d) {
+      return options.linkColorScale(d.data[options.linkColorField]);
     });
 
     // // Transition exiting nodes to the parent's new position.
@@ -399,6 +403,12 @@
     options.linkStrengthScale = d3.scaleLinear();
     options.linkStrengthField = "value";
     options.linkStrengthRange = [1, 10];
+
+    options.linkColorStatic = true;
+    options.linkColorScale = function (value) {
+      return value;
+    }; // id function as default - assuming linkColorField contains colors
+    options.linkColorField = "color";
 
     options.propagate = false; // default: no propagation
     options.propagateField = "value"; // default field for propagation
@@ -490,6 +500,18 @@
       return chartAPI;
     };
 
+    chartAPI.linkColor = function (_) {
+      var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkColorScale;
+
+      if (!arguments.length) return "scale: " + options.linkColorScale;
+      options.linkColorStatic = false;
+      options.linkColorField = _;
+      options.linkColorScale = scale;
+
+      if (typeof options.updateLinkColor === "function") options.updateLinkColor();
+      return chartAPI;
+    };
+
     chartAPI.alignLeaves = function (_) {
       if (!arguments.length) return options.alignLeaves;
       options.alignLeaves = _;
@@ -516,31 +538,6 @@
         }
       });
     }
-
-    /*
-    function createOldDataInfo() {
-      let myData = {};
-      myData.data = _myData;
-      // default settings
-      myData.keyField = "name"; // default key name
-      myData.delimiter = ",";
-        if (Array.isArray(dataSpec)) {
-        myData.hierarchyLevels = dataSpec;
-      } else if (typeof dataSpec === "string"){
-        myData.keyField = dataSpec;
-        options.keyField = myData.keyField;
-      } else if (typeof dataSpec === "object"){ // Arrays are objects, too, but this is else case so here is no Array possible
-        myData.data = dataSpec.source;
-        myData.keyField = dataSpec.key;
-        myData.hierarchyLevels = dataSpec.hierarchyLevels;
-        myData.delimiter = dataSpec.delimiter;
-      }
-        myData.fromFile = (typeof myData.data === "undefined") ? false : true;
-      options.keyField = myData.keyField;
-      myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
-      return myData;
-    }
-    */
 
     function createDataInfo(dataSpec) {
       var myData = {};

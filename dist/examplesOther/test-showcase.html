@@ -2,7 +2,7 @@
   <meta charset="utf-8"> <!-- also save this file as unicode-8 ! -->
   <head>
     <!--script src="../../node_modules/d3/dist/d3.js"></script-->
-    <script src="http://d3js.org/d3.v5.js"></script>
+    <script src="https://d3js.org/d3.v5.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/d3_template_reusable.css">
     <script src="../js/reusableChart.js"></script>
     <style>
@@ -37,8 +37,8 @@
       myFunctions.push({function: () => myChart.linkHeight(20), text: 'myChart.linkHeight(20)'});
       myFunctions.push({function: () => myChart.linkStrength(8), text: 'myChart.linkStrength(8)'});
       myFunctions.push({function: () => myChart.linkStrength("value"), text: 'myChart.linkStrength("value")'});
-      myFunctions.push({function: () => myChart.alignLeaves(true), text: 'myChart.alignLeaves(false)'});
-      myFunctions.push({function: () => myChart.alignLeaves(false), text: 'myChart.alignLeaves(true)'});
+      myFunctions.push({function: () => myChart.alignLeaves(true), text: 'myChart.alignLeaves(true)'});
+      myFunctions.push({function: () => myChart.alignLeaves(false), text: 'myChart.alignLeaves(false)'});
       myFunctions.push({function: () => myChart.linkWidth(50), text: 'myChart.linkWidth(50)'});
       myFunctions.push({function: () => myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
 

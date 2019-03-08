@@ -36,6 +36,10 @@ export default function (_dataSpec) {
   options.linkStrengthField = "value";
   options.linkStrengthRange = [1, 10];
 
+  options.linkColorStatic = true;
+  options.linkColorScale = (value) => value; // id function as default - assuming linkColorField contains colors
+  options.linkColorField = "color";
+
   options.propagate = false; // default: no propagation
   options.propagateField = "value"; // default field for propagation
 
@@ -122,6 +126,16 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
+  chartAPI.linkColor = function(_, scale = options.linkColorScale) {
+    if (!arguments.length) return "scale: " + options.linkColorScale;
+    options.linkColorStatic = false;
+    options.linkColorField = _;
+    options.linkColorScale = scale;
+    
+    if (typeof options.updateLinkColor === "function") options.updateLinkColor();
+    return chartAPI;
+  };
+
   chartAPI.alignLeaves = function(_) {
     if (!arguments.length) return options.alignLeaves;
     options.alignLeaves = _;
@@ -147,33 +161,6 @@ export default function (_dataSpec) {
       }
     });
   }  
-
-  /*
-  function createOldDataInfo() {
-    let myData = {};
-    myData.data = _myData;
-    // default settings
-    myData.keyField = "name"; // default key name
-    myData.delimiter = ",";
-
-    if (Array.isArray(dataSpec)) {
-      myData.hierarchyLevels = dataSpec;
-    } else if (typeof dataSpec === "string"){
-      myData.keyField = dataSpec;
-      options.keyField = myData.keyField;
-    } else if (typeof dataSpec === "object"){ // Arrays are objects, too, but this is else case so here is no Array possible
-      myData.data = dataSpec.source;
-      myData.keyField = dataSpec.key;
-      myData.hierarchyLevels = dataSpec.hierarchyLevels;
-      myData.delimiter = dataSpec.delimiter;
-    }
-
-    myData.fromFile = (typeof myData.data === "undefined") ? false : true;
-    options.keyField = myData.keyField;
-    myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
-    return myData;
-  }
-  */
 
   function createDataInfo(dataSpec) {
     let myData = {};

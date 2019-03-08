@@ -81,6 +81,10 @@ function createUpdateFunctions(options, config, data){
     update(config.root, options, config);
   };
 
+  options.updateLinkColor = function() {
+    update(config.root, options, config);
+  };
+
   options.updateAlignLeaves = function() {
     createTree(options, config, data);
     update(config.root, options, config);
@@ -243,9 +247,9 @@ function update(source, options, config){
   link.merge(linkEnter).transition()
     .duration(options.transitionDuration)
     .attr("d", (d) => { return linkPath(d, options.linkFunction); })
-    // .style("stroke-width", options.linkStrength) 
     .style("stroke-width", 
-      d => options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.value) + "px");
+      d => options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px")
+    .style("stroke", options.linkColorStatic ? "grey" : d => options.linkColorScale(d.data[options.linkColorField]));
 
   // // Transition exiting nodes to the parent's new position.
   link.exit().transition()

@@ -9,26 +9,25 @@
 
 <body>
 
-  <!-- paste data in aside tag -->
-  <aside id="data">
-level1;level2;level3;size1;size2;size3;color
-Eve;Cain;;1;2;4;rgb(100 23 80)
-Eve;Seth;;3;2;4;rgb(100 23 80)
-Eve;Seth;Enos;3;2;4;rgb(100 23 80)
-Eve;Seth;Noam;3;2;4;rgb(100 23 80)
-Eve;Abel;;3;2;4;rgb(100 23 80)
-Eve;Awan;Enoch;3;2;4;rgb(100 23 80)
-Eve;Azura;;3;2;4;rgb(100 23 80)
-  </aside>
+<!-- paste data in aside tag -->
+<aside id="data">
+</aside>
 
   <script>
     const dataSpec = {
-      hierarchyLevels: ["level1", "level2", "level3"],
-      delimiter: ";",
+      source: "../data/flare.json",
     };
+    const colorScale = d3.scaleOrdinal()
+      .domain(["flare", "graph", "animate", "cluster"])
+      .range(['black', 'deeppink', 'green', 'yellow'])
+      .unknown("grey");
     const myChart = reusableChart.chart(dataSpec)
       .debugOn(true)
-    ;
+      .propagateValue("size")
+      .linkColor("name", colorScale) // passing a function for setting a dynamic link color
+      .linkStrength(8)
+      ;
+
     showChart(); // for preprocessing data see below
     
     window.setTimeout(function() {

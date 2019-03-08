@@ -8,15 +8,19 @@
 * selection.each() ?
 * support csv file and inline csv file
 [ok] add csv flat embedded
+* -bug- : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
+* change global links to always reflect https
 * propagate for both csv files
 * all nodes with square + cross when collapsed
 * -| when expanded
 * square when leaf
+* calculate size of SVG dynamically
 * API call to initiate tree with collapsed nodes [node2, node7] --> collapse
 * create nodes from names as ids and from separate ids if names are ambiguuous
 * updateFunction for maxNameLength
 * tree with no interior nodes + text on top of nodes (not leaves)
 * then: LinkWidth based on longest Text/2 per depth
+* to center text on link (function (number, format, unit): https://stackoverflow.com/questions/54859521/how-can-i-center-the-text-in-a-node/54902423#54902423
 
 * color
 * thickness
