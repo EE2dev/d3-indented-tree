@@ -222,11 +222,26 @@
     };
   }
 
-  function linkPath(d, linkFunction) {
-    var path = linkFunction === "curved" ? // curved
-    "M" + d.y + "," + d.x + "C" + (d.y + d.parent.y) / 2 + "," + d.x + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x + " " + d.parent.y + "," + d.parent.x : // straight
-    "M" + d.parent.y + "," + d.parent.x + "V" + d.x + "H" + d.y;
+  function getLinkD(d, direction, options) {
+    var linkStrengthParent = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthField === "value" ? options.linkStrengthScale(d.parent[options.linkStrengthField]) : options.linkStrengthScale(d.parent.data[options.linkStrengthField]);
+    var linkStrength = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) : options.linkStrengthScale(d.data[options.linkStrengthField]);
+
+    var path = void 0;
+    if (direction === "down") {
+      path = "M" + d.parent.y + "," + d.parent.x + "V" + (d.x + linkStrength / 2);
+    } else if (direction === "right") {
+      path = path = "M" + (d.parent.y + linkStrengthParent / 2) + "," + d.x + "H" + d.y;
+    }
     return path;
+  }
+
+  function getLinkStroke(d, options) {
+    return options.linkColorStatic ? options.defaultColor : options.linkColorScale(d.data[options.linkColorField]);
+  }
+
+  function getLinkStrokeWidth(d, options) {
+    var sw = options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
+    return sw;
   }
 
   /*
@@ -331,32 +346,56 @@
     nodeExit.select("text").style("fill-opacity", 1e-6);
 
     // Update the links…
-    var link = config.svg.selectAll("path.link").data(links, function (d) {
+    var link = config.svg.selectAll("g.link").data(links, function (d) {
       // return d.target.id;
       var id = d.id + "->" + d.parent.id;
       return id;
     });
 
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert("path", "g").attr("class", "link").attr("d", function () {
+    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link");
+
+    linkEnter.append("path").attr("class", "link down").attr("d", function () {
       var o = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
-      return linkPath(o, options.linkFunction);
+      return getLinkD(o, "down", options);
+    });
+
+    linkEnter.append("path").attr("class", "link right").attr("d", function () {
+      var o = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
+      return getLinkD(o, "right", options);
     });
 
     // Transition links to their new position.
-    link.merge(linkEnter).transition().duration(options.transitionDuration).attr("d", function (d) {
-      return linkPath(d, options.linkFunction);
+    var linkUpdate = link.merge(linkEnter).transition().duration(options.transitionDuration);
+
+    linkUpdate.select("path.link.down").attr("d", function (d) {
+      return getLinkD(d, "down", options);
+    }).style("stroke", function (d) {
+      return getLinkStroke(d.parent, options);
     }).style("stroke-width", function (d) {
-      return options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
-    }).style("stroke", options.linkColorStatic ? "grey" : function (d) {
-      return options.linkColorScale(d.data[options.linkColorField]);
+      return getLinkStrokeWidth(d.parent, options);
+    });
+
+    linkUpdate.select("path.link.right").attr("d", function (d) {
+      return getLinkD(d, "right", options);
+    }).style("stroke", function (d) {
+      return getLinkStroke(d, options);
+    }).style("stroke-width", function (d) {
+      return getLinkStrokeWidth(d, options);
     });
 
     // // Transition exiting nodes to the parent's new position.
-    link.exit().transition().duration(options.transitionDuration).attr("d", function () {
+    var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
+
+    linkExit.selectAll("path.link.down").attr("d", function () {
       var o = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-      return linkPath(o, options.linkFunction);
-    }).remove();
+      return getLinkD(o, "down", options);
+    });
+
+    linkExit.selectAll("path.link.right").attr("d", function () {
+      var o = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
+      return getLinkD(o, "right", options);
+    });
 
     // Stash the old positions for transition.
     nodesSort.forEach(function (d) {
@@ -383,7 +422,7 @@
     options.maxNameLength = 50;
     options.transitionDuration = 750;
 
-    options.linkFunction = "straight"; // alternative is "curved"
+    options.defaultColor = "grey";
     options.linkHeight = 20;
     /*
     options.linkWidth = 30;
@@ -423,6 +462,12 @@
       return chartAPI;
     };
 
+    chartAPI.defaultColor = function (_) {
+      if (!arguments.length) return options.defaultColor;
+      options.defaultColor = _;
+      return chartAPI;
+    };
+
     chartAPI.margin = function (_) {
       if (!arguments.length) return options.margin;
       options.margin = _;
@@ -438,12 +483,6 @@
     chartAPI.transitionDuration = function (_) {
       if (!arguments.length) return options.transitionDuration;
       options.transitionDuration = _;
-      return chartAPI;
-    };
-
-    chartAPI.linkFunction = function (_) {
-      if (!arguments.length) return options.linkFunction;
-      options.linkFunction = _;
       return chartAPI;
     };
 

@@ -34,13 +34,16 @@
       stroke-width: 1px;
     }
 
+    div.chart{
+      font-size: 14px;
+    }
     .node text {
-      font: 14px sans-serif;
+      font: 1em sans-serif;
     }
 
     .link {
       fill: none;
-      stroke: #ccc;
       stroke-width: 1px;
+      /*shape-rendering: crispEdges;*/
     }
 

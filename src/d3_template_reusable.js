@@ -15,7 +15,7 @@ export default function (_dataSpec) {
   options.maxNameLength = 50;
   options.transitionDuration = 750;
 
-  options.linkFunction = "straight"; // alternative is "curved"
+  options.defaultColor = "grey";
   options.linkHeight = 20;
   /*
   options.linkWidth = 30;
@@ -52,6 +52,12 @@ export default function (_dataSpec) {
     options.debugOn = _;
     return chartAPI;
   }; 
+
+  chartAPI.defaultColor = function(_) {
+    if (!arguments.length) return options.defaultColor;
+    options.defaultColor = _;
+    return chartAPI;
+  }; 
   
   chartAPI.margin = function(_) {
     if (!arguments.length) return options.margin;
@@ -69,13 +75,7 @@ export default function (_dataSpec) {
     if (!arguments.length) return options.transitionDuration;
     options.transitionDuration = _;
     return chartAPI;
-  }; 
-
-  chartAPI.linkFunction = function(_) {
-    if (!arguments.length) return options.linkFunction;
-    options.linkFunction = _;
-    return chartAPI;
-  }; 
+  };  
 
   chartAPI.propagateValue = function(_) {
     if (!arguments.length) return options.propagate + ": " + options.propagateField;

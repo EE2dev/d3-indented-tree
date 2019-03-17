@@ -18,9 +18,9 @@
       source: "../data/flare.json",
     };
     const colorScale = d3.scaleOrdinal()
-      .domain(["flare", "graph", "animate", "cluster"])
-      .range(['black', 'deeppink', 'green', 'yellow'])
-      .unknown("grey");
+      .domain(["flare", "graph", "animate", "cluster", "optimization", "HierarchicalCluster"])
+      .range(['black', 'deeppink', 'green', 'yellow', "blue", "yellow"])
+      .unknown("lightgrey");
     const myChart = reusableChart.chart(dataSpec)
       .debugOn(true)
       .propagateValue("size")

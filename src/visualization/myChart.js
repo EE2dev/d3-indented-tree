@@ -91,17 +91,32 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
-function linkPath(d, linkFunction) {
-  const path = (linkFunction === "curved")
-    ? // curved
-    "M" + d.y + "," + d.x +
-    "C" + (d.y + d.parent.y) / 2 + "," + d.x +
-    " " + (d.y + d.parent.y) / 2 + "," + d.parent.x +
-    " " + d.parent.y + "," + d.parent.x
-    : // straight
-    "M" + d.parent.y + "," + d.parent.x
-    + "V" + d.x + "H" + d.y;
+function getLinkD(d, direction, options) {
+  const linkStrengthParent = options.linkStrengthStatic ? options.linkStrengthValue 
+    : options.linkStrengthField === "value" ? options.linkStrengthScale(d.parent[options.linkStrengthField]) 
+      : options.linkStrengthScale(d.parent.data[options.linkStrengthField]); 
+  const linkStrength = options.linkStrengthStatic ? options.linkStrengthValue 
+    : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
+      : options.linkStrengthScale(d.data[options.linkStrengthField]);
+
+  let path;
+  if (direction === "down"){
+    path = "M" + d.parent.y + "," + d.parent.x + "V" + (d.x + linkStrength / 2);
+  } else if (direction === "right"){
+    path = path = "M" + (d.parent.y + linkStrengthParent / 2) + "," + d.x + "H" + d.y;
+  }
   return path;
+}
+
+function getLinkStroke(d, options) {
+  return options.linkColorStatic ? options.defaultColor : options.linkColorScale(d.data[options.linkColorField]);
+}
+
+function getLinkStrokeWidth(d, options) {
+  const sw = options.linkStrengthStatic ? options.linkStrengthValue + "px" : 
+    options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px"
+      : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
+  return sw;
 }
 
 /*
@@ -227,38 +242,61 @@ function update(source, options, config){
     .style("fill-opacity", 1e-6);
   
   // Update the links…
-  var link = config.svg.selectAll("path.link")
+  const link = config.svg.selectAll("g.link")
     .data(links, function (d) {
-    // return d.target.id;
+      // return d.target.id;
       var id = d.id + "->" + d.parent.id;
       return id;
-    }
-    );
+    });
 
   // Enter any new links at the parent's previous position.
-  let linkEnter = link.enter().insert("path", "g")
-    .attr("class", "link")
+  const linkEnter = link.enter().insert("g", "g.node")
+    .attr("class", "link");
+  
+  linkEnter.append("path")
+    .attr("class", "link down")
     .attr("d", () => {
       var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-      return linkPath(o, options.linkFunction);
+      return getLinkD(o, "down", options);
+    });
+
+  linkEnter.append("path")
+    .attr("class", "link right")
+    .attr("d", () => {
+      var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
+      return getLinkD(o, "right", options);
     });
   
   // Transition links to their new position.
-  link.merge(linkEnter).transition()
-    .duration(options.transitionDuration)
-    .attr("d", (d) => { return linkPath(d, options.linkFunction); })
-    .style("stroke-width", 
-      d => options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px")
-    .style("stroke", options.linkColorStatic ? "grey" : d => options.linkColorScale(d.data[options.linkColorField]));
+  const linkUpdate = link.merge(linkEnter).transition()
+    .duration(options.transitionDuration);
+
+  linkUpdate.select("path.link.down")
+    .attr("d", (d) => getLinkD(d, "down", options))
+    .style("stroke", (d) => getLinkStroke(d.parent, options))
+    .style("stroke-width", (d) => getLinkStrokeWidth(d.parent, options));
+
+  linkUpdate.select("path.link.right")
+    .attr("d", (d) => getLinkD(d, "right", options))
+    .style("stroke", (d) => getLinkStroke(d, options))
+    .style("stroke-width", (d) => getLinkStrokeWidth(d, options));
 
   // // Transition exiting nodes to the parent's new position.
-  link.exit().transition()
+  const linkExit = link.exit().transition()
     .duration(options.transitionDuration)
+    .remove();
+
+  linkExit.selectAll("path.link.down")
     .attr("d", () => {
       var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-      return linkPath(o, options.linkFunction);
-    })
-    .remove();
+      return getLinkD(o, "down", options);
+    });
+
+  linkExit.selectAll("path.link.right")
+    .attr("d", () => {
+      var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
+      return getLinkD(o, "right", options);
+    });
 
   // Stash the old positions for transition.
   nodesSort.forEach(function (d) {
