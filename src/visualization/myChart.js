@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { getLinkD, getLinkStrength, getLinkStroke, getLinkStrokeWidth } from "./links.js";
 
 ////////////////////////////////////////////////////
 // add visualization specific processing here     //
@@ -91,34 +92,6 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
-function getLinkD(d, direction, options) {
-  const linkStrengthParent = options.linkStrengthStatic ? options.linkStrengthValue 
-    : options.linkStrengthField === "value" ? options.linkStrengthScale(d.parent[options.linkStrengthField]) 
-      : options.linkStrengthScale(d.parent.data[options.linkStrengthField]); 
-  const linkStrength = options.linkStrengthStatic ? options.linkStrengthValue 
-    : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
-      : options.linkStrengthScale(d.data[options.linkStrengthField]);
-
-  let path;
-  if (direction === "down"){
-    path = "M" + d.parent.y + "," + d.parent.x + "V" + (d.x + linkStrength / 2);
-  } else if (direction === "right"){
-    path = path = "M" + (d.parent.y + linkStrengthParent / 2) + "," + d.x + "H" + d.y;
-  }
-  return path;
-}
-
-function getLinkStroke(d, options) {
-  return options.linkColorStatic ? options.defaultColor : options.linkColorScale(d.data[options.linkColorField]);
-}
-
-function getLinkStrokeWidth(d, options) {
-  const sw = options.linkStrengthStatic ? options.linkStrengthValue + "px" : 
-    options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px"
-      : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
-  return sw;
-}
-
 /*
 function collapse(d){
   if (d.children) {
@@ -165,7 +138,7 @@ function update(source, options, config){
     .duration(options.transitionDuration)
     .attr("height", config.height);
 
-  // Update the nodes…
+  // 1. Update the nodes…
   let node = config.svg.selectAll("g.node")
     .data(nodesSort, function (d) {
       return d.id || (d.id = ++config.i);
@@ -241,7 +214,7 @@ function update(source, options, config){
   nodeExit.select("text")
     .style("fill-opacity", 1e-6);
   
-  // Update the links…
+  // 2. Update the links…
   const link = config.svg.selectAll("g.link")
     .data(links, function (d) {
       // return d.target.id;
@@ -258,14 +231,16 @@ function update(source, options, config){
     .attr("d", () => {
       var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
       return getLinkD(o, "down", options);
-    });
+    })
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
 
   linkEnter.append("path")
     .attr("class", "link right")
     .attr("d", () => {
       var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
       return getLinkD(o, "right", options);
-    });
+    })
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
   
   // Transition links to their new position.
   const linkUpdate = link.merge(linkEnter).transition()
@@ -273,13 +248,23 @@ function update(source, options, config){
 
   linkUpdate.select("path.link.down")
     .attr("d", (d) => getLinkD(d, "down", options))
+    .attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")")
     .style("stroke", (d) => getLinkStroke(d.parent, options))
     .style("stroke-width", (d) => getLinkStrokeWidth(d.parent, options));
 
   linkUpdate.select("path.link.right")
     .attr("d", (d) => getLinkD(d, "right", options))
+    .attr("transform", (d) => "translate(" + (d.parent.y + getLinkStrength(d.parent, options) / 2) + " " + d.x + ")")
     .style("stroke", (d) => getLinkStroke(d, options))
-    .style("stroke-width", (d) => getLinkStrokeWidth(d, options));
+    .style("stroke-width", (d) => getLinkStrokeWidth(d, options))
+    .each(() => {
+      /*
+      if (options.linkLabelOn) {
+        d3.select(this)
+        .
+      }
+      */
+    });
 
   // // Transition exiting nodes to the parent's new position.
   const linkExit = link.exit().transition()
@@ -290,13 +275,15 @@ function update(source, options, config){
     .attr("d", () => {
       var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
       return getLinkD(o, "down", options);
-    });
+    })
+    .attr("transform", "translate(" + source.y + " " + source.x + ")");
 
   linkExit.selectAll("path.link.right")
     .attr("d", () => {
       var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
       return getLinkD(o, "right", options);
-    });
+    })
+    .attr("transform", "translate(" + source.y + " " + source.x + ")");
 
   // Stash the old positions for transition.
   nodesSort.forEach(function (d) {
