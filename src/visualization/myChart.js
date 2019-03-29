@@ -1,5 +1,6 @@
 import * as d3 from "d3";
-import { getLinkD, getLinkStrength, getLinkStroke, getLinkStrokeWidth } from "./links.js";
+// import { getLinkD, getLinkStrength, getLinkStroke, getLinkStrokeWidth, getLinkLabel } from "./links.js";
+import { linksAPI } from "./links.js";
 
 ////////////////////////////////////////////////////
 // add visualization specific processing here     //
@@ -74,6 +75,10 @@ function createUpdateFunctions(options, config, data){
   };
 
   options.updateLinkHeight = function() {
+    update(config.root, options, config);
+  };
+
+  options.updateLinkLabel = function() {
     update(config.root, options, config);
   };
 
@@ -215,6 +220,9 @@ function update(source, options, config){
     .style("fill-opacity", 1e-6);
   
   // 2. Update the links…
+  const l = linksAPI;
+  l.initialize(options);
+
   const link = config.svg.selectAll("g.link")
     .data(links, function (d) {
       // return d.target.id;
@@ -230,7 +238,7 @@ function update(source, options, config){
     .attr("class", "link down")
     .attr("d", () => {
       var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-      return getLinkD(o, "down", options);
+      return l.getLinkD(o, "down");
     })
     .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
 
@@ -238,33 +246,42 @@ function update(source, options, config){
     .attr("class", "link right")
     .attr("d", () => {
       var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-      return getLinkD(o, "right", options);
+      return l.getLinkD(o, "right");
     })
     .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+
+  linkEnter
+    .append("text")          
+    .attr("x", source.y0)
+    .attr("y", source.x0)
+    .attr("dy", ".35em")
+    .attr("text-anchor", "middle") 
+    .text(l.getLinkLabel)
+    .style("opacity", 1e-6);          
   
   // Transition links to their new position.
   const linkUpdate = link.merge(linkEnter).transition()
     .duration(options.transitionDuration);
 
   linkUpdate.select("path.link.down")
-    .attr("d", (d) => getLinkD(d, "down", options))
+    .attr("d", (d) => l.getLinkD(d, "down"))
     .attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")")
-    .style("stroke", (d) => getLinkStroke(d.parent, options))
-    .style("stroke-width", (d) => getLinkStrokeWidth(d.parent, options));
+    .style("stroke", (d) => l.getLinkStroke(d.parent, options))
+    .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent, options));
 
   linkUpdate.select("path.link.right")
-    .attr("d", (d) => getLinkD(d, "right", options))
-    .attr("transform", (d) => "translate(" + (d.parent.y + getLinkStrength(d.parent, options) / 2) + " " + d.x + ")")
-    .style("stroke", (d) => getLinkStroke(d, options))
-    .style("stroke-width", (d) => getLinkStrokeWidth(d, options))
-    .each(() => {
-      /*
-      if (options.linkLabelOn) {
-        d3.select(this)
-        .
-      }
-      */
-    });
+    .attr("d", (d) => l.getLinkD(d, "right"))
+    .attr("transform", l.getLinkRTranslate)
+    .style("stroke", l.getLinkStroke)
+    .style("stroke-width", l.getLinkStrokeWidth);
+
+  linkUpdate
+    .select("text") 
+    .attr("x", d => d.parent.y + (d.y - d.parent.y) / 2)
+    .attr("y", d => d.x)
+    // .text(function (d) {return getLinkLabel(d, options); })
+    .call(sel => sel.tween("text", l.getLinkTextTween))
+    .style("opacity", 1); 
 
   // // Transition exiting nodes to the parent's new position.
   const linkExit = link.exit().transition()
@@ -274,16 +291,22 @@ function update(source, options, config){
   linkExit.selectAll("path.link.down")
     .attr("d", () => {
       var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-      return getLinkD(o, "down", options);
+      return l.getLinkD(o, "down");
     })
     .attr("transform", "translate(" + source.y + " " + source.x + ")");
 
   linkExit.selectAll("path.link.right")
     .attr("d", () => {
       var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-      return getLinkD(o, "right", options);
+      return l.getLinkD(o, "right");
     })
     .attr("transform", "translate(" + source.y + " " + source.x + ")");
+
+  linkExit
+    .select("text")
+    .attr("x", source.y)
+    .attr("y", source.x)
+    .style("opacity", 1e-6);
 
   // Stash the old positions for transition.
   nodesSort.forEach(function (d) {

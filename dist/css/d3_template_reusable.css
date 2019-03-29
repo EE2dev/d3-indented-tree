@@ -37,6 +37,7 @@
     div.chart{
       font-size: 14px;
     }
+
     .node text {
       font: 1em sans-serif;
     }
@@ -45,5 +46,10 @@
       fill: none;
       stroke-width: 1px;
       /*shape-rendering: crispEdges;*/
+    }
+
+    .link text{
+      font: 0.8em sans-serif;
+      stroke: red;
     }
 

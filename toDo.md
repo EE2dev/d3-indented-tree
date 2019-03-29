@@ -4,6 +4,11 @@
 [ok] linkStrength function or number
 [ok] put d3.hierarchy (in vis to data processing)
 [ok] dynamic linkWidth
+* linkLabel: group text elements and create two text elements (one 2px larger in the back)
+* linkLabel: allow text to be put on top of link
+* linkLabel: adjust width to minimum Width
+* linkLabel: right-align text-anchor:end text after finding the largest numbers
+
 * check updateable function with collapsed nodes
 * selection.each() ?
 . link.call(function (sel) {positionPath(sel, options)}) --> positionPath -> d attr and transform
@@ -11,8 +16,12 @@
 * Implementierung Gradient: 1) iterate through node and add all different parent-son color combinations to set
 2) create gradients for these combinations (10% offset)
 * support csv file and inline csv file
+* add linkLabelColor
 [ok] add csv flat embedded
 [ok] fixed bug: dynamic width/strength of link
+* readme linklabel
+* check is more updatable functions are necessary 
+[ok] (defaultColor after linkColor is set to reset)
 * -bug- : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
 * change global links to always reflect https
 * propagate for both csv files

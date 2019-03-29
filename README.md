@@ -20,21 +20,26 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 Transitions to the new strength (thickness) of the links. The horizontal link to and the vertical link from a node is denoting its strength.
 * to statically set all the links to the strength, call this function with an <i>integer</i> argument, which denotes the thickness in pixels (default is ```1```).
 * to set the link strength dynamically, provide the name of a numeric field (default is ```"value"```). The field "value" references the propagated field. In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the strength (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[1,10]```). 
-* with no parameter returns the static strength of the links and the scale (applicable to the dynamic version)
+* with no parameter returns the static strength of the links.
 
 <a name="link_linkWidth" href="#link_linkWidth">#</a> <i>myChart</i>.<b>linkWidth</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new width (horizontal length) of the links. The horizontal link to a node is affected by its corresponding value. 
 * to statically set all the links to the width, call this function with an <i>integer</i> argument, which denotes the width in pixels (default is ```30```).
 * to set the link width dynamically, provide the name of a numeric field (default is ```"value"```). The field "value" references the propagated field. In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[15,100]```). 
-* with no parameter returns the static width of the links and the scale (applicable to the dynamic version)
+* with no parameter returns the static width of the links.
+
+<a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Transitions to the new label on top of the links. 
+TO DO
 
 <a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new color of the links. The horizontal link to and the vertical link from a node is denoted by its color.
-* to statically set all the links to one color, call this function with a <i>string</i> argument, which denotes the color of the stroke of the links (default is ```"grey"```).
-* to set the link color dynamically, provide the name of a field (default is ```"value"```). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[15,100]```). 
-* with no parameter returns the static width of the links and the scale (applicable to the dynamic version)
+* to set the link color statically, use instead <a href="#other_defaultColor"><i>myChart</i>.<b>defaultColor</b>()</a>
+* to set the link color dynamically, provide the name of a field (default is ```"value"``` after the first call). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is the identity function ```(value) => value``` assuming the field contains a valid color). 
+* with no parameter returns the field used for the color.
 
 <a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 

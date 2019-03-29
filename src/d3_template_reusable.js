@@ -17,6 +17,13 @@ export default function (_dataSpec) {
 
   options.defaultColor = "grey";
   options.linkHeight = 20;
+  
+  options.linkLabelType = "none";
+  options.linkLabelField = "value";
+  options.linkLabelValue = 1;
+  options.linkLabelUnit = "";
+  // options.linkLabelFormat = d => d;
+  options.linkLabelFormat = d3.format(".0f"); 
   /*
   options.linkWidth = 30;
   options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
@@ -56,6 +63,7 @@ export default function (_dataSpec) {
   chartAPI.defaultColor = function(_) {
     if (!arguments.length) return options.defaultColor;
     options.defaultColor = _;
+    if (typeof options.updateLinkColor === "function") options.updateLinkColor();
     return chartAPI;
   }; 
   
@@ -92,8 +100,29 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
+  chartAPI.linkLabel = function(_, unit = options.linkLabelUnit, format = options.linkLabelFormat) {
+    if (!arguments.length) 
+      return options.linkLabelField;
+
+    if (typeof(_)  === "undefined") {
+      options.linkLabelType = "none";
+    } else { if (typeof (_) === "number") { 
+      options.linkLabelType = "number";
+      options.linkLabelValue = _;
+    } else {
+      options.linkLabelType = "field";
+      options.linkLabelField = _; 
+    }
+    options.linkLabelOn = true;
+    options.linkLabelUnit = (unit === "") ? "" : unit;
+    options.linkLabelFormat = format; 
+    }  
+    if (typeof options.updateLinkLabel === "function") options.updateLinkLabel();
+    return chartAPI;
+  };
+
   chartAPI.linkWidth = function(_, scale = options.linkWidthScale, range = options.linkWidthRange) {
-    if (!arguments.length) return options.linkWidthValue + ", scale: " + options.linkWidthScale;
+    if (!arguments.length) return options.linkWidthValue;
     if (typeof (_) === "number") { 
       options.linkWidthStatic = true;
       options.linkWidthValue = _;
@@ -110,7 +139,7 @@ export default function (_dataSpec) {
   };
 
   chartAPI.linkStrength = function(_, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
-    if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkStrengthScale;
+    if (!arguments.length) return options.linkStrengthValue;
     if (typeof (_) === "number") { 
       options.linkStrengthStatic = true;
       options.linkStrengthValue = _;
@@ -127,11 +156,10 @@ export default function (_dataSpec) {
   };
 
   chartAPI.linkColor = function(_, scale = options.linkColorScale) {
-    if (!arguments.length) return "scale: " + options.linkColorScale;
+    if (!arguments.length) return options.linkColorField;
     options.linkColorStatic = false;
     options.linkColorField = _;
     options.linkColorScale = scale;
-    
     if (typeof options.updateLinkColor === "function") options.updateLinkColor();
     return chartAPI;
   };

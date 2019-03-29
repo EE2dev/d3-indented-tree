@@ -131,9 +131,16 @@
     }
   }
 
-  function getLinkD(d, direction, options) {
-    var linkStrengthParent = getLinkStrength(d.parent, options);
-    var linkStrength = getLinkStrength(d, options);
+  var linksAPI = {};
+  var options = void 0;
+
+  linksAPI.initialize = function (_options) {
+    options = _options;
+  };
+
+  linksAPI.getLinkD = function (d, direction) {
+    var linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
+    var linkStrength = linksAPI.getLinkStrength(d, options);
     var path = void 0;
     if (direction === "down") {
       path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
@@ -141,20 +148,44 @@
       path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
     }
     return path;
-  }
+  };
 
-  function getLinkStrength(d, options) {
+  linksAPI.getLinkStrength = function (d) {
     return options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) : options.linkStrengthScale(d.data[options.linkStrengthField]);
-  }
+  };
 
-  function getLinkStroke(d, options) {
+  linksAPI.getLinkStroke = function (d) {
     return options.linkColorStatic ? options.defaultColor : options.linkColorScale(d.data[options.linkColorField]);
-  }
+  };
 
-  function getLinkStrokeWidth(d, options) {
+  linksAPI.getLinkStrokeWidth = function (d) {
     var sw = options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
     return sw;
-  }
+  };
+
+  linksAPI.getLinkLabel = function (d) {
+    if (options.linkLabelType === "none") return "";
+    var label = void 0;
+    if (options.linkLabelType === "field") {
+      label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField]) : options.linkLabelFormat(d.data[options.linkLabelField]);
+    } else if (options.linkLabelType === "number") {
+      label = options.linkLabelFormat(options.linkLabelValue);
+    }
+    label = label + options.linkLabelUnit;
+    return label;
+  };
+
+  linksAPI.getLinkTextTween = function (d) {
+    var selection = d3.select(this);
+    var i = d3.interpolateNumber(selection.text().replace(/,/g, ""), linksAPI.getLinkLabel(d));
+    return function (t) {
+      selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit);
+    };
+  };
+
+  linksAPI.getLinkRTranslate = function (d) {
+    return "translate(" + (d.parent.y + linksAPI.getLinkStrength(d.parent) / 2) + " " + d.x + ")";
+  };
 
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
@@ -229,6 +260,10 @@
     };
 
     options.updateLinkHeight = function () {
+      update(config.root, options, config);
+    };
+
+    options.updateLinkLabel = function () {
       update(config.root, options, config);
     };
 
@@ -349,6 +384,9 @@
     nodeExit.select("text").style("fill-opacity", 1e-6);
 
     // 2. Update the links…
+    var l = linksAPI;
+    l.initialize(options);
+
     var link = config.svg.selectAll("g.link").data(links, function (d) {
       // return d.target.id;
       var id = d.id + "->" + d.parent.id;
@@ -360,56 +398,57 @@
 
     linkEnter.append("path").attr("class", "link down").attr("d", function () {
       var o = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
-      return getLinkD(o, "down", options);
+      return l.getLinkD(o, "down");
     }).attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
 
     linkEnter.append("path").attr("class", "link right").attr("d", function () {
       var o = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
-      return getLinkD(o, "right", options);
+      return l.getLinkD(o, "right");
     }).attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+
+    linkEnter.append("text").attr("x", source.y0).attr("y", source.x0).attr("dy", ".35em").attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6);
 
     // Transition links to their new position.
     var linkUpdate = link.merge(linkEnter).transition().duration(options.transitionDuration);
 
     linkUpdate.select("path.link.down").attr("d", function (d) {
-      return getLinkD(d, "down", options);
+      return l.getLinkD(d, "down");
     }).attr("transform", function (d) {
       return "translate(" + d.parent.y + " " + d.parent.x + ")";
     }).style("stroke", function (d) {
-      return getLinkStroke(d.parent, options);
+      return l.getLinkStroke(d.parent, options);
     }).style("stroke-width", function (d) {
-      return getLinkStrokeWidth(d.parent, options);
+      return l.getLinkStrokeWidth(d.parent, options);
     });
 
     linkUpdate.select("path.link.right").attr("d", function (d) {
-      return getLinkD(d, "right", options);
-    }).attr("transform", function (d) {
-      return "translate(" + (d.parent.y + getLinkStrength(d.parent, options) / 2) + " " + d.x + ")";
-    }).style("stroke", function (d) {
-      return getLinkStroke(d, options);
-    }).style("stroke-width", function (d) {
-      return getLinkStrokeWidth(d, options);
-    }).each(function () {
-      /*
-      if (options.linkLabelOn) {
-        d3.select(this)
-        .
-      }
-      */
-    });
+      return l.getLinkD(d, "right");
+    }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
+
+    linkUpdate.select("text").attr("x", function (d) {
+      return d.parent.y + (d.y - d.parent.y) / 2;
+    }).attr("y", function (d) {
+      return d.x;
+    })
+    // .text(function (d) {return getLinkLabel(d, options); })
+    .call(function (sel) {
+      return sel.tween("text", l.getLinkTextTween);
+    }).style("opacity", 1);
 
     // // Transition exiting nodes to the parent's new position.
     var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
 
     linkExit.selectAll("path.link.down").attr("d", function () {
       var o = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-      return getLinkD(o, "down", options);
+      return l.getLinkD(o, "down");
     }).attr("transform", "translate(" + source.y + " " + source.x + ")");
 
     linkExit.selectAll("path.link.right").attr("d", function () {
       var o = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-      return getLinkD(o, "right", options);
+      return l.getLinkD(o, "right");
     }).attr("transform", "translate(" + source.y + " " + source.x + ")");
+
+    linkExit.select("text").attr("x", source.y).attr("y", source.x).style("opacity", 1e-6);
 
     // Stash the old positions for transition.
     nodesSort.forEach(function (d) {
@@ -438,6 +477,13 @@
 
     options.defaultColor = "grey";
     options.linkHeight = 20;
+
+    options.linkLabelType = "none";
+    options.linkLabelField = "value";
+    options.linkLabelValue = 1;
+    options.linkLabelUnit = "";
+    // options.linkLabelFormat = d => d;
+    options.linkLabelFormat = d3.format(".0f");
     /*
     options.linkWidth = 30;
     options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
@@ -479,6 +525,7 @@
     chartAPI.defaultColor = function (_) {
       if (!arguments.length) return options.defaultColor;
       options.defaultColor = _;
+      if (typeof options.updateLinkColor === "function") options.updateLinkColor();
       return chartAPI;
     };
 
@@ -515,11 +562,35 @@
       return chartAPI;
     };
 
+    chartAPI.linkLabel = function (_) {
+      var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelUnit;
+      var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormat;
+
+      if (!arguments.length) return options.linkLabelField;
+
+      if (typeof _ === "undefined") {
+        options.linkLabelType = "none";
+      } else {
+        if (typeof _ === "number") {
+          options.linkLabelType = "number";
+          options.linkLabelValue = _;
+        } else {
+          options.linkLabelType = "field";
+          options.linkLabelField = _;
+        }
+        options.linkLabelOn = true;
+        options.linkLabelUnit = unit === "" ? "" : unit;
+        options.linkLabelFormat = format;
+      }
+      if (typeof options.updateLinkLabel === "function") options.updateLinkLabel();
+      return chartAPI;
+    };
+
     chartAPI.linkWidth = function (_) {
       var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkWidthScale;
       var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkWidthRange;
 
-      if (!arguments.length) return options.linkWidthValue + ", scale: " + options.linkWidthScale;
+      if (!arguments.length) return options.linkWidthValue;
       if (typeof _ === "number") {
         options.linkWidthStatic = true;
         options.linkWidthValue = _;
@@ -538,7 +609,7 @@
       var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkStrengthScale;
       var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkStrengthRange;
 
-      if (!arguments.length) return options.linkStrengthValue + ", scale: " + options.linkStrengthScale;
+      if (!arguments.length) return options.linkStrengthValue;
       if (typeof _ === "number") {
         options.linkStrengthStatic = true;
         options.linkStrengthValue = _;
@@ -556,11 +627,10 @@
     chartAPI.linkColor = function (_) {
       var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkColorScale;
 
-      if (!arguments.length) return "scale: " + options.linkColorScale;
+      if (!arguments.length) return options.linkColorField;
       options.linkColorStatic = false;
       options.linkColorField = _;
       options.linkColorScale = scale;
-
       if (typeof options.updateLinkColor === "function") options.updateLinkColor();
       return chartAPI;
     };
