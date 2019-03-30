@@ -57,5 +57,5 @@ linksAPI.getLinkTextTween = function(d) {
 };
 
 linksAPI.getLinkRTranslate = function (d) {
-  return "translate(" + (d.parent.y + linksAPI.getLinkStrength(d.parent) / 2) + " " + d.x + ")";
+  return "translate(" + (linksAPI.getLinkStrength(d.parent) / 2) + " " + (d.x - d.parent.x) + ")";
 };

@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-// import { getLinkD, getLinkStrength, getLinkStroke, getLinkStrokeWidth, getLinkLabel } from "./links.js";
 import { linksAPI } from "./links.js";
 
 ////////////////////////////////////////////////////
@@ -232,28 +231,22 @@ function update(source, options, config){
 
   // Enter any new links at the parent's previous position.
   const linkEnter = link.enter().insert("g", "g.node")
-    .attr("class", "link");
+    .attr("class", "link")
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
   
+  const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
   linkEnter.append("path")
     .attr("class", "link down")
-    .attr("d", () => {
-      var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-      return l.getLinkD(o, "down");
-    })
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
-
+    .attr("d", () => l.getLinkD(origin, "down"));
+    
   linkEnter.append("path")
     .attr("class", "link right")
-    .attr("d", () => {
-      var o = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-      return l.getLinkD(o, "right");
-    })
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+    .attr("d", () => l.getLinkD(origin, "right"));
 
   linkEnter
     .append("text")          
-    .attr("x", source.y0)
-    .attr("y", source.x0)
+    //.attr("x", source.y0)
+    //.attr("y", source.x0)
     .attr("dy", ".35em")
     .attr("text-anchor", "middle") 
     .text(l.getLinkLabel)
@@ -263,9 +256,10 @@ function update(source, options, config){
   const linkUpdate = link.merge(linkEnter).transition()
     .duration(options.transitionDuration);
 
+  linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
+
   linkUpdate.select("path.link.down")
     .attr("d", (d) => l.getLinkD(d, "down"))
-    .attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")")
     .style("stroke", (d) => l.getLinkStroke(d.parent, options))
     .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent, options));
 
@@ -277,35 +271,30 @@ function update(source, options, config){
 
   linkUpdate
     .select("text") 
-    .attr("x", d => d.parent.y + (d.y - d.parent.y) / 2)
-    .attr("y", d => d.x)
-    // .text(function (d) {return getLinkLabel(d, options); })
+    .attr("x", d => (d.y - d.parent.y) / 2)
+    .attr("y", d => d.x - d.parent.x)
     .call(sel => sel.tween("text", l.getLinkTextTween))
     .style("opacity", 1); 
 
-  // // Transition exiting nodes to the parent's new position.
+  // Transition exiting nodes to the parent's new position.
   const linkExit = link.exit().transition()
     .duration(options.transitionDuration)
     .remove();
 
+  linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")"); 
+
+  const destination = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
   linkExit.selectAll("path.link.down")
-    .attr("d", () => {
-      var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-      return l.getLinkD(o, "down");
-    })
-    .attr("transform", "translate(" + source.y + " " + source.x + ")");
+    .attr("d", () => l.getLinkD(destination, "down")); 
 
   linkExit.selectAll("path.link.right")
-    .attr("d", () => {
-      var o = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-      return l.getLinkD(o, "right");
-    })
-    .attr("transform", "translate(" + source.y + " " + source.x + ")");
+    .attr("d", () => l.getLinkD(destination, "right"))
+    .attr("transform", "translate(0 0)");
 
   linkExit
     .select("text")
-    .attr("x", source.y)
-    .attr("y", source.x)
+    .attr("x", 0)
+    .attr("y", 0)
     .style("opacity", 1e-6);
 
   // Stash the old positions for transition.
@@ -314,4 +303,3 @@ function update(source, options, config){
     d.y0 = d.y;
   }); 
 }
-

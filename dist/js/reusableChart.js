@@ -184,7 +184,7 @@
   };
 
   linksAPI.getLinkRTranslate = function (d) {
-    return "translate(" + (d.parent.y + linksAPI.getLinkStrength(d.parent) / 2) + " " + d.x + ")";
+    return "translate(" + linksAPI.getLinkStrength(d.parent) / 2 + " " + (d.x - d.parent.x) + ")";
   };
 
   ////////////////////////////////////////////////////
@@ -394,27 +394,31 @@
     });
 
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link");
+    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link").attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
 
+    var origin = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
     linkEnter.append("path").attr("class", "link down").attr("d", function () {
-      var o = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
-      return l.getLinkD(o, "down");
-    }).attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+      return l.getLinkD(origin, "down");
+    });
 
     linkEnter.append("path").attr("class", "link right").attr("d", function () {
-      var o = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
-      return l.getLinkD(o, "right");
-    }).attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+      return l.getLinkD(origin, "right");
+    });
 
-    linkEnter.append("text").attr("x", source.y0).attr("y", source.x0).attr("dy", ".35em").attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6);
+    linkEnter.append("text")
+    //.attr("x", source.y0)
+    //.attr("y", source.x0)
+    .attr("dy", ".35em").attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6);
 
     // Transition links to their new position.
     var linkUpdate = link.merge(linkEnter).transition().duration(options.transitionDuration);
 
+    linkUpdate.attr("transform", function (d) {
+      return "translate(" + d.parent.y + " " + d.parent.x + ")";
+    });
+
     linkUpdate.select("path.link.down").attr("d", function (d) {
       return l.getLinkD(d, "down");
-    }).attr("transform", function (d) {
-      return "translate(" + d.parent.y + " " + d.parent.x + ")";
     }).style("stroke", function (d) {
       return l.getLinkStroke(d.parent, options);
     }).style("stroke-width", function (d) {
@@ -426,29 +430,28 @@
     }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
 
     linkUpdate.select("text").attr("x", function (d) {
-      return d.parent.y + (d.y - d.parent.y) / 2;
+      return (d.y - d.parent.y) / 2;
     }).attr("y", function (d) {
-      return d.x;
-    })
-    // .text(function (d) {return getLinkLabel(d, options); })
-    .call(function (sel) {
+      return d.x - d.parent.x;
+    }).call(function (sel) {
       return sel.tween("text", l.getLinkTextTween);
     }).style("opacity", 1);
 
-    // // Transition exiting nodes to the parent's new position.
+    // Transition exiting nodes to the parent's new position.
     var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
 
+    linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")");
+
+    var destination = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
     linkExit.selectAll("path.link.down").attr("d", function () {
-      var o = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-      return l.getLinkD(o, "down");
-    }).attr("transform", "translate(" + source.y + " " + source.x + ")");
+      return l.getLinkD(destination, "down");
+    });
 
     linkExit.selectAll("path.link.right").attr("d", function () {
-      var o = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-      return l.getLinkD(o, "right");
-    }).attr("transform", "translate(" + source.y + " " + source.x + ")");
+      return l.getLinkD(destination, "right");
+    }).attr("transform", "translate(0 0)");
 
-    linkExit.select("text").attr("x", source.y).attr("y", source.x).style("opacity", 1e-6);
+    linkExit.select("text").attr("x", 0).attr("y", 0).style("opacity", 1e-6);
 
     // Stash the old positions for transition.
     nodesSort.forEach(function (d) {
