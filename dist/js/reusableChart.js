@@ -161,8 +161,14 @@
   };
 
   linksAPI.getLinkStrength = function (d) {
-    var s = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) : options.linkStrengthScale(d.data[options.linkStrengthField]);
+    if (!d.data) return 0;
+    var s = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthScale(d.data[options.linkStrengthField]);
+    return s;
+    /*
+      : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
+        : options.linkStrengthScale(d.data[options.linkStrengthField]); 
     return s ? s : 0; // 0 in case s is undefined
+    */
   };
 
   linksAPI.getLinkStroke = function (d) {
@@ -170,21 +176,28 @@
   };
 
   linksAPI.getLinkStrokeWidth = function (d) {
-    var sw = options.linkStrengthStatic ? options.linkStrengthValue + "px" : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px" : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
-    return sw;
+    var sw = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthScale(d.data[options.linkStrengthField]);
+    /*
+      options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px"
+        : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
+        */
+    return sw + "px";
   };
 
   linksAPI.getLinkLabel = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
     if (!options.linkLabelOn) return "";
-    var label = void 0;
     /*
-    label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
-      : options.linkLabelFormat(d.data[options.linkLabelField]);
-      */
+    let label;
+    
+    //label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
+    //  : options.linkLabelFormat(d.data[options.linkLabelField]);
+      
     label = labelField === "value" ? d[labelField] : d.data[labelField];
     return label;
+    */
+    return d.data[labelField];
   };
 
   linksAPI.getLinkTextTween = function (d) {
@@ -254,6 +267,9 @@
       d.name = d.id; //transferring name to a name variable
       d.id = config.i; //Assigning numerical Ids
       config.i++;
+      if (options.propagate) {
+        d.data[options.propagateField] = d.value;
+      }
     });
     config.root.x0 = config.root.x;
     config.root.y0 = config.root.y;
@@ -268,12 +284,12 @@
     var nodes = config.root.descendants();
     if (!options.linkStrengthStatic) {
       options.linkStrengthScale.domain(d3.extent(nodes.slice(1), function (d) {
-        return options.linkStrengthField === "value" ? +d[options.linkStrengthField] : +d.data[options.linkStrengthField];
+        return +d.data[options.linkStrengthField];
       })).range(options.linkStrengthRange);
     }
     if (!options.linkWidthStatic) {
       options.linkWidthScale.domain(d3.extent(nodes.slice(1), function (d) {
-        return options.linkWidthField === "value" ? +d[options.linkWidthField] : +d.data[options.linkWidthField];
+        return +d.data[options.linkWidthField];
       })).range(options.linkWidthRange);
     }
   }
@@ -348,7 +364,7 @@
       n.x = i * options.linkHeight;
       if (!options.linkWidthStatic) {
         if (i !== 0) {
-          n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+          n.y = n.parent.y + options.linkWidthScale(+n.data[options.linkWidthField]);
         }
       }
     });

@@ -9,9 +9,16 @@
 [ok] (defaultColor after linkColor is set to reset)
 [ok] linkColor set with "value"
 [ok] linkStrength dynamic example
+[ok] linkWidth / linkStrength with "weight" in linkLabel2.html
+
 
 [bug] : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
-[bug] linkWidth / linkStrength with "weight" in linkLabel2.html
+
+
+[ok] remove .value if cases
+* adjust API function
+* update docu
+* change scale domains from [15,50] to [50,50]
 
 [ok] linkLabel: doubletext: https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
 * linkLabel add group transform to links

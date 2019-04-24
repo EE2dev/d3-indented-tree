@@ -29,10 +29,15 @@ linksAPI.getLinkD = function (d, direction) {
 };
 
 linksAPI.getLinkStrength = function (d) {
-  let s = options.linkStrengthStatic ? options.linkStrengthValue 
+  if (!d.data) return 0;
+  const s = options.linkStrengthStatic ? options.linkStrengthValue 
+    : options.linkStrengthScale(d.data[options.linkStrengthField]); 
+  return s;
+  /*
     : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
       : options.linkStrengthScale(d.data[options.linkStrengthField]); 
   return s ? s : 0; // 0 in case s is undefined
+  */
 };
 
 linksAPI.getLinkStroke = function (d) {
@@ -40,21 +45,27 @@ linksAPI.getLinkStroke = function (d) {
 };
 
 linksAPI.getLinkStrokeWidth = function (d) {
-  const sw = options.linkStrengthStatic ? options.linkStrengthValue + "px" : 
+  const sw = options.linkStrengthStatic ? options.linkStrengthValue
+    : options.linkStrengthScale(d.data[options.linkStrengthField]); 
+  /*
     options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px"
       : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
-  return sw;
+      */
+  return sw + "px";
 };
 
 linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
   if (!options.linkLabelOn) return "";
-  let label;
   /*
-  label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
-    : options.linkLabelFormat(d.data[options.linkLabelField]);
-    */
+  let label;
+  
+  //label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
+  //  : options.linkLabelFormat(d.data[options.linkLabelField]);
+    
   label = labelField === "value" ? d[labelField] : d.data[labelField];
   return label;
+  */
+  return d.data[labelField]; 
 };
 
 linksAPI.getLinkTextTween = function(d) { 

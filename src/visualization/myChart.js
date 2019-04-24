@@ -39,6 +39,7 @@ function createTree(options, config, data) {
     d.name = d.id; //transferring name to a name variable
     d.id = config.i; //Assigning numerical Ids
     config.i++;
+    if (options.propagate) { d.data[options.propagateField] = d.value;}
   });
   config.root.x0 = config.root.x;
   config.root.y0 = config.root.y;
@@ -53,16 +54,12 @@ function createScale(options, config) {
   let nodes = config.root.descendants();
   if (!options.linkStrengthStatic) {    
     options.linkStrengthScale
-      .domain(d3.extent(nodes.slice(1), function(d) { 
-        return options.linkStrengthField === "value" ? +d[options.linkStrengthField] : +d.data[options.linkStrengthField];
-      }))
+      .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkStrengthField]))
       .range(options.linkStrengthRange);
   }
   if (!options.linkWidthStatic) {    
     options.linkWidthScale
-      .domain(d3.extent(nodes.slice(1), function(d) { 
-        return options.linkWidthField === "value" ? +d[options.linkWidthField] : +d.data[options.linkWidthField];
-      }))
+      .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]))
       .range(options.linkWidthRange);
   }
 }
@@ -137,7 +134,7 @@ function update(source, options, config){
     n.x = i * options.linkHeight;
     if (!options.linkWidthStatic){
       if (i !== 0) {
-        n.y = n.parent.y + options.linkWidthScale(n[options.linkWidthField]);
+        n.y = n.parent.y + options.linkWidthScale(+n.data[options.linkWidthField]);
       } 
     }
   });
