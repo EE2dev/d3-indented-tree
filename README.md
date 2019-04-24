@@ -38,7 +38,7 @@ TO DO
 
 Transitions to the new color of the links. The horizontal link to and the vertical link from a node is denoted by its color.
 * to set the link color statically, use instead <a href="#other_defaultColor"><i>myChart</i>.<b>defaultColor</b>()</a>
-* to set the link color dynamically, provide the name of a field (default is ```"value"``` after the first call). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is the identity function ```(value) => value``` assuming the field contains a valid color). 
+* to set the link color dynamically, provide the name of a field (default is ```"value"``` after the first call). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the color (default is the identity function ```(value) => value``` assuming the field contains a valid color). 
 * with no parameter returns the field used for the color.
 
 <a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")

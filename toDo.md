@@ -7,22 +7,27 @@
 [ok] add csv flat embedded
 [ok] fixed bug: dynamic width/strength of link
 [ok] (defaultColor after linkColor is set to reset)
+[ok] linkColor set with "value"
+[ok] linkStrength dynamic example
 
-[bug] linkColor set with "value"
-[bug] linkStrength dynamic example
+[bug] : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
+[bug] linkWidth / linkStrength with "weight" in linkLabel2.html
+
+[ok] linkLabel: doubletext: https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
 * linkLabel add group transform to links
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)
 * linkLabel: allow text to be put on top of link
 * linkLabel: adjust width to minimum Width
 * linkLabel: right-align text-anchor:end text after finding the largest numbers
-* linkLabel: textTween replace ,(.) based on locale
-* add linkLabelColor
-* readme linklabel
+* linkLabel: textTween replace ,(.) based on locale https://bl.ocks.org/mbostock/7004f92cac972edef365
+* add linkLabelColor (static or function (e.g. <0 red otherwise green))
+* readme linklabel, linkLabelColor
 
 * link.call(function (sel) {positionPath(sel, options)}) --> positionPath -> d attr and transform
 * linkColor: Implementierung Gradient: 1) iterate through node and add all different parent-son color combinations to set
 * linkColor: 2) create gradients for these combinations (10% offset)
 
+* document CSS
 * check updateable function with collapsed nodes
 * selection.each() ?
 * offer shape-rendering crispEdges and auto
@@ -30,13 +35,16 @@
 * support csv file and inline csv file
 * check is more updatable functions are necessary 
 
-* -bug- : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
 * change global links to always reflect https
 * propagate for both csv files
 * all nodes with square + cross when collapsed
 * -| when expanded
 * readme: propagateValue -> if default -> value. data field value cannot be used!
 * square when leaf
+* nodes: load svg externally https://bl.ocks.org/HarryStevens/c2c877a7e8e6bcd33a0fc1b21b31cbdf
+* nodes: load canvas externally http://bl.ocks.org/boeric/aa80b0048b7e39dd71c8fbe958d1b1d4
+https://observablehq.com/@mootari/embed-canvas-into-svg
+http://www.svgopen.org/2009/papers/12-Using_Canvas_in_SVG/
 * calculate size of SVG dynamically
 * adjust font-size dynamically and based on em
 * provide API to set font size
@@ -57,3 +65,6 @@
 * allow graphics before text for each node
 * option: save as pgn/svg in function call to add buttons
 * change data input to just object
+[compatibility] String.endsWith
+[compatibility] d3.fetch vs XHR d3v5 vs d3v4
+[compatibility] linkLabel doubleText

@@ -45,11 +45,17 @@
     .link {
       fill: none;
       stroke-width: 1px;
-      /*shape-rendering: crispEdges;*/
+      /* shape-rendering: crispEdges; */
     }
 
     .link text{
       font: 0.8em sans-serif;
-      stroke: red;
+      paint-order: stroke;
+      stroke: #fff;
+      fill: black;
+      stroke-width: 4px;
+      stroke-linecap: butt;
+      stroke-linejoin: miter;
+      /*font-weight: 800; */
     }
 

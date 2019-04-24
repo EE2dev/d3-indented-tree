@@ -133,9 +133,19 @@
 
   var linksAPI = {};
   var options = void 0;
+  var oldLabelField = void 0,
+      newLabelField = void 0;
 
   linksAPI.initialize = function (_options) {
     options = _options;
+    oldLabelField = newLabelField;
+    newLabelField = options.linkLabelOn ? options.linkLabelField : undefined;
+    if (options.debugOn) {
+      console.log("oldLabel:");
+      console.log(oldLabelField);
+      console.log("newLabel:");
+      console.log(newLabelField);
+    }
   };
 
   linksAPI.getLinkD = function (d, direction) {
@@ -151,7 +161,8 @@
   };
 
   linksAPI.getLinkStrength = function (d) {
-    return options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) : options.linkStrengthScale(d.data[options.linkStrengthField]);
+    var s = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) : options.linkStrengthScale(d.data[options.linkStrengthField]);
+    return s ? s : 0; // 0 in case s is undefined
   };
 
   linksAPI.getLinkStroke = function (d) {
@@ -164,20 +175,38 @@
   };
 
   linksAPI.getLinkLabel = function (d) {
-    if (options.linkLabelType === "none") return "";
+    var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
+
+    if (!options.linkLabelOn) return "";
     var label = void 0;
-    if (options.linkLabelType === "field") {
-      label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField]) : options.linkLabelFormat(d.data[options.linkLabelField]);
-    } else if (options.linkLabelType === "number") {
-      label = options.linkLabelFormat(options.linkLabelValue);
-    }
-    label = label + options.linkLabelUnit;
+    /*
+    label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
+      : options.linkLabelFormat(d.data[options.linkLabelField]);
+      */
+    label = labelField === "value" ? d[labelField] : d.data[labelField];
     return label;
   };
 
   linksAPI.getLinkTextTween = function (d) {
     var selection = d3.select(this);
-    var i = d3.interpolateNumber(selection.text().replace(/,/g, ""), linksAPI.getLinkLabel(d));
+    if (!options.linkLabelOn) {
+      return function () {
+        selection.text("");
+      };
+    }
+    /*
+    const i = d3.interpolateNumber(
+      selection.text()
+        .replace(options.linkLabelUnit,"") // because repeated call can contain unit
+        .replace(/[.,]/g, "")
+      , linksAPI.getLinkLabel(d));
+    return function(t) { 
+      selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); 
+    };
+    */
+    var numberStart = linksAPI.getLinkLabel(d, oldLabelField);
+    var numberEnd = linksAPI.getLinkLabel(d, newLabelField);
+    var i = d3.interpolateNumber(numberStart, numberEnd);
     return function (t) {
       selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit);
     };
@@ -239,12 +268,12 @@
     var nodes = config.root.descendants();
     if (!options.linkStrengthStatic) {
       options.linkStrengthScale.domain(d3.extent(nodes.slice(1), function (d) {
-        return +d[options.linkStrengthField];
+        return options.linkStrengthField === "value" ? +d[options.linkStrengthField] : +d.data[options.linkStrengthField];
       })).range(options.linkStrengthRange);
     }
     if (!options.linkWidthStatic) {
       options.linkWidthScale.domain(d3.extent(nodes.slice(1), function (d) {
-        return +d[options.linkWidthField];
+        return options.linkWidthField === "value" ? +d[options.linkWidthField] : +d.data[options.linkWidthField];
       })).range(options.linkWidthRange);
     }
   }
@@ -405,10 +434,9 @@
       return l.getLinkD(origin, "right");
     });
 
-    linkEnter.append("text")
-    //.attr("x", source.y0)
-    //.attr("y", source.x0)
-    .attr("dy", ".35em").attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6);
+    linkEnter.append("text").attr("dy", ".35em")
+    // .attr("text-anchor", "end") 
+    .attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6);
 
     // Transition links to their new position.
     var linkUpdate = link.merge(linkEnter).transition().duration(options.transitionDuration);
@@ -429,7 +457,9 @@
       return l.getLinkD(d, "right");
     }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
 
-    linkUpdate.select("text").attr("x", function (d) {
+    linkUpdate.select("text")
+    // .attr("x", d => (d.y - d.parent.y) / 2 + l.labelMaxYPerDepth) // l.getLinkLabelX
+    .attr("x", function (d) {
       return (d.y - d.parent.y) / 2;
     }).attr("y", function (d) {
       return d.x - d.parent.x;
@@ -481,9 +511,8 @@
     options.defaultColor = "grey";
     options.linkHeight = 20;
 
-    options.linkLabelType = "none";
     options.linkLabelField = "value";
-    options.linkLabelValue = 1;
+    options.linkLabelOn = false;
     options.linkLabelUnit = "";
     // options.linkLabelFormat = d => d;
     options.linkLabelFormat = d3.format(".0f");
@@ -565,31 +594,29 @@
       return chartAPI;
     };
 
-    chartAPI.linkLabel = function (_) {
+    chartAPI.linkLabel = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkLabelField;
+
       var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelUnit;
       var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormat;
 
       if (!arguments.length) return options.linkLabelField;
 
-      if (typeof _ === "undefined") {
-        options.linkLabelType = "none";
-      } else {
-        if (typeof _ === "number") {
-          options.linkLabelType = "number";
-          options.linkLabelValue = _;
-        } else {
-          options.linkLabelType = "field";
-          options.linkLabelField = _;
-        }
+      if (typeof _ === "string") {
+        options.linkLabelField = _;
         options.linkLabelOn = true;
         options.linkLabelUnit = unit === "" ? "" : unit;
         options.linkLabelFormat = format;
+      } else if (typeof _ === "boolean") {
+        options.linkLabelOn = _;
       }
       if (typeof options.updateLinkLabel === "function") options.updateLinkLabel();
       return chartAPI;
     };
 
-    chartAPI.linkWidth = function (_) {
+    chartAPI.linkWidth = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkWidthField;
+
       var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkWidthScale;
       var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkWidthRange;
 
@@ -608,7 +635,9 @@
       return chartAPI;
     };
 
-    chartAPI.linkStrength = function (_) {
+    chartAPI.linkStrength = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkStrengthField;
+
       var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkStrengthScale;
       var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkStrengthRange;
 
@@ -627,7 +656,9 @@
       return chartAPI;
     };
 
-    chartAPI.linkColor = function (_) {
+    chartAPI.linkColor = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkColorField;
+
       var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkColorScale;
 
       if (!arguments.length) return options.linkColorField;

@@ -18,9 +18,8 @@ export default function (_dataSpec) {
   options.defaultColor = "grey";
   options.linkHeight = 20;
   
-  options.linkLabelType = "none";
   options.linkLabelField = "value";
-  options.linkLabelValue = 1;
+  options.linkLabelOn = false;
   options.linkLabelUnit = "";
   // options.linkLabelFormat = d => d;
   options.linkLabelFormat = d3.format(".0f"); 
@@ -100,28 +99,23 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
-  chartAPI.linkLabel = function(_, unit = options.linkLabelUnit, format = options.linkLabelFormat) {
-    if (!arguments.length) 
-      return options.linkLabelField;
+  chartAPI.linkLabel = function(_ = options.linkLabelField, unit = options.linkLabelUnit, 
+    format = options.linkLabelFormat) {
+    if (!arguments.length) return options.linkLabelField;
 
-    if (typeof(_)  === "undefined") {
-      options.linkLabelType = "none";
-    } else { if (typeof (_) === "number") { 
-      options.linkLabelType = "number";
-      options.linkLabelValue = _;
-    } else {
-      options.linkLabelType = "field";
+    if (typeof(_)  === "string")  {
       options.linkLabelField = _; 
+      options.linkLabelOn = true;
+      options.linkLabelUnit = (unit === "") ? "" : unit;
+      options.linkLabelFormat = format; 
+    } else if (typeof(_)  === "boolean") {
+      options.linkLabelOn = _;
     }
-    options.linkLabelOn = true;
-    options.linkLabelUnit = (unit === "") ? "" : unit;
-    options.linkLabelFormat = format; 
-    }  
     if (typeof options.updateLinkLabel === "function") options.updateLinkLabel();
     return chartAPI;
   };
 
-  chartAPI.linkWidth = function(_, scale = options.linkWidthScale, range = options.linkWidthRange) {
+  chartAPI.linkWidth = function(_ = options.linkWidthField, scale = options.linkWidthScale, range = options.linkWidthRange) {
     if (!arguments.length) return options.linkWidthValue;
     if (typeof (_) === "number") { 
       options.linkWidthStatic = true;
@@ -138,7 +132,7 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
-  chartAPI.linkStrength = function(_, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
+  chartAPI.linkStrength = function(_ = options.linkStrengthField, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
     if (!arguments.length) return options.linkStrengthValue;
     if (typeof (_) === "number") { 
       options.linkStrengthStatic = true;
@@ -155,7 +149,7 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
-  chartAPI.linkColor = function(_, scale = options.linkColorScale) {
+  chartAPI.linkColor = function(_ = options.linkColorField, scale = options.linkColorScale) {
     if (!arguments.length) return options.linkColorField;
     options.linkColorStatic = false;
     options.linkColorField = _;

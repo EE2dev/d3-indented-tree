@@ -2,8 +2,19 @@ import * as d3 from "d3";
 
 export let linksAPI = {};
 let options;
+let oldLabelField , newLabelField;
 
-linksAPI.initialize = function(_options) { options = _options; };
+linksAPI.initialize = function(_options) { 
+  options = _options; 
+  oldLabelField = newLabelField;
+  newLabelField = options.linkLabelOn ? options.linkLabelField : undefined;
+  if (options.debugOn) {
+    console.log("oldLabel:");
+    console.log(oldLabelField);
+    console.log("newLabel:");
+    console.log(newLabelField);
+  }
+};
 
 linksAPI.getLinkD = function (d, direction) {
   const linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
@@ -18,9 +29,10 @@ linksAPI.getLinkD = function (d, direction) {
 };
 
 linksAPI.getLinkStrength = function (d) {
-  return options.linkStrengthStatic ? options.linkStrengthValue 
+  let s = options.linkStrengthStatic ? options.linkStrengthValue 
     : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
       : options.linkStrengthScale(d.data[options.linkStrengthField]); 
+  return s ? s : 0; // 0 in case s is undefined
 };
 
 linksAPI.getLinkStroke = function (d) {
@@ -34,26 +46,36 @@ linksAPI.getLinkStrokeWidth = function (d) {
   return sw;
 };
 
-linksAPI.getLinkLabel = function(d) {
-  if (options.linkLabelType === "none") return "";
+linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
+  if (!options.linkLabelOn) return "";
   let label;
-  if (options.linkLabelType === "field") { 
-    label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
-      : options.linkLabelFormat(d.data[options.linkLabelField]);
-  }
-  else if (options.linkLabelType === "number") {
-    label = options.linkLabelFormat(options.linkLabelValue);
-  }
-  label = label + options.linkLabelUnit;
+  /*
+  label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
+    : options.linkLabelFormat(d.data[options.linkLabelField]);
+    */
+  label = labelField === "value" ? d[labelField] : d.data[labelField];
   return label;
 };
 
 linksAPI.getLinkTextTween = function(d) { 
   const selection = d3.select(this);
-  const i = d3.interpolateNumber(selection.text().replace(/,/g, ""), linksAPI.getLinkLabel(d));
+  if (!options.linkLabelOn) {
+    return function() { selection.text(""); };
+  }
+  /*
+  const i = d3.interpolateNumber(
+    selection.text()
+      .replace(options.linkLabelUnit,"") // because repeated call can contain unit
+      .replace(/[.,]/g, "")
+    , linksAPI.getLinkLabel(d));
   return function(t) { 
     selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); 
   };
+  */
+  const numberStart = linksAPI.getLinkLabel(d, oldLabelField);
+  const numberEnd = linksAPI.getLinkLabel(d, newLabelField);
+  const i = d3.interpolateNumber(numberStart, numberEnd);
+  return function(t) { selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); };
 };
 
 linksAPI.getLinkRTranslate = function (d) {

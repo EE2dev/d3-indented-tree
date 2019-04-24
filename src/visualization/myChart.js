@@ -53,12 +53,16 @@ function createScale(options, config) {
   let nodes = config.root.descendants();
   if (!options.linkStrengthStatic) {    
     options.linkStrengthScale
-      .domain(d3.extent(nodes.slice(1), function(d) { return +d[options.linkStrengthField];}))
+      .domain(d3.extent(nodes.slice(1), function(d) { 
+        return options.linkStrengthField === "value" ? +d[options.linkStrengthField] : +d.data[options.linkStrengthField];
+      }))
       .range(options.linkStrengthRange);
   }
   if (!options.linkWidthStatic) {    
     options.linkWidthScale
-      .domain(d3.extent(nodes.slice(1), function(d) { return +d[options.linkWidthField];}))
+      .domain(d3.extent(nodes.slice(1), function(d) { 
+        return options.linkWidthField === "value" ? +d[options.linkWidthField] : +d.data[options.linkWidthField];
+      }))
       .range(options.linkWidthRange);
   }
 }
@@ -245,12 +249,11 @@ function update(source, options, config){
 
   linkEnter
     .append("text")          
-    //.attr("x", source.y0)
-    //.attr("y", source.x0)
     .attr("dy", ".35em")
+    // .attr("text-anchor", "end") 
     .attr("text-anchor", "middle") 
     .text(l.getLinkLabel)
-    .style("opacity", 1e-6);          
+    .style("opacity", 1e-6);        
   
   // Transition links to their new position.
   const linkUpdate = link.merge(linkEnter).transition()
@@ -271,6 +274,7 @@ function update(source, options, config){
 
   linkUpdate
     .select("text") 
+    // .attr("x", d => (d.y - d.parent.y) / 2 + l.labelMaxYPerDepth) // l.getLinkLabelX
     .attr("x", d => (d.y - d.parent.y) / 2)
     .attr("y", d => d.x - d.parent.x)
     .call(sel => sel.tween("text", l.getLinkTextTween))
