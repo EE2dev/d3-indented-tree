@@ -19,20 +19,28 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 
 Transitions to the new strength (thickness) of the links. The horizontal link to and the vertical link from a node is denoting its strength.
 * to statically set all the links to the strength, call this function with an <i>integer</i> argument, which denotes the thickness in pixels (default is ```1```).
-* to set the link strength dynamically, provide the name of a numeric field (default is ```"value"```). The field "value" references the propagated field. In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the strength (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[1,10]```). 
+* to set the link strength dynamically, provide the name of a numeric field (default is ```"value"```). In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the strength (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[1,10]```). 
 * with no parameter returns the static strength of the links.
 
 <a name="link_linkWidth" href="#link_linkWidth">#</a> <i>myChart</i>.<b>linkWidth</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new width (horizontal length) of the links. The horizontal link to a node is affected by its corresponding value. 
 * to statically set all the links to the width, call this function with an <i>integer</i> argument, which denotes the width in pixels (default is ```30```).
-* to set the link width dynamically, provide the name of a numeric field (default is ```"value"```). The field "value" references the propagated field. In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[15,100]```). 
+* to set the link width dynamically, provide the name of a numeric field (default is ```"value"```). In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is ```d3.scaleLinear()```). The third argument is an <i>array</i> and refers to the range of the scale (default is ```[15,100]```). 
 * with no parameter returns the static width of the links.
 
 <a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Transitions to the new label on top of the links. 
-TO DO
+Transitions to the new number label on top of the links. 
+* the first argument is either a <i>string</i> refering to the name of the numeric field containing the link label values or <i>boolean</i> to switch the label on or off. Default values are ```"value"``` and ```false```
+* to add a unit/suffix to the label you provide a <i>string</i> as the second argument. Default is ```""``` 
+* to specify the format of the number label, you can pass a <i>string</i> as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e) as the third argument. The default is ```",.0f"```. Note that you can change the locale with [formatDefaultLocale, too](#other_formatDefaultLocale).
+
+<a name="link_linkLabelColor" href="#link_linkLabelColor">#</a> <i>myChart</i>.<b>linkLabelColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sets the color of the link label (default is ```"black"```). 
+
+* the only argument is a callback <i>function</i> which gets passed the corresponding value of the link label.
 
 <a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
@@ -88,9 +96,23 @@ Sets the transition duration for the transitions.
 
 <a name="other_propagateValue" href="#other_propagateValue">#</a> <i>myChart</i>.<b>propagateValue</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Propagates a field (which may be just filled in the leaves) throughout all the nodes by summing up the values bottom up. The resulting field is named ```"value``` and is attached to all nodes. 
+Propagates a field (which may be just filled in the leaves) throughout all the nodes by summing up the values bottom up.
 * the first argument is a <i>string</i> referencing a field to be propagated (default is ```"value"```).
 * with no parameter returns if a field is propagated and its name.
+
+<a name="other_formatDefaultLocale" href="#other_formatDefaultLocale">#</a> <i>myChart</i>.<b>formatDefaultLocale</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Overrides the default locale format with the specified locale format 
+* the first argument is an <i>object</i> referencing the locale format. E.g. the object for the German Locale would be:
+```
+{
+  "decimal": ",",
+  "thousands": ".",
+  "grouping": [3],
+  "currency": ["", " €"]
+}
+```
+
 
 ## 4. License  
 This code is released under the [BSD license](https://github.com/EE2dev/hierarchy-explorer//blob/master/LICENSE).

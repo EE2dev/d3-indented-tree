@@ -22,7 +22,21 @@ export default function (_dataSpec) {
   options.linkLabelOn = false;
   options.linkLabelUnit = "";
   // options.linkLabelFormat = d => d;
-  options.linkLabelFormat = d3.format(".0f"); 
+
+  /*
+  const localeGerman = d3.formatDefaultLocale({
+    "decimal": ",",
+    "thousands": ".",
+    "grouping": [3],
+    "currency": ["€", ""] //if you want a space between €-sign and number, add it here in the first string 
+  });
+  console.log(localeGerman);
+  */
+  options.locale = undefined;
+  options.linkLabelFormatSpecifier = ",.0f"; 
+  options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
+
+  options.linkLabelColor; // function for setting the label color based on the value.
   /*
   options.linkWidth = 30;
   options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
@@ -91,27 +105,41 @@ export default function (_dataSpec) {
     return chartAPI;
   }; 
 
+  chartAPI.formatDefaultLocale = function(_) {
+    if (!arguments.length) return options.locale;
+    if (_ === "DE"){
+      _ = {
+        "decimal": ",",
+        "thousands": ".",
+        "grouping": [3],
+        "currency": ["", " €"]   
+      };
+    }
+    options.locale = d3.formatDefaultLocale(_);
+    return chartAPI;
+  }; 
+
   // 3. ADD getter-setter methods with updateable functions here
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;
     options.linkHeight = _;
-    if (typeof options.updateLinkHeight === "function") options.updateLinkHeight();
+    if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
 
   chartAPI.linkLabel = function(_ = options.linkLabelField, unit = options.linkLabelUnit, 
-    format = options.linkLabelFormat) {
+    format = options.linkLabelFormatSpecifier) {
     if (!arguments.length) return options.linkLabelField;
 
     if (typeof(_)  === "string")  {
       options.linkLabelField = _; 
       options.linkLabelOn = true;
       options.linkLabelUnit = (unit === "") ? "" : unit;
-      options.linkLabelFormat = format; 
+      options.linkLabelFormat = d3.format(format); 
     } else if (typeof(_)  === "boolean") {
       options.linkLabelOn = _;
     }
-    if (typeof options.updateLinkLabel === "function") options.updateLinkLabel();
+    if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
 
@@ -154,9 +182,16 @@ export default function (_dataSpec) {
     options.linkColorStatic = false;
     options.linkColorField = _;
     options.linkColorScale = scale;
-    if (typeof options.updateLinkColor === "function") options.updateLinkColor();
+    if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
+
+  chartAPI.linkLabelColor = function(_) {
+    if (!arguments.length) return options.linkLabelColor;
+    options.linkLabelColor = _;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  }; 
 
   chartAPI.alignLeaves = function(_) {
     if (!arguments.length) return options.alignLeaves;

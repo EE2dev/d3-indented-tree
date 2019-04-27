@@ -229,6 +229,14 @@
     return "translate(" + linksAPI.getLinkStrength(d.parent) / 2 + " " + (d.x - d.parent.x) + ")";
   };
 
+  linksAPI.getLinkLabelColor = function (d) {
+    if (!options.linkLabelColor) {
+      return d3.select(this).style("fill");
+    } else {
+      return options.linkLabelColor(linksAPI.getLinkLabel(d, oldLabelField));
+    }
+  };
+
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
   //////////////////////////////////////////////////// 
@@ -304,25 +312,29 @@
       update(config.root, options, config);
     };
 
-    options.updateLinkHeight = function () {
-      update(config.root, options, config);
-    };
-
-    options.updateLinkLabel = function () {
-      update(config.root, options, config);
-    };
-
     options.updateLinkStrength = function () {
       createScale(options, config);
       update(config.root, options, config);
     };
 
-    options.updateLinkColor = function () {
+    options.updateAlignLeaves = function () {
+      createTree(options, config, data);
       update(config.root, options, config);
     };
 
-    options.updateAlignLeaves = function () {
-      createTree(options, config, data);
+    /*
+    options.updateLinkHeight = function() {
+      update(config.root, options, config);
+    };
+      options.updateLinkLabel = function() {
+      update(config.root, options, config);
+    };
+      options.updateLinkColor = function() {
+      update(config.root, options, config);
+    };
+    */
+
+    options.updateDefault = function () {
       update(config.root, options, config);
     };
   }
@@ -452,7 +464,7 @@
 
     linkEnter.append("text").attr("dy", ".35em")
     // .attr("text-anchor", "end") 
-    .attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6);
+    .attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6).style("fill", l.getLinkLabelColor);
 
     // Transition links to their new position.
     var linkUpdate = link.merge(linkEnter).transition().duration(options.transitionDuration);
@@ -531,7 +543,19 @@
     options.linkLabelOn = false;
     options.linkLabelUnit = "";
     // options.linkLabelFormat = d => d;
-    options.linkLabelFormat = d3.format(".0f");
+
+    /*
+    const localeGerman = d3.formatDefaultLocale({
+      "decimal": ",",
+      "thousands": ".",
+      "grouping": [3],
+      "currency": ["€", ""] //if you want a space between €-sign and number, add it here in the first string 
+    });
+    console.log(localeGerman);
+    */
+
+    options.linkLabelFormatSpecifier = ",.0f";
+    options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
     /*
     options.linkWidth = 30;
     options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
@@ -602,11 +626,25 @@
       return chartAPI;
     };
 
+    chartAPI.formatDefaultLocale = function (_) {
+      if (!arguments.length) return options.locale;
+      if (_ === "German") {
+        _ = {
+          "decimal": ",",
+          "thousands": ".",
+          "grouping": [3],
+          "currency": ["€", ""]
+        };
+      }
+      options.locale = d3.formatDefaultLocale(_);
+      return chartAPI;
+    };
+
     // 3. ADD getter-setter methods with updateable functions here
     chartAPI.linkHeight = function (_) {
       if (!arguments.length) return options.linkHeight;
       options.linkHeight = _;
-      if (typeof options.updateLinkHeight === "function") options.updateLinkHeight();
+      if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
     };
 
@@ -614,7 +652,7 @@
       var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkLabelField;
 
       var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelUnit;
-      var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormat;
+      var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormatSpecifier;
 
       if (!arguments.length) return options.linkLabelField;
 
@@ -622,11 +660,11 @@
         options.linkLabelField = _;
         options.linkLabelOn = true;
         options.linkLabelUnit = unit === "" ? "" : unit;
-        options.linkLabelFormat = format;
+        options.linkLabelFormat = d3.format(format);
       } else if (typeof _ === "boolean") {
         options.linkLabelOn = _;
       }
-      if (typeof options.updateLinkLabel === "function") options.updateLinkLabel();
+      if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
     };
 
@@ -681,7 +719,14 @@
       options.linkColorStatic = false;
       options.linkColorField = _;
       options.linkColorScale = scale;
-      if (typeof options.updateLinkColor === "function") options.updateLinkColor();
+      if (typeof options.updateDefault === "function") options.updateDefault();
+      return chartAPI;
+    };
+
+    chartAPI.linkLabelColor = function (_) {
+      if (!arguments.length) return options.linkLabelColor;
+      options.linkLabelColor = _;
+      if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
     };
 

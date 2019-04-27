@@ -10,27 +10,26 @@
 [ok] linkColor set with "value"
 [ok] linkStrength dynamic example
 [ok] linkWidth / linkStrength with "weight" in linkLabel2.html
-
-
 [bug] : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
-
-
 [ok] remove .value if cases
-* adjust API function
-* update docu
-* change scale domains from [15,50] to [50,50]
+[ok] adjust API function
+[ok] update docu (default field ok - propagation)
+[ok] add linkLabelColor (static or function (e.g. value < 0 red otherwise green))
+[ok] readme linkLabelColor
+
+* docu data format
 
 [ok] linkLabel: doubletext: https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
 * linkLabel add group transform to links
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)
-* linkLabel: allow text to be put on top of link
+*3 linkLabel: allow text to be put on top of link (add css with different class for that)
 * linkLabel: adjust width to minimum Width
-* linkLabel: right-align text-anchor:end text after finding the largest numbers
-* linkLabel: textTween replace ,(.) based on locale https://bl.ocks.org/mbostock/7004f92cac972edef365
-* add linkLabelColor (static or function (e.g. <0 red otherwise green))
-* readme linklabel, linkLabelColor
+*1 linkLabel: right-align text-anchor:end text per depth after finding the largest numbers
+*2 linkLabel: API to change defaultLocale and offer shortcut to German locale replace ,(.) based on locale https://bl.ocks.org/mbostock/7004f92cac972edef365
+https://gitlab.com/snippets/1703535
+* readme linklabel
 
-* link.call(function (sel) {positionPath(sel, options)}) --> positionPath -> d attr and transform
+* link.call(function (sel) {positionPath(sel, options)})  --> positionPath -> d attr and transform
 * linkColor: Implementierung Gradient: 1) iterate through node and add all different parent-son color combinations to set
 * linkColor: 2) create gradients for these combinations (10% offset)
 

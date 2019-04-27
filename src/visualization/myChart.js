@@ -74,6 +74,17 @@ function createUpdateFunctions(options, config, data){
     update(config.root, options, config);
   };
 
+  options.updateLinkStrength = function() {
+    createScale(options, config);
+    update(config.root, options, config);
+  };
+
+  options.updateAlignLeaves = function() {
+    createTree(options, config, data);
+    update(config.root, options, config);
+  };
+
+  /*
   options.updateLinkHeight = function() {
     update(config.root, options, config);
   };
@@ -82,17 +93,12 @@ function createUpdateFunctions(options, config, data){
     update(config.root, options, config);
   };
 
-  options.updateLinkStrength = function() {
-    createScale(options, config);
-    update(config.root, options, config);
-  };
-
   options.updateLinkColor = function() {
     update(config.root, options, config);
   };
+  */
 
-  options.updateAlignLeaves = function() {
-    createTree(options, config, data);
+  options.updateDefault = function() {
     update(config.root, options, config);
   };
 }
@@ -250,7 +256,8 @@ function update(source, options, config){
     // .attr("text-anchor", "end") 
     .attr("text-anchor", "middle") 
     .text(l.getLinkLabel)
-    .style("opacity", 1e-6);        
+    .style("opacity", 1e-6)
+    .style("fill", l.getLinkLabelColor);        
   
   // Transition links to their new position.
   const linkUpdate = link.merge(linkEnter).transition()

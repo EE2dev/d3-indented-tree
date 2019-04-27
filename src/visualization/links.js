@@ -92,3 +92,11 @@ linksAPI.getLinkTextTween = function(d) {
 linksAPI.getLinkRTranslate = function (d) {
   return "translate(" + (linksAPI.getLinkStrength(d.parent) / 2) + " " + (d.x - d.parent.x) + ")";
 };
+
+linksAPI.getLinkLabelColor = function (d) {
+  if (!options.linkLabelColor) {
+    return d3.select(this).style("fill");
+  } else { 
+    return options.linkLabelColor(linksAPI.getLinkLabel(d, oldLabelField));
+  }
+};
