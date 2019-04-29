@@ -16,17 +16,18 @@
 [ok] update docu (default field ok - propagation)
 [ok] add linkLabelColor (static or function (e.g. value < 0 red otherwise green))
 [ok] readme linkLabelColor
+[ok] linkLabel: API to change defaultLocale and offer shortcut to German locale replace ,(.) based on locale https://bl.ocks.org/mbostock/7004f92cac972edef365
+https://gitlab.com/snippets/1703535
+[ok] linkLabel: doubletext: https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
+[ok] linkLabel: right-align text-anchor:end text per depth after finding the largest numbers
+[ok] linkLabel: allow text to be put on top of link (add css with different class for that)
 
 * docu data format
 
-[ok] linkLabel: doubletext: https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
 * linkLabel add group transform to links
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)
-*3 linkLabel: allow text to be put on top of link (add css with different class for that)
 * linkLabel: adjust width to minimum Width
-*1 linkLabel: right-align text-anchor:end text per depth after finding the largest numbers
-*2 linkLabel: API to change defaultLocale and offer shortcut to German locale replace ,(.) based on locale https://bl.ocks.org/mbostock/7004f92cac972edef365
-https://gitlab.com/snippets/1703535
+
 * readme linklabel
 
 * link.call(function (sel) {positionPath(sel, options)})  --> positionPath -> d attr and transform
@@ -71,6 +72,18 @@ http://www.svgopen.org/2009/papers/12-Using_Canvas_in_SVG/
 * allow graphics before text for each node
 * option: save as pgn/svg in function call to add buttons
 * change data input to just object
+
+[improvements]
+* enforce constraints:
+  - linkStrength < nodeWidth/Height
+  - linkLabel < linkWidth
+  - linkLabel < linkHeight
+  - ...
+* better sepearation of what updates and what not. -> see sections in myChart.js update vs enter
+* not updatable
+  - defaultLocale -> linkLabel
+  - ...
+
 [compatibility] String.endsWith
 [compatibility] d3.fetch vs XHR d3v5 vs d3v4
 [compatibility] linkLabel doubleText

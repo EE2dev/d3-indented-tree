@@ -48,14 +48,22 @@
       /* shape-rendering: crispEdges; */
     }
 
-    .link text{
+    .link text.label{
       font: 0.8em sans-serif;
       paint-order: stroke;
       stroke: #fff;
       fill: black;
-      stroke-width: 4px;
+      /*stroke-width: 4px;*/
       stroke-linecap: butt;
       stroke-linejoin: miter;
       /*font-weight: 800; */
+    }
+
+    .link text.label.ontop{
+      stroke-width: 4px;
+    }    
+
+    .link text.label.above{
+      stroke-width: 0px;
     }
 

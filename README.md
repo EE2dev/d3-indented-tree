@@ -103,7 +103,7 @@ Propagates a field (which may be just filled in the leaves) throughout all the n
 <a name="other_formatDefaultLocale" href="#other_formatDefaultLocale">#</a> <i>myChart</i>.<b>formatDefaultLocale</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Overrides the default locale format with the specified locale format 
-* the first argument is an <i>object</i> referencing the locale format. E.g. the object for the German Locale would be:
+* the first argument is an <i>object</i> referencing the locale format. E.g. the object for the German Locale would be (as a shortcut you can also pass the <i>string</i>```"DE"```):
 ```
 {
   "decimal": ",",

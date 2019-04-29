@@ -14,6 +14,7 @@ export function myChart(selection, data, options){
   config.root = undefined;
   config.svg = undefined;
   config.counter = 0;
+  config.labelDimensions = [];
 
   config.svg = selection.append("svg")
     .attr("width", config.width + options.margin.right + options.margin.left)
@@ -250,18 +251,36 @@ function update(source, options, config){
     .attr("class", "link right")
     .attr("d", () => l.getLinkD(origin, "right"));
 
+  /*
   linkEnter
-    .append("text")          
-    .attr("dy", ".35em")
-    // .attr("text-anchor", "end") 
-    .attr("text-anchor", "middle") 
-    .text(l.getLinkLabel)
+    .append("text")  
+    .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
+    .attr("dy", l.getDy) 
+    // .attr("dy", ".35em")
+    .attr("text-anchor", "end") 
+    // .attr("text-anchor", "middle") 
+    .text(d => l.getLinkLabelFormatted(d))
     .style("opacity", 1e-6)
-    .style("fill", l.getLinkLabelColor);        
+    .style("fill", l.getLinkLabelColor);  
+    */    
+  linkEnter
+    .append("text")  
+    .attr("text-anchor", "end") 
+    .style("opacity", 1e-6);   
   
+  // update merged selection before transition
+  const linkMerge = link.merge(linkEnter);
+  linkMerge.select("text")
+    .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
+    .attr("dy", l.getInitialDy)
+    .text(d => l.getLinkLabelFormatted(d))
+    .style("fill", l.getLinkLabelColor); 
+
   // Transition links to their new position.
-  const linkUpdate = link.merge(linkEnter).transition()
+  const linkUpdate = linkMerge.transition()
     .duration(options.transitionDuration);
+  
+  l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
 
   linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
 
@@ -277,9 +296,9 @@ function update(source, options, config){
     .style("stroke-width", l.getLinkStrokeWidth);
 
   linkUpdate
-    .select("text") 
-    // .attr("x", d => (d.y - d.parent.y) / 2 + l.labelMaxYPerDepth) // l.getLinkLabelX
-    .attr("x", d => (d.y - d.parent.y) / 2)
+    .select("text")  
+    .attr("dy", l.getDy)
+    .attr("x", l.getLinkTextPositionX)
     .attr("y", d => d.x - d.parent.x)
     .call(sel => sel.tween("text", l.getLinkTextTween))
     .style("opacity", 1); 

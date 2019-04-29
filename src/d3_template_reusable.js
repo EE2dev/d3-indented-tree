@@ -21,27 +21,15 @@ export default function (_dataSpec) {
   options.linkLabelField = "value";
   options.linkLabelOn = false;
   options.linkLabelUnit = "";
+  options.linkLabelOnTop = true;
   // options.linkLabelFormat = d => d;
 
-  /*
-  const localeGerman = d3.formatDefaultLocale({
-    "decimal": ",",
-    "thousands": ".",
-    "grouping": [3],
-    "currency": ["€", ""] //if you want a space between €-sign and number, add it here in the first string 
-  });
-  console.log(localeGerman);
-  */
   options.locale = undefined;
   options.linkLabelFormatSpecifier = ",.0f"; 
   options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
 
   options.linkLabelColor; // function for setting the label color based on the value.
-  /*
-  options.linkWidth = 30;
-  options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
-  options.linkWidthField = "value";
-  */
+
   // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
   options.linkWidthStatic = true; 
   options.linkWidthValue = 30;
@@ -128,16 +116,19 @@ export default function (_dataSpec) {
   };
 
   chartAPI.linkLabel = function(_ = options.linkLabelField, unit = options.linkLabelUnit, 
-    format = options.linkLabelFormatSpecifier) {
+    format = options.linkLabelFormatSpecifier, labelOnTop = options.linkLabelOnTop) {
     if (!arguments.length) return options.linkLabelField;
 
     if (typeof(_)  === "string")  {
       options.linkLabelField = _; 
       options.linkLabelOn = true;
-      options.linkLabelUnit = (unit === "") ? "" : unit;
-      options.linkLabelFormat = d3.format(format); 
     } else if (typeof(_)  === "boolean") {
       options.linkLabelOn = _;
+    }
+    if (options.linkLabelOn) {
+      options.linkLabelUnit = (unit === "") ? "" : unit;
+      options.linkLabelFormat = d3.format(format);
+      options.linkLabelOnTop = labelOnTop;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;

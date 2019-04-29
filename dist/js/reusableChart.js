@@ -135,6 +135,7 @@
   var options = void 0;
   var oldLabelField = void 0,
       newLabelField = void 0;
+  var labelDimensions = void 0;
 
   linksAPI.initialize = function (_options) {
     options = _options;
@@ -160,15 +161,31 @@
     return path;
   };
 
+  linksAPI.getDy = function (d) {
+    if (options.linkLabelOnTop) {
+      return "0.35em";
+    } else {
+      return Math.ceil(-.5 * linksAPI.getLinkStrength(d) - 3);
+    }
+  };
+
+  // initialize to support switch from labelonTop to labelabove and vice versa
+  // otherwise transition throws error when trying "0.35em" --> 1 or 1 --> "0.35em" 
+  linksAPI.getInitialDy = function () {
+    if (!d3.select(this).attr("dy")) {
+      return null;
+    }
+    if (options.linkLabelOnTop) {
+      return d3.select(this).attr("dy").endsWith("em") ? d3.select(this).attr("dy") : "0.35em";
+    } else {
+      return d3.select(this).attr("dy").endsWith("em") ? 0 : d3.select(this).attr("dy");
+    }
+  };
+
   linksAPI.getLinkStrength = function (d) {
     if (!d.data) return 0;
     var s = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthScale(d.data[options.linkStrengthField]);
     return s;
-    /*
-      : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
-        : options.linkStrengthScale(d.data[options.linkStrengthField]); 
-    return s ? s : 0; // 0 in case s is undefined
-    */
   };
 
   linksAPI.getLinkStroke = function (d) {
@@ -176,28 +193,24 @@
   };
 
   linksAPI.getLinkStrokeWidth = function (d) {
-    var sw = options.linkStrengthStatic ? options.linkStrengthValue : options.linkStrengthScale(d.data[options.linkStrengthField]);
     /*
-      options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px"
-        : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
-        */
+    const sw = options.linkStrengthStatic ? options.linkStrengthValue
+      : options.linkStrengthScale(d.data[options.linkStrengthField]); 
     return sw + "px";
+    */
+    return linksAPI.getLinkStrength(d) + "px";
   };
 
   linksAPI.getLinkLabel = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    if (!options.linkLabelOn) return "";
-    /*
-    let label;
-    
-    //label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
-    //  : options.linkLabelFormat(d.data[options.linkLabelField]);
-      
-    label = labelField === "value" ? d[labelField] : d.data[labelField];
-    return label;
-    */
-    return d.data[labelField];
+    return !options.linkLabelOn ? "" : d.data[labelField];
+  };
+
+  linksAPI.getLinkLabelFormatted = function (d) {
+    var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
+
+    return !options.linkLabelOn ? "" : options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit;
   };
 
   linksAPI.getLinkTextTween = function (d) {
@@ -207,16 +220,6 @@
         selection.text("");
       };
     }
-    /*
-    const i = d3.interpolateNumber(
-      selection.text()
-        .replace(options.linkLabelUnit,"") // because repeated call can contain unit
-        .replace(/[.,]/g, "")
-      , linksAPI.getLinkLabel(d));
-    return function(t) { 
-      selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); 
-    };
-    */
     var numberStart = linksAPI.getLinkLabel(d, oldLabelField);
     var numberEnd = linksAPI.getLinkLabel(d, newLabelField);
     var i = d3.interpolateNumber(numberStart, numberEnd);
@@ -237,6 +240,42 @@
     }
   };
 
+  linksAPI.getLinkTextPositionX = function (d) {
+    return (d.y - d.parent.y) / 2 + labelDimensions[d.depth].maxX / 2;
+  };
+
+  linksAPI.computeLabelDimensions = function (trans) {
+    // if (!options.linkLabelOn) { return;}
+    var dims = [undefined];
+    trans.each(function (d) {
+      var labelDimensions = {};
+      var height = d3.select(this).node().getBBox().height;
+      var width = d3.select(this).node().getBBox().width;
+      var text = d3.select(this).text();
+      if (!dims[d.depth]) {
+        labelDimensions.maxX = width;
+        labelDimensions.maxY = height;
+        labelDimensions.maxXText = text;
+        labelDimensions.maxYText = text;
+        dims.push(labelDimensions);
+      } else {
+        if (dims[d.depth].maxX < width) {
+          dims[d.depth].maxX = width;
+          dims[d.depth].maxXText = text;
+        }
+        if (dims[d.depth].maxY < height) {
+          dims[d.depth].maxY = height;
+          dims[d.depth].maxYText = text;
+        }
+      }
+    });
+    labelDimensions = dims;
+    if (options.debugOn) {
+      console.log("dimensions:");
+      console.log(dims);
+    }
+  };
+
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
   //////////////////////////////////////////////////// 
@@ -250,6 +289,7 @@
     config.root = undefined;
     config.svg = undefined;
     config.counter = 0;
+    config.labelDimensions = [];
 
     config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
@@ -462,12 +502,30 @@
       return l.getLinkD(origin, "right");
     });
 
-    linkEnter.append("text").attr("dy", ".35em")
-    // .attr("text-anchor", "end") 
-    .attr("text-anchor", "middle").text(l.getLinkLabel).style("opacity", 1e-6).style("fill", l.getLinkLabelColor);
+    /*
+    linkEnter
+      .append("text")  
+      .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
+      .attr("dy", l.getDy) 
+      // .attr("dy", ".35em")
+      .attr("text-anchor", "end") 
+      // .attr("text-anchor", "middle") 
+      .text(d => l.getLinkLabelFormatted(d))
+      .style("opacity", 1e-6)
+      .style("fill", l.getLinkLabelColor);  
+      */
+    linkEnter.append("text").attr("text-anchor", "end").style("opacity", 1e-6);
+
+    // update merged selection before transition
+    var linkMerge = link.merge(linkEnter);
+    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above").attr("dy", l.getInitialDy).text(function (d) {
+      return l.getLinkLabelFormatted(d);
+    }).style("fill", l.getLinkLabelColor);
 
     // Transition links to their new position.
-    var linkUpdate = link.merge(linkEnter).transition().duration(options.transitionDuration);
+    var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
+
+    l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
 
     linkUpdate.attr("transform", function (d) {
       return "translate(" + d.parent.y + " " + d.parent.x + ")";
@@ -485,11 +543,7 @@
       return l.getLinkD(d, "right");
     }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
 
-    linkUpdate.select("text")
-    // .attr("x", d => (d.y - d.parent.y) / 2 + l.labelMaxYPerDepth) // l.getLinkLabelX
-    .attr("x", function (d) {
-      return (d.y - d.parent.y) / 2;
-    }).attr("y", function (d) {
+    linkUpdate.select("text").attr("dy", l.getDy).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
       return d.x - d.parent.x;
     }).call(function (sel) {
       return sel.tween("text", l.getLinkTextTween);
@@ -542,25 +596,13 @@
     options.linkLabelField = "value";
     options.linkLabelOn = false;
     options.linkLabelUnit = "";
+    options.linkLabelOnTop = true;
     // options.linkLabelFormat = d => d;
 
-    /*
-    const localeGerman = d3.formatDefaultLocale({
-      "decimal": ",",
-      "thousands": ".",
-      "grouping": [3],
-      "currency": ["€", ""] //if you want a space between €-sign and number, add it here in the first string 
-    });
-    console.log(localeGerman);
-    */
-
+    options.locale = undefined;
     options.linkLabelFormatSpecifier = ",.0f";
     options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
-    /*
-    options.linkWidth = 30;
-    options.linkWidthScale = d3.scaleLinear().domain([264, 432629]).range([15,100]);
-    options.linkWidthField = "value";
-    */
+
     // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
     options.linkWidthStatic = true;
     options.linkWidthValue = 30;
@@ -628,12 +670,12 @@
 
     chartAPI.formatDefaultLocale = function (_) {
       if (!arguments.length) return options.locale;
-      if (_ === "German") {
+      if (_ === "DE") {
         _ = {
           "decimal": ",",
           "thousands": ".",
           "grouping": [3],
-          "currency": ["€", ""]
+          "currency": ["", " €"]
         };
       }
       options.locale = d3.formatDefaultLocale(_);
@@ -653,16 +695,20 @@
 
       var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelUnit;
       var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormatSpecifier;
+      var labelOnTop = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : options.linkLabelOnTop;
 
       if (!arguments.length) return options.linkLabelField;
 
       if (typeof _ === "string") {
         options.linkLabelField = _;
         options.linkLabelOn = true;
-        options.linkLabelUnit = unit === "" ? "" : unit;
-        options.linkLabelFormat = d3.format(format);
       } else if (typeof _ === "boolean") {
         options.linkLabelOn = _;
+      }
+      if (options.linkLabelOn) {
+        options.linkLabelUnit = unit === "" ? "" : unit;
+        options.linkLabelFormat = d3.format(format);
+        options.linkLabelOnTop = labelOnTop;
       }
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;

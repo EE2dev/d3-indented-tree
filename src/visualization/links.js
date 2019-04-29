@@ -3,6 +3,7 @@ import * as d3 from "d3";
 export let linksAPI = {};
 let options;
 let oldLabelField , newLabelField;
+let labelDimensions;
 
 linksAPI.initialize = function(_options) { 
   options = _options; 
@@ -28,16 +29,30 @@ linksAPI.getLinkD = function (d, direction) {
   return path;
 };
 
+linksAPI.getDy = function (d) {
+  if (options.linkLabelOnTop) { return "0.35em";}
+  else {
+    return Math.ceil((-.5) * linksAPI.getLinkStrength(d) -3);
+  }
+};
+
+// initialize to support switch from labelonTop to labelabove and vice versa
+// otherwise transition throws error when trying "0.35em" --> 1 or 1 --> "0.35em" 
+linksAPI.getInitialDy = function () { 
+  if (!d3.select(this).attr("dy")) { return null;}
+  if (options.linkLabelOnTop) { 
+    return (d3.select(this).attr("dy").endsWith("em")) ? d3.select(this).attr("dy") : "0.35em";
+  }
+  else {
+    return (d3.select(this).attr("dy").endsWith("em")) ? 0 : d3.select(this).attr("dy");
+  }
+};
+
 linksAPI.getLinkStrength = function (d) {
   if (!d.data) return 0;
   const s = options.linkStrengthStatic ? options.linkStrengthValue 
     : options.linkStrengthScale(d.data[options.linkStrengthField]); 
   return s;
-  /*
-    : options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) 
-      : options.linkStrengthScale(d.data[options.linkStrengthField]); 
-  return s ? s : 0; // 0 in case s is undefined
-  */
 };
 
 linksAPI.getLinkStroke = function (d) {
@@ -45,27 +60,21 @@ linksAPI.getLinkStroke = function (d) {
 };
 
 linksAPI.getLinkStrokeWidth = function (d) {
+  /*
   const sw = options.linkStrengthStatic ? options.linkStrengthValue
     : options.linkStrengthScale(d.data[options.linkStrengthField]); 
-  /*
-    options.linkStrengthField === "value" ? options.linkStrengthScale(d[options.linkStrengthField]) + "px"
-      : options.linkStrengthScale(d.data[options.linkStrengthField]) + "px";
-      */
   return sw + "px";
+  */
+  return linksAPI.getLinkStrength(d) + "px";
 };
 
 linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
-  if (!options.linkLabelOn) return "";
-  /*
-  let label;
-  
-  //label = options.linkLabelField === "value" ? options.linkLabelFormat(d[options.linkLabelField])
-  //  : options.linkLabelFormat(d.data[options.linkLabelField]);
-    
-  label = labelField === "value" ? d[labelField] : d.data[labelField];
-  return label;
-  */
-  return d.data[labelField]; 
+  return (!options.linkLabelOn) ? "" : d.data[labelField]; 
+};
+
+linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
+  return (!options.linkLabelOn) ? "" :
+    options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
 };
 
 linksAPI.getLinkTextTween = function(d) { 
@@ -73,16 +82,6 @@ linksAPI.getLinkTextTween = function(d) {
   if (!options.linkLabelOn) {
     return function() { selection.text(""); };
   }
-  /*
-  const i = d3.interpolateNumber(
-    selection.text()
-      .replace(options.linkLabelUnit,"") // because repeated call can contain unit
-      .replace(/[.,]/g, "")
-    , linksAPI.getLinkLabel(d));
-  return function(t) { 
-    selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); 
-  };
-  */
   const numberStart = linksAPI.getLinkLabel(d, oldLabelField);
   const numberEnd = linksAPI.getLinkLabel(d, newLabelField);
   const i = d3.interpolateNumber(numberStart, numberEnd);
@@ -98,5 +97,42 @@ linksAPI.getLinkLabelColor = function (d) {
     return d3.select(this).style("fill");
   } else { 
     return options.linkLabelColor(linksAPI.getLinkLabel(d, oldLabelField));
+  }
+};
+
+linksAPI.getLinkTextPositionX = function (d) {
+  return (d.y - d.parent.y) / 2 + labelDimensions[d.depth].maxX / 2; 
+};
+
+linksAPI.computeLabelDimensions = function (trans) {
+  // if (!options.linkLabelOn) { return;}
+  let dims = [undefined];
+  trans
+    .each(function(d) {
+      let labelDimensions = {};
+      const height = d3.select(this).node().getBBox().height;
+      const width = d3.select(this).node().getBBox().width;
+      const text = d3.select(this).text();
+      if (!dims[d.depth]) {
+        labelDimensions.maxX = width;
+        labelDimensions.maxY = height;
+        labelDimensions.maxXText = text;
+        labelDimensions.maxYText = text;
+        dims.push(labelDimensions);
+      } else {          
+        if (dims[d.depth].maxX < width) {
+          dims[d.depth].maxX = width;
+          dims[d.depth].maxXText = text;
+        } 
+        if (dims[d.depth].maxY < height) {
+          dims[d.depth].maxY = height;
+          dims[d.depth].maxYText = text;
+        } 
+      }
+    });
+  labelDimensions = dims;
+  if (options.debugOn) {
+    console.log("dimensions:");
+    console.log(dims);
   }
 };
