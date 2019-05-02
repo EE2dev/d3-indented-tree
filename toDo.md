@@ -21,8 +21,15 @@ https://gitlab.com/snippets/1703535
 [ok] linkLabel: doubletext: https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
 [ok] linkLabel: right-align text-anchor:end text per depth after finding the largest numbers
 [ok] linkLabel: allow text to be put on top of link (add css with different class for that)
+[ok] csv files: other fileds are not copied to d.data
+[ok] optional alignment of link label (horizontally)
+
+[bug] alignLevaes(false) in test-showcase_g.html leads to thicker links
+* update examples
 
 * docu data format
+
+* change function arguments to objects -> https://stackoverflow.com/questions/12826977/multiple-arguments-vs-options-object
 
 * linkLabel add group transform to links
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)

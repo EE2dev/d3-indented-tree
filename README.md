@@ -10,7 +10,8 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 ## 1. How to use Hierarchy explorer
 
 ## 2. Data format
-This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
+Hierarchical data can be specified in one of the following three data formats:
+
 
 ## 3.0 API reference
 
@@ -35,6 +36,8 @@ Transitions to the new number label on top of the links.
 * the first argument is either a <i>string</i> refering to the name of the numeric field containing the link label values or <i>boolean</i> to switch the label on or off. Default values are ```"value"``` and ```false```
 * to add a unit/suffix to the label you provide a <i>string</i> as the second argument. Default is ```""``` 
 * to specify the format of the number label, you can pass a <i>string</i> as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e) as the third argument. The default is ```",.0f"```. Note that you can change the locale with [formatDefaultLocale, too](#other_formatDefaultLocale).
+* to move the link label above the link, you can pass a <i>boolean</i> as the fourth argument. Passing ```false``` puts the label (horizontally) above the link, ```true``` on top of (and overlaying) the link. Default is ```true```. 
+* to align the link label horizontally, you can pass a <i>boolean</i> as the fifth argument. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depths. Default is ```true```. 
 
 <a name="link_linkLabelColor" href="#link_linkLabelColor">#</a> <i>myChart</i>.<b>linkLabelColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
@@ -57,7 +60,7 @@ Sets the height (vertical length) of the links.
 
 <a name="link_alignLeaves" href="#link_alignLeaves">#</a> <i>myChart</i>.<b>alignLeaves</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Sets the alignment of the leaves of the hierarchy. If leaves are aligned, all leaves start at the same horizontal position (cluster layout).  
+Sets the alignment of the leaves of the hierarchy. If leaves are aligned, all leaves start at the same horizontal position (cluster layout). If ```myChart.linkWidth()``` is set dynamically (by referencing a field), this function has no effect.  
 * the first argument is <i>boolean</i> referencing if all leaves are aligned at the same depth (default is ```false```).
 * with no parameter returns if the leaves are aligned at the same depth.
 

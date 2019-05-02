@@ -1,0 +1,11 @@
+key,parent,population
+World,,
+Asia,World,4436
+China,Asia,1420
+India,Asia,1369
+Africa,World,1216
+Europe,World,739
+North America,World,579
+USA,North America,329
+South America,World,423
+Oceania,World,38

@@ -264,14 +264,14 @@ function update(source, options, config){
     .style("fill", l.getLinkLabelColor);  
     */    
   linkEnter
-    .append("text")  
-    .attr("text-anchor", "end") 
+    .append("text")   
     .style("opacity", 1e-6);   
   
   // update merged selection before transition
   const linkMerge = link.merge(linkEnter);
   linkMerge.select("text")
     .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
+    .attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
     .attr("dy", l.getInitialDy)
     .text(d => l.getLinkLabelFormatted(d))
     .style("fill", l.getLinkLabelColor); 

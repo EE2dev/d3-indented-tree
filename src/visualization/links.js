@@ -101,7 +101,8 @@ linksAPI.getLinkLabelColor = function (d) {
 };
 
 linksAPI.getLinkTextPositionX = function (d) {
-  return (d.y - d.parent.y) / 2 + labelDimensions[d.depth].maxX / 2; 
+  const shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
+  return (d.y - d.parent.y) / 2 + shiftAlign; 
 };
 
 linksAPI.computeLabelDimensions = function (trans) {

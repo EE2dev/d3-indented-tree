@@ -31,7 +31,7 @@
             if (debugOn) {
               console.log(data);
             }
-            var hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn);
+            var hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn);
             if (debugOn) {
               console.log("hierarchy: ");console.log(hierarchy);
             }
@@ -97,37 +97,101 @@
     return root;
   }
 
+  /*
   function createHierarchyFromFlatData(data, keys, debugOn) {
+    let entries = d3.nest();
+    keys.forEach(key => entries.key(d => d[key]));
+    entries = entries.entries(data);
+    constructJson(entries);
+    let root = d3.hierarchy(entries[0], getChildren);
+    return root;
+
+    function getChildren(d){
+      let children = d.values;
+      if (typeof (children) === "undefined") {
+        return null;
+      }
+      children = children.filter(function(child) {
+        if (typeof (child.key) === "undefined") { 
+          return false; 
+        }
+        if (child.key.length !== 0) { 
+          return true;
+        }
+        else { 
+          return false;
+        }
+      }); 
+      
+      if (debugOn) { console.log("Key: " + d.key + " Children: " + children.length);}
+      return (children.length === 0) ? null : children;
+    }
+    function constructJson(entries){
+      return entries;
+    }
+  } */
+
+  function createHierarchyFromFlatData(data, keys, keyField, debugOn) {
     var entries = d3.nest();
     keys.forEach(function (key) {
       return entries.key(function (d) {
         return d[key];
       });
     });
-    entries = entries.entries(data);
-    var root = d3.hierarchy(entries[0], getChildren);
+    entries = entries.map(data);
+    //let json = {key: entries.keys()[0]};
+    var json = {};
+    json[keyField] = entries.keys()[0];
+    constructJson(json, entries.get(entries.keys()[0]), keyField);
+    if (debugOn) {
+      console.log("converted JSON:");
+      console.log(json);
+    }
+    var root = d3.hierarchy(json);
+    // let root = d3.hierarchy(entries[0], getChildren);
     return root;
 
-    function getChildren(d) {
-      var children = d.values;
-      if (typeof children === "undefined") {
+    /*
+    function getChildren(d){
+      let children = d.values;
+      if (typeof (children) === "undefined") {
         return null;
       }
-      children = children.filter(function (child) {
-        if (typeof child.key === "undefined") {
-          return false;
+      children = children.filter(function(child) {
+        if (typeof (child.key) === "undefined") { 
+          return false; 
         }
-        if (child.key.length !== 0) {
+        if (child.key.length !== 0) { 
           return true;
-        } else {
+        }
+        else { 
           return false;
         }
-      });
-
-      if (debugOn) {
-        console.log("Key: " + d.key + " Children: " + children.length);
+      }); 
+      
+      if (debugOn) { console.log("Key: " + d.key + " Children: " + children.length);}
+      return (children.length === 0) ? null : children;
+    }
+    */
+    function constructJson(json, entries, keyField) {
+      if (Array.isArray(entries)) {
+        var obj = entries[0];
+        for (var property in obj) {
+          json[property] = obj[property];
+        }
+      } else {
+        entries.entries().forEach(function (ele) {
+          if (ele[keyField] === "") {
+            constructJson(json, ele.value);
+          } else {
+            json.children = !json.children ? [] : json.children;
+            var newObject = {};
+            newObject[keyField] = ele[keyField];
+            json.children.push(constructJson(newObject, ele.value, keyField));
+          }
+        });
       }
-      return children.length === 0 ? null : children;
+      return json;
     }
   }
 
@@ -241,7 +305,8 @@
   };
 
   linksAPI.getLinkTextPositionX = function (d) {
-    return (d.y - d.parent.y) / 2 + labelDimensions[d.depth].maxX / 2;
+    var shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
+    return (d.y - d.parent.y) / 2 + shiftAlign;
   };
 
   linksAPI.computeLabelDimensions = function (trans) {
@@ -514,11 +579,11 @@
       .style("opacity", 1e-6)
       .style("fill", l.getLinkLabelColor);  
       */
-    linkEnter.append("text").attr("text-anchor", "end").style("opacity", 1e-6);
+    linkEnter.append("text").style("opacity", 1e-6);
 
     // update merged selection before transition
     var linkMerge = link.merge(linkEnter);
-    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above").attr("dy", l.getInitialDy).text(function (d) {
+    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above").attr("text-anchor", options.linkLabelAligned ? "end" : "middle").attr("dy", l.getInitialDy).text(function (d) {
       return l.getLinkLabelFormatted(d);
     }).style("fill", l.getLinkLabelColor);
 
@@ -597,6 +662,7 @@
     options.linkLabelOn = false;
     options.linkLabelUnit = "";
     options.linkLabelOnTop = true;
+    options.linkLabelAligned = true; // otherwise centered
     // options.linkLabelFormat = d => d;
 
     options.locale = undefined;
@@ -627,7 +693,7 @@
     options.propagateField = "value"; // default field for propagation
 
     options.alignLeaves = false; // use tree layout as default, otherwise cluster layout
-    options.keyField = undefined;
+    options.keyField = "key";
 
     // 2. ADD getter-setter methods here
     chartAPI.debugOn = function (_) {
@@ -696,6 +762,7 @@
       var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelUnit;
       var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormatSpecifier;
       var labelOnTop = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : options.linkLabelOnTop;
+      var alignLabels = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : options.linkLabelAligned;
 
       if (!arguments.length) return options.linkLabelField;
 
@@ -709,6 +776,7 @@
         options.linkLabelUnit = unit === "" ? "" : unit;
         options.linkLabelFormat = d3.format(format);
         options.linkLabelOnTop = labelOnTop;
+        options.linkLabelAligned = alignLabels;
       }
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
@@ -809,7 +877,8 @@
       if ((typeof dataSpec === "undefined" ? "undefined" : _typeof(dataSpec)) === "object") {
         myData.data = dataSpec.source;
         myData.hierarchyLevels = dataSpec.hierarchyLevels;
-        myData.keyField = dataSpec.key ? dataSpec.key : myData.hierarchyLevels ? "key" : "name";
+        // myData.keyField = dataSpec.key ? dataSpec.key : (myData.hierarchyLevels ? "key" : "name");
+        myData.keyField = dataSpec.key ? dataSpec.key : "key";
         myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
       } else {
         console.log("dataspec is not an object!");

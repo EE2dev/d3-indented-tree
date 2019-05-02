@@ -22,6 +22,7 @@ export default function (_dataSpec) {
   options.linkLabelOn = false;
   options.linkLabelUnit = "";
   options.linkLabelOnTop = true;
+  options.linkLabelAligned = true; // otherwise centered
   // options.linkLabelFormat = d => d;
 
   options.locale = undefined;
@@ -52,7 +53,7 @@ export default function (_dataSpec) {
   options.propagateField = "value"; // default field for propagation
 
   options.alignLeaves = false; // use tree layout as default, otherwise cluster layout
-  options.keyField = undefined;
+  options.keyField = "key";
 
   // 2. ADD getter-setter methods here
   chartAPI.debugOn = function(_) {
@@ -116,7 +117,8 @@ export default function (_dataSpec) {
   };
 
   chartAPI.linkLabel = function(_ = options.linkLabelField, unit = options.linkLabelUnit, 
-    format = options.linkLabelFormatSpecifier, labelOnTop = options.linkLabelOnTop) {
+    format = options.linkLabelFormatSpecifier, labelOnTop = options.linkLabelOnTop, 
+    alignLabels = options.linkLabelAligned) {
     if (!arguments.length) return options.linkLabelField;
 
     if (typeof(_)  === "string")  {
@@ -129,6 +131,7 @@ export default function (_dataSpec) {
       options.linkLabelUnit = (unit === "") ? "" : unit;
       options.linkLabelFormat = d3.format(format);
       options.linkLabelOnTop = labelOnTop;
+      options.linkLabelAligned = alignLabels;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
@@ -216,7 +219,8 @@ export default function (_dataSpec) {
     if (typeof dataSpec === "object"){ 
       myData.data = dataSpec.source;
       myData.hierarchyLevels = dataSpec.hierarchyLevels;
-      myData.keyField = dataSpec.key ? dataSpec.key : (myData.hierarchyLevels ? "key" : "name");
+      // myData.keyField = dataSpec.key ? dataSpec.key : (myData.hierarchyLevels ? "key" : "name");
+      myData.keyField = dataSpec.key ? dataSpec.key : "key";
       myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
     } else {
       console.log("dataspec is not an object!");
