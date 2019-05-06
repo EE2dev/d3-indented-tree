@@ -10,7 +10,122 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 ## 1. How to use Hierarchy explorer
 
 ## 2. Data format
-Hierarchical data can be specified in one of the following three data formats:
+Hierarchical data can be specified in one of the following three data formats. The examples contain the same data in the supported formats.
+
+### 2.1. JSON format
+A JSON file format, containing a key field for each node. By default, the key field for each node should have the property name ```"key"```. If the key field has a name other than ```"key"```, the *dataSpec* object has to reference it (see below for the example which has the field ```"name"```as a key). 
+
+```
+{
+  "name": "World",
+  "children": [
+    {
+      "name": "Asia",
+      "population": 4436,
+      "children": [
+        {
+          "name": "China",
+          "population": 1420
+        },
+        {
+          "name": "India",
+          "population": 1369
+        }
+      ]
+    },
+    {
+      "name": "Africa",
+      "population": 1216
+    },
+    {
+      "name": "Europe",
+      "population": 739
+    },
+    {
+      "name": "North America",
+      "population": 579,
+      "children": [
+        {
+          "name": "USA",
+          "population": 329
+        }
+      ]
+    },
+    {
+      "name": "South America",
+      "population": 423
+    },
+    {
+      "name": "Oceania",
+      "population": 38
+    }
+  ]
+}
+```
+Then the javascript part would look like:
+```
+...
+    <script>
+      const dataSpec = {
+        source: "../data/data1.json",
+        key: "name",
+      };
+      const myChart = reusableChart.chart(dataSpec);
+      ...
+``` 
+### 2.2. CSV (hierarchical) format
+A csv file format consisting of one row for each node. Each row contains ```key```as the key in the first column, ```parent``` as its parent key in the second column and the remaning data for each node.  
+```
+key,parent,population
+World,,
+Asia,World,4436
+China,Asia,1420
+India,Asia,1369
+Africa,World,1216
+Europe,World,739
+North America,World,579
+USA,North America,329
+South America,World,423
+Oceania,World,38
+```
+Then the javascript part would look like:
+```
+...
+    <script>
+      const dataSpec = {
+        source: "../data/data3.csv",
+      };
+      const myChart = reusableChart.chart(dataSpec);
+      ...
+``` 
+### 2.3. CSV (relational) format
+A csv file format consisting of one row for each leaf node. Each row contains the keys of each node traversed from the root down to the leaf and the corresponding data for each leaf.
+The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference with the property ```hierarchyLevels``` the columns of each level in its top-down traversal order (see below for the example). 
+
+```
+all,continent,country,population
+World,Asia,,4436
+World,Asia,China,1420
+World,Asia,India,1369
+World,Africa,,1216
+World,Europe,,739
+World,North America,,579
+World,North America,USA,329
+World,South America,,423
+World,Oceania,,38
+```
+```
+...
+    <script>
+      const dataSpec = {
+        source: "../data/data2.csv",
+        hierarchyLevels: ["all", "continent", "country"],
+      };
+      const myChart = reusableChart.chart(dataSpec);
+      ...
+``` 
+
+
 
 
 ## 3.0 API reference
@@ -37,7 +152,7 @@ Transitions to the new number label on top of the links.
 * to add a unit/suffix to the label you provide a <i>string</i> as the second argument. Default is ```""``` 
 * to specify the format of the number label, you can pass a <i>string</i> as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e) as the third argument. The default is ```",.0f"```. Note that you can change the locale with [formatDefaultLocale, too](#other_formatDefaultLocale).
 * to move the link label above the link, you can pass a <i>boolean</i> as the fourth argument. Passing ```false``` puts the label (horizontally) above the link, ```true``` on top of (and overlaying) the link. Default is ```true```. 
-* to align the link label horizontally, you can pass a <i>boolean</i> as the fifth argument. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depths. Default is ```true```. 
+* to align the link label horizontally, you can pass a <i>boolean</i> as the fifth argument. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth. Default is ```true```. 
 
 <a name="link_linkLabelColor" href="#link_linkLabelColor">#</a> <i>myChart</i>.<b>linkLabelColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 

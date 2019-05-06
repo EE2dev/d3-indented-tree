@@ -35,7 +35,7 @@ https://gitlab.com/snippets/1703535
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)
 * linkLabel: adjust width to minimum Width
 
-* readme linklabel
+[ok] readme linklabel
 
 * link.call(function (sel) {positionPath(sel, options)})  --> positionPath -> d attr and transform
 * linkColor: Implementierung Gradient: 1) iterate through node and add all different parent-son color combinations to set
