@@ -60,11 +60,6 @@ linksAPI.getLinkStroke = function (d) {
 };
 
 linksAPI.getLinkStrokeWidth = function (d) {
-  /*
-  const sw = options.linkStrengthStatic ? options.linkStrengthValue
-    : options.linkStrengthScale(d.data[options.linkStrengthField]); 
-  return sw + "px";
-  */
   return linksAPI.getLinkStrength(d) + "px";
 };
 
@@ -106,7 +101,6 @@ linksAPI.getLinkTextPositionX = function (d) {
 };
 
 linksAPI.computeLabelDimensions = function (trans) {
-  // if (!options.linkLabelOn) { return;}
   let dims = [undefined];
   trans
     .each(function(d) {

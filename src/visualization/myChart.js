@@ -44,6 +44,7 @@ function createTree(options, config, data) {
   });
   config.root.x0 = config.root.x;
   config.root.y0 = config.root.y;
+  if (options.propagate) { options.propagate = false; }
 
   if (options.debugOn) {
     console.log("Data:"); console.log(data);
@@ -55,7 +56,7 @@ function createScale(options, config) {
   let nodes = config.root.descendants();
   if (!options.linkStrengthStatic) {    
     options.linkStrengthScale
-      .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkStrengthField]))
+      .domain(d3.extent(nodes, d => +d.data[options.linkStrengthField]))
       .range(options.linkStrengthRange);
   }
   if (!options.linkWidthStatic) {    
@@ -286,8 +287,8 @@ function update(source, options, config){
 
   linkUpdate.select("path.link.down")
     .attr("d", (d) => l.getLinkD(d, "down"))
-    .style("stroke", (d) => l.getLinkStroke(d.parent, options))
-    .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent, options));
+    .style("stroke", (d) => l.getLinkStroke(d.parent))
+    .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
 
   linkUpdate.select("path.link.right")
     .attr("d", (d) => l.getLinkD(d, "right"))

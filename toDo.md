@@ -23,13 +23,13 @@ https://gitlab.com/snippets/1703535
 [ok] linkLabel: allow text to be put on top of link (add css with different class for that)
 [ok] csv files: other fileds are not copied to d.data
 [ok] optional alignment of link label (horizontally)
+[ok] docu data format
+[ok] alignLevaes(false) in test-showcase_g.html leads to thicker links
 
-[bug] alignLevaes(false) in test-showcase_g.html leads to thicker links
-* update examples
-
-* docu data format
-
+* html template with all option properties
 * change function arguments to objects -> https://stackoverflow.com/questions/12826977/multiple-arguments-vs-options-object
+* update examples
+* link.js _> change dims = [undefined] to = []
 
 * linkLabel add group transform to links
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)

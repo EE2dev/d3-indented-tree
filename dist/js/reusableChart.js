@@ -257,11 +257,6 @@
   };
 
   linksAPI.getLinkStrokeWidth = function (d) {
-    /*
-    const sw = options.linkStrengthStatic ? options.linkStrengthValue
-      : options.linkStrengthScale(d.data[options.linkStrengthField]); 
-    return sw + "px";
-    */
     return linksAPI.getLinkStrength(d) + "px";
   };
 
@@ -310,7 +305,6 @@
   };
 
   linksAPI.computeLabelDimensions = function (trans) {
-    // if (!options.linkLabelOn) { return;}
     var dims = [undefined];
     trans.each(function (d) {
       var labelDimensions = {};
@@ -386,6 +380,9 @@
     });
     config.root.x0 = config.root.x;
     config.root.y0 = config.root.y;
+    if (options.propagate) {
+      options.propagate = false;
+    }
 
     if (options.debugOn) {
       console.log("Data:");console.log(data);
@@ -396,7 +393,7 @@
   function createScale(options, config) {
     var nodes = config.root.descendants();
     if (!options.linkStrengthStatic) {
-      options.linkStrengthScale.domain(d3.extent(nodes.slice(1), function (d) {
+      options.linkStrengthScale.domain(d3.extent(nodes, function (d) {
         return +d.data[options.linkStrengthField];
       })).range(options.linkStrengthRange);
     }
@@ -599,9 +596,9 @@
     linkUpdate.select("path.link.down").attr("d", function (d) {
       return l.getLinkD(d, "down");
     }).style("stroke", function (d) {
-      return l.getLinkStroke(d.parent, options);
+      return l.getLinkStroke(d.parent);
     }).style("stroke-width", function (d) {
-      return l.getLinkStrokeWidth(d.parent, options);
+      return l.getLinkStrokeWidth(d.parent);
     });
 
     linkUpdate.select("path.link.right").attr("d", function (d) {
