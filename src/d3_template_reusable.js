@@ -154,6 +154,7 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
+  /*
   chartAPI.linkStrength = function(_ = options.linkStrengthField, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
     if (!arguments.length) return options.linkStrengthValue;
     if (typeof (_) === "number") { 
@@ -165,6 +166,24 @@ export default function (_dataSpec) {
       options.linkStrengthField = _;
       options.linkStrengthScale = scale;
       options.linkStrengthRange = range;
+    }
+    
+    if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
+    return chartAPI;
+  };
+  */
+  chartAPI.linkStrength = function(_ = options.linkStrengthField, _options = {}) {
+    //scale = options.linkStrengthScale, range = options.linkStrengthRange) {
+    if (!arguments.length) return options.linkStrengthValue;
+    if (typeof (_) === "number") { 
+      options.linkStrengthStatic = true;
+      options.linkStrengthValue = _;
+    }
+    else if (typeof(_) === "string") {
+      options.linkStrengthStatic = false;
+      options.linkStrengthField = _;
+      options.linkStrengthScale = _options.scale || options.linkStrengthScale;
+      options.linkStrengthRange = _options.range || options.linkStrengthRange;
     }
     
     if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();

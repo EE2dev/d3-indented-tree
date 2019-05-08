@@ -30,6 +30,8 @@ https://gitlab.com/snippets/1703535
 * change function arguments to objects -> https://stackoverflow.com/questions/12826977/multiple-arguments-vs-options-object
 * update examples
 * link.js _> change dims = [undefined] to = []
+* readme no webserver
+* change directories to build and lib and test
 
 * linkLabel add group transform to links
 * linkLabel: group text elements and create two text elements (one 2px larger in the back)

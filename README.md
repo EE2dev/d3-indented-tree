@@ -15,7 +15,7 @@ Hierarchical data can be specified in one of the following three data formats. T
 ### 2.1. JSON format
 A JSON file format, containing a key field for each node. By default, the key field for each node should have the property name ```"key"```. If the key field has a name other than ```"key"```, the *dataSpec* object has to reference it (see below for the example which has the field ```"name"```as a key). 
 
-```
+```js
 {
   "name": "World",
   "children": [
@@ -63,7 +63,7 @@ A JSON file format, containing a key field for each node. By default, the key fi
 }
 ```
 Then the javascript part would look like:
-```
+```js
 ...
     <script>
       const dataSpec = {
@@ -89,7 +89,7 @@ South America,World,423
 Oceania,World,38
 ```
 Then the javascript part would look like:
-```
+```js
 ...
     <script>
       const dataSpec = {
@@ -114,7 +114,7 @@ World,North America,USA,329
 World,South America,,423
 World,Oceania,,38
 ```
-```
+```js
 ...
     <script>
       const dataSpec = {
@@ -134,9 +134,18 @@ World,Oceania,,38
 <a name="link_linkStrength" href="#link_linkStrength">#</a> <i>myChart</i>.<b>linkStrength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new strength (thickness) of the links. The horizontal link to and the vertical link from a node is denoting its strength.
-* to statically set all the links to the strength, call this function with an <i>integer</i> argument, which denotes the thickness in pixels (default is ```1```).
-* to set the link strength dynamically, provide the name of a numeric field (default is ```"value"```). In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the strength (default is ```d3.scaleLinear()```). The third argument refers to the range of the scale (default is ```[1,10]```). 
-* with no parameter returns the static strength of the links.
+
+1. argument:
+    * to statically set all the links to the strength, call this function with an <i>integer</i> argument, which denotes the thickness in pixels (default is ```1```).
+    * to set the link strength dynamically, provide the name of a numeric field as a *string*. 
+    
+2. argument (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `scale` defines the scale used to map the values to the strength (default is `d3.scaleLinear()`).
+        * `range` refers to the range of the scale (default is `[1,10]`). 
+
+* No argument:
+    * with no parameter the function returns the static strength of the links.
 
 <a name="link_linkWidth" href="#link_linkWidth">#</a> <i>myChart</i>.<b>linkWidth</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
