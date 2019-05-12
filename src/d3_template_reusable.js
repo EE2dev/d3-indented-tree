@@ -12,6 +12,7 @@ export default function (_dataSpec) {
   // 1. ADD all options that should be accessible to caller
   options.debugOn = false;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
+  options.svgDimensions = {height: 800, width: 1400};
   options.maxNameLength = 50;
   options.transitionDuration = 750;
 
@@ -72,6 +73,12 @@ export default function (_dataSpec) {
   chartAPI.margin = function(_) {
     if (!arguments.length) return options.margin;
     options.margin = _;
+    return chartAPI;
+  }; 
+
+  chartAPI.svgDimensions = function(_) {
+    if (!arguments.length) return options.svgDimensions;
+    options.svgDimensions = _;
     return chartAPI;
   }; 
     
@@ -137,6 +144,7 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
+  /*
   chartAPI.linkWidth = function(_ = options.linkWidthField, scale = options.linkWidthScale, range = options.linkWidthRange) {
     if (!arguments.length) return options.linkWidthValue;
     if (typeof (_) === "number") { 
@@ -153,7 +161,23 @@ export default function (_dataSpec) {
     if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
     return chartAPI;
   };
-
+  */
+  chartAPI.linkWidth = function(_ = options.linkWidthField, _options = {}) {
+    if (!arguments.length) return options.linkWidthValue;
+    if (typeof (_) === "number") { 
+      options.linkWidthStatic = true;
+      options.linkWidthValue = _;
+    }
+    else if (typeof(_) === "string") {
+      options.linkWidthStatic = false;
+      options.linkWidthField = _;
+      options.linkWidthScale  = _options.scale || options.linkWidthScale;
+      options.linkWidthRange = _options.range || options.linkWidthRange;
+    }
+    
+    if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
+    return chartAPI;
+  };
   /*
   chartAPI.linkStrength = function(_ = options.linkStrengthField, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
     if (!arguments.length) return options.linkStrengthValue;
@@ -173,7 +197,6 @@ export default function (_dataSpec) {
   };
   */
   chartAPI.linkStrength = function(_ = options.linkStrengthField, _options = {}) {
-    //scale = options.linkStrengthScale, range = options.linkStrengthRange) {
     if (!arguments.length) return options.linkStrengthValue;
     if (typeof (_) === "number") { 
       options.linkStrengthStatic = true;

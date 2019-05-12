@@ -7,9 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "b-clean-dist": "rm -rf dist && mkdir dist",
+    "b-clean-build": "rm -rf build && mkdir build",
     "b-rollup": "rollup -c",
-    "b-uglify": "uglifyjs dist/js/reusableChart.js -c -m -o dist/js/reusableChart.min.js",
+    "b-uglify": "uglifyjs build/reusableChart.js -c -m -o build/reusableChart.min.js",
     "b-eslint": "eslint index.js src",
     "b-tape": "node test/reusableChart-test.js | tap-spec",
     "build": "npm run -s b-rollup & npm run -s b-eslint & npm run -s b-uglify",

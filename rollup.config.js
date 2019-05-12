@@ -4,7 +4,7 @@ import babel from "rollup-plugin-babel";
 
 export default {
   entry: "index.js",
-  dest: "dist/js/reusableChart.js",
+  dest: "build/reusableChart.js",
   format: "umd",
   moduleName: "reusableChart",
   globals: {

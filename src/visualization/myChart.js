@@ -7,8 +7,8 @@ import { linksAPI } from "./links.js";
 
 export function myChart(selection, data, options){
   let config = {};
-  config.width = 1400 - options.margin.right - options.margin.left;
-  config.height = 800 - options.margin.top - options.margin.bottom;
+  config.width = options.svgDimensions.width - options.margin.right - options.margin.left;
+  config.height = options.svgDimensions.height - options.margin.top - options.margin.bottom;
   config.i = 0; // counter for numerical IDs
   config.tree = undefined;
   config.root = undefined;
@@ -86,20 +86,6 @@ function createUpdateFunctions(options, config, data){
     update(config.root, options, config);
   };
 
-  /*
-  options.updateLinkHeight = function() {
-    update(config.root, options, config);
-  };
-
-  options.updateLinkLabel = function() {
-    update(config.root, options, config);
-  };
-
-  options.updateLinkColor = function() {
-    update(config.root, options, config);
-  };
-  */
-
   options.updateDefault = function() {
     update(config.root, options, config);
   };
@@ -127,7 +113,7 @@ function click(d, options, config){
 }
 
 function update(source, options, config){
-  config.width = 800;
+  // config.width = 800;
 
   // Compute the new tree layout.
   let nodes = config.tree(config.root);

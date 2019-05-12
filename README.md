@@ -145,14 +145,23 @@ Transitions to the new strength (thickness) of the links. The horizontal link to
         * `range` refers to the range of the scale (default is `[1,10]`). 
 
 * No argument:
-    * with no parameter the function returns the static strength of the links.
+  * with no argument the function returns the static strength of the links.
 
 <a name="link_linkWidth" href="#link_linkWidth">#</a> <i>myChart</i>.<b>linkWidth</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new width (horizontal length) of the links. The horizontal link to a node is affected by its corresponding value. 
-* to statically set all the links to the width, call this function with an <i>integer</i> argument, which denotes the width in pixels (default is ```30```).
-* to set the link width dynamically, provide the name of a numeric field (default is ```"value"```). In addition to the field name, two optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the width (default is ```d3.scaleLinear()```). The third argument is an <i>array</i> and refers to the range of the scale (default is ```[15,100]```). 
-* with no parameter returns the static width of the links.
+
+1. argument:
+    * to statically set all the links to the width, call this function with an <i>integer</i> argument, which denotes the width in pixels (default is ```30```).
+    * to set the link width dynamically, provide the name of a numeric field as a *string*. 
+    
+2. argument (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `scale` defines the scale used to map the values to the width (default is `d3.scaleLinear()`).
+        * `range` refers to the range of the scale (default is `[15, 100]`). 
+
+* No argument:
+  * with no argument the function returns the static width of the links.
 
 <a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
@@ -174,19 +183,19 @@ Sets the color of the link label (default is ```"black"```).
 Transitions to the new color of the links. The horizontal link to and the vertical link from a node is denoted by its color.
 * to set the link color statically, use instead <a href="#other_defaultColor"><i>myChart</i>.<b>defaultColor</b>()</a>
 * to set the link color dynamically, provide the name of a field (default is ```"value"``` after the first call). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale used to map the values to the color (default is the identity function ```(value) => value``` assuming the field contains a valid color). 
-* with no parameter returns the field used for the color.
+* with no argument returns the field used for the color.
 
 <a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the height (vertical length) of the links. 
 * the first argument is an <i>integer</i> referencing link height in pixels (default is ```20```).
-* with no parameter returns the height of the links.
+* with no argument returns the height of the links.
 
 <a name="link_alignLeaves" href="#link_alignLeaves">#</a> <i>myChart</i>.<b>alignLeaves</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the alignment of the leaves of the hierarchy. If leaves are aligned, all leaves start at the same horizontal position (cluster layout). If ```myChart.linkWidth()``` is set dynamically (by referencing a field), this function has no effect.  
 * the first argument is <i>boolean</i> referencing if all leaves are aligned at the same depth (default is ```false```).
-* with no parameter returns if the leaves are aligned at the same depth.
+* with no argument returns if the leaves are aligned at the same depth.
 
 ### 3.2 Nodes
 
@@ -195,37 +204,43 @@ Sets the alignment of the leaves of the hierarchy. If leaves are aligned, all le
 
 Enables/disables debugging info on the console. 
 * the first argument is <i>boolean</i> and references if the debug option is enabled (default is ```false```).
-* with no parameter returns the boolean value indicating if the debug option is enabled.
+* with no argument returns the boolean value indicating if the debug option is enabled.
 
 <a name="other_defaultColor" href="#other_defaultColor">#</a> <i>myChart</i>.<b>defaultColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the default color for the links and nodes. 
 * the first argument is a <i>string</i> referencing the color (default is ```"grey"```).
-* with no parameter returns the default color.
+* with no argument returns the default color.
 
 <a name="other_margin" href="#other_margin">#</a> <i>myChart</i>.<b>margin</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the margins for the SVG. 
 * the first argument is an <i>object</i> referencing the four dimensions of the margin (default is ```{top: 20, right: 10, bottom: 20, left: 10}```).
-* with no parameter returns the default margin.
+* with no argument returns the default margin.
+
+<a name="other_svgDimensions" href="#other_svgDimensions">#</a> <i>myChart</i>.<b>svgDimensions</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sets the dimensions for the SVG. 
+* the first argument is an <i>object</i> referencing the dimensions of the SVG (default is ```{width: 1400, height: 800}```).
+* with no argument returns the default SVG dimensions.
 
 <a name="other_maxNameLength" href="#other_maxNameLength">#</a> <i>myChart</i>.<b>maxNameLength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the maximum number of characters displayed as node label. All remaining characters are truncated and displayed as ```...```.  
 * the first argument is an <i>integer</i> referencing the maximum number of characters display as node label (default is ```50```).
-* with no parameter returns the maximum number of characters displayed as node label.
+* with no argument returns the maximum number of characters displayed as node label.
 
 <a name="other_transitionDuration" href="#other_transitionDuration">#</a> <i>myChart</i>.<b>transitionDuration</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the transition duration for the transitions.
 * the first argument is an <i>integer</i> referencing the duration of a transition in milliseconds (default is ```750```).
-* with no parameter returns the transition duration for the transitions.
+* with no argument returns the transition duration for the transitions.
 
 <a name="other_propagateValue" href="#other_propagateValue">#</a> <i>myChart</i>.<b>propagateValue</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Propagates a field (which may be just filled in the leaves) throughout all the nodes by summing up the values bottom up.
 * the first argument is a <i>string</i> referencing a field to be propagated (default is ```"value"```).
-* with no parameter returns if a field is propagated and its name.
+* with no argument returns if a field is propagated and its name.
 
 <a name="other_formatDefaultLocale" href="#other_formatDefaultLocale">#</a> <i>myChart</i>.<b>formatDefaultLocale</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
