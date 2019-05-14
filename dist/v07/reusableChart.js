@@ -341,8 +341,8 @@
 
   function myChart(selection, data, options) {
     var config = {};
-    config.width = 1400 - options.margin.right - options.margin.left;
-    config.height = 800 - options.margin.top - options.margin.bottom;
+    config.width = options.svgDimensions.width - options.margin.right - options.margin.left;
+    config.height = options.svgDimensions.height - options.margin.top - options.margin.bottom;
     config.i = 0; // counter for numerical IDs
     config.tree = undefined;
     config.root = undefined;
@@ -424,18 +424,6 @@
       update(config.root, options, config);
     };
 
-    /*
-    options.updateLinkHeight = function() {
-      update(config.root, options, config);
-    };
-      options.updateLinkLabel = function() {
-      update(config.root, options, config);
-    };
-      options.updateLinkColor = function() {
-      update(config.root, options, config);
-    };
-    */
-
     options.updateDefault = function () {
       update(config.root, options, config);
     };
@@ -463,7 +451,7 @@
   }
 
   function update(source, options, config) {
-    config.width = 800;
+    // config.width = 800;
 
     // Compute the new tree layout.
     var nodes = config.tree(config.root);
@@ -649,6 +637,7 @@
     // 1. ADD all options that should be accessible to caller
     options.debugOn = false;
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
+    options.svgDimensions = { height: 800, width: 1400 };
     options.maxNameLength = 50;
     options.transitionDuration = 750;
 
@@ -709,6 +698,12 @@
     chartAPI.margin = function (_) {
       if (!arguments.length) return options.margin;
       options.margin = _;
+      return chartAPI;
+    };
+
+    chartAPI.svgDimensions = function (_) {
+      if (!arguments.length) return options.svgDimensions;
+      options.svgDimensions = _;
       return chartAPI;
     };
 
@@ -779,11 +774,28 @@
       return chartAPI;
     };
 
+    /*
+    chartAPI.linkWidth = function(_ = options.linkWidthField, scale = options.linkWidthScale, range = options.linkWidthRange) {
+      if (!arguments.length) return options.linkWidthValue;
+      if (typeof (_) === "number") { 
+        options.linkWidthStatic = true;
+        options.linkWidthValue = _;
+      }
+      else if (typeof(_) === "string") {
+        options.linkWidthStatic = false;
+        options.linkWidthField = _;
+        options.linkWidthScale = scale;
+        options.linkWidthRange = range;
+      }
+      
+      if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
+      return chartAPI;
+    };
+    */
     chartAPI.linkWidth = function () {
       var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkWidthField;
 
-      var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkWidthScale;
-      var range = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkWidthRange;
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!arguments.length) return options.linkWidthValue;
       if (typeof _ === "number") {
@@ -792,14 +804,13 @@
       } else if (typeof _ === "string") {
         options.linkWidthStatic = false;
         options.linkWidthField = _;
-        options.linkWidthScale = scale;
-        options.linkWidthRange = range;
+        options.linkWidthScale = _options.scale || options.linkWidthScale;
+        options.linkWidthRange = _options.range || options.linkWidthRange;
       }
 
       if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
       return chartAPI;
     };
-
     /*
     chartAPI.linkStrength = function(_ = options.linkStrengthField, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
       if (!arguments.length) return options.linkStrengthValue;
@@ -823,7 +834,6 @@
 
       var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      //scale = options.linkStrengthScale, range = options.linkStrengthRange) {
       if (!arguments.length) return options.linkStrengthValue;
       if (typeof _ === "number") {
         options.linkStrengthStatic = true;

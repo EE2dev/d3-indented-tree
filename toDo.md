@@ -26,6 +26,9 @@ https://gitlab.com/snippets/1703535
 [ok] docu data format
 [ok] alignLevaes(false) in test-showcase_g.html leads to thicker links
 
+[bug] test error for test_showcase_g.html
+* test linkLabel with just text
+
 * html template with all option properties
 * change function arguments to objects -> https://stackoverflow.com/questions/12826977/multiple-arguments-vs-options-object
 * update examples
