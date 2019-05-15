@@ -99,8 +99,8 @@ Then the javascript part would look like:
       ...
 ``` 
 ### 2.3. CSV (relational) format
-A csv file format consisting of one row for each leaf node. Each row contains the keys of each node traversed from the root down to the leaf and the corresponding data for each leaf.
-The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference with the property ```hierarchyLevels``` the columns of each level in its top-down traversal order (see below for the example). 
+A csv file format consisting of one row for each node. Each row contains the keys of each node traversed from the root down to the specific node and the corresponding data for that node.
+The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference the columns of each level in its top-down traversal order with the property ```hierarchyLevels```  (see below for the example). 
 
 ```
 all,continent,country,population
@@ -166,17 +166,23 @@ Transitions to the new width (horizontal length) of the links. The horizontal li
 <a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new number label on top of the links. 
-* the first argument is either a <i>string</i> refering to the name of the numeric field containing the link label values or <i>boolean</i> to switch the label on or off. Default values are ```"value"``` and ```false```
-* to add a unit/suffix to the label you provide a <i>string</i> as the second argument. Default is ```""``` 
-* to specify the format of the number label, you can pass a <i>string</i> as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e) as the third argument. The default is ```",.0f"```. Note that you can change the locale with [formatDefaultLocale, too](#other_formatDefaultLocale).
-* to move the link label above the link, you can pass a <i>boolean</i> as the fourth argument. Passing ```false``` puts the label (horizontally) above the link, ```true``` on top of (and overlaying) the link. Default is ```true```. 
-* to align the link label horizontally, you can pass a <i>boolean</i> as the fifth argument. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth. Default is ```true```. 
 
-<a name="link_linkLabelColor" href="#link_linkLabelColor">#</a> <i>myChart</i>.<b>linkLabelColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+1. argument:
+    * to set the label dynamically, provide the name of a numeric field as a *string*. 
+    * to switch the label on or off provide a <i>boolean</i>. 
+    
+2. argument (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `unit` specifies a suffix *string* to the label (default is `""`).
+        * `format` refers to the format *string* of the label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
+        * `locale` is an *object* overriding the default locale format with the specified locale format. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
 
-Sets the color of the link label (default is ```"black"```). 
+        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`).
+        * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth. Default is ```true```.
+        * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
 
-* the only argument is a callback <i>function</i> which gets passed the corresponding value of the link label.
+* No argument:
+    * with no argument the function returns the static width of the links.
 
 <a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
@@ -187,13 +193,13 @@ Transitions to the new color of the links. The horizontal link to and the vertic
 
 <a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Sets the height (vertical length) of the links. 
+Transitions the height (vertical length) of the links. 
 * the first argument is an <i>integer</i> referencing link height in pixels (default is ```20```).
 * with no argument returns the height of the links.
 
 <a name="link_alignLeaves" href="#link_alignLeaves">#</a> <i>myChart</i>.<b>alignLeaves</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Sets the alignment of the leaves of the hierarchy. If leaves are aligned, all leaves start at the same horizontal position (cluster layout). If ```myChart.linkWidth()``` is set dynamically (by referencing a field), this function has no effect.  
+Transitions the alignment of the leaves of the hierarchy. If leaves are aligned, all leaves start at the same horizontal position (cluster layout). If ```myChart.linkWidth()``` is set dynamically (by referencing a field), this function has no effect.  
 * the first argument is <i>boolean</i> referencing if all leaves are aligned at the same depth (default is ```false```).
 * with no argument returns if the leaves are aligned at the same depth.
 

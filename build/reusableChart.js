@@ -51,11 +51,11 @@
           });
         }
       } else {
-        console.log("File must end with .json or csv");
+        console.log("File must end with .json or .csv");
       }
     } else {
       // read data from DOM
-      var data = readDataFromDOM(myData.delimiter);
+      var data = readDataFromDOM(myData.delimiter, myData.data);
       var hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn) : createHierarchy(data, myData.keyField);
       if (debugOn) {
         console.log("embedded data: ");console.log(hierarchy);
@@ -751,10 +751,7 @@
     chartAPI.linkLabel = function () {
       var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkLabelField;
 
-      var unit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelUnit;
-      var format = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : options.linkLabelFormatSpecifier;
-      var labelOnTop = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : options.linkLabelOnTop;
-      var alignLabels = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : options.linkLabelAligned;
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!arguments.length) return options.linkLabelField;
 
@@ -765,33 +762,19 @@
         options.linkLabelOn = _;
       }
       if (options.linkLabelOn) {
-        options.linkLabelUnit = unit === "" ? "" : unit;
-        options.linkLabelFormat = d3.format(format);
-        options.linkLabelOnTop = labelOnTop;
-        options.linkLabelAligned = alignLabels;
+        if (_options.locale) {
+          chartAPI.formatDefaultLocale(_options.locale);
+        }
+        options.linkLabelColor = _options.color || options.linkLabelColor;
+        options.linkLabelUnit = _options.unit || options.linkLabelUnit;
+        options.linkLabelFormat = _options.format ? d3.format(_options.format) : options.linkLabelFormat;
+        options.linkLabelOnTop = typeof _options.onTop !== "undefined" ? _options.onTop : options.linkLabelOnTop;
+        options.linkLabelAligned = typeof _options.align !== "undefined" ? _options.align : options.linkLabelAligned;
       }
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
     };
 
-    /*
-    chartAPI.linkWidth = function(_ = options.linkWidthField, scale = options.linkWidthScale, range = options.linkWidthRange) {
-      if (!arguments.length) return options.linkWidthValue;
-      if (typeof (_) === "number") { 
-        options.linkWidthStatic = true;
-        options.linkWidthValue = _;
-      }
-      else if (typeof(_) === "string") {
-        options.linkWidthStatic = false;
-        options.linkWidthField = _;
-        options.linkWidthScale = scale;
-        options.linkWidthRange = range;
-      }
-      
-      if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
-      return chartAPI;
-    };
-    */
     chartAPI.linkWidth = function () {
       var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkWidthField;
 
@@ -811,24 +794,7 @@
       if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
       return chartAPI;
     };
-    /*
-    chartAPI.linkStrength = function(_ = options.linkStrengthField, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
-      if (!arguments.length) return options.linkStrengthValue;
-      if (typeof (_) === "number") { 
-        options.linkStrengthStatic = true;
-        options.linkStrengthValue = _;
-      }
-      else if (typeof(_) === "string") {
-        options.linkStrengthStatic = false;
-        options.linkStrengthField = _;
-        options.linkStrengthScale = scale;
-        options.linkStrengthRange = range;
-      }
-      
-      if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
-      return chartAPI;
-    };
-    */
+
     chartAPI.linkStrength = function () {
       var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkStrengthField;
 
@@ -858,13 +824,6 @@
       options.linkColorStatic = false;
       options.linkColorField = _;
       options.linkColorScale = scale;
-      if (typeof options.updateDefault === "function") options.updateDefault();
-      return chartAPI;
-    };
-
-    chartAPI.linkLabelColor = function (_) {
-      if (!arguments.length) return options.linkLabelColor;
-      options.linkLabelColor = _;
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
     };
@@ -908,7 +867,7 @@
       } else {
         console.log("dataspec is not an object!");
       }
-      myData.fromFile = typeof myData.data === "undefined" ? false : true;
+      myData.fromFile = myData.data.endsWith(".json") || myData.data.endsWith(".csv") ? true : false;
       myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
       options.keyField = myData.keyField;
       return myData;

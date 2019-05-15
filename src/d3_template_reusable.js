@@ -123,9 +123,7 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
-  chartAPI.linkLabel = function(_ = options.linkLabelField, unit = options.linkLabelUnit, 
-    format = options.linkLabelFormatSpecifier, labelOnTop = options.linkLabelOnTop, 
-    alignLabels = options.linkLabelAligned) {
+  chartAPI.linkLabel = function(_ = options.linkLabelField, _options = {}) { 
     if (!arguments.length) return options.linkLabelField;
 
     if (typeof(_)  === "string")  {
@@ -135,33 +133,17 @@ export default function (_dataSpec) {
       options.linkLabelOn = _;
     }
     if (options.linkLabelOn) {
-      options.linkLabelUnit = (unit === "") ? "" : unit;
-      options.linkLabelFormat = d3.format(format);
-      options.linkLabelOnTop = labelOnTop;
-      options.linkLabelAligned = alignLabels;
+      if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
+      options.linkLabelColor = _options.color || options.linkLabelColor;
+      options.linkLabelUnit = _options.unit || options.linkLabelUnit;
+      options.linkLabelFormat = (_options.format) ? d3.format(_options.format) : options.linkLabelFormat;
+      options.linkLabelOnTop = (typeof (_options.onTop) !== "undefined") ? _options.onTop : options.linkLabelOnTop;
+      options.linkLabelAligned = (typeof (_options.align) !== "undefined") ? _options.align : options.linkLabelAligned;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
 
-  /*
-  chartAPI.linkWidth = function(_ = options.linkWidthField, scale = options.linkWidthScale, range = options.linkWidthRange) {
-    if (!arguments.length) return options.linkWidthValue;
-    if (typeof (_) === "number") { 
-      options.linkWidthStatic = true;
-      options.linkWidthValue = _;
-    }
-    else if (typeof(_) === "string") {
-      options.linkWidthStatic = false;
-      options.linkWidthField = _;
-      options.linkWidthScale = scale;
-      options.linkWidthRange = range;
-    }
-    
-    if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
-    return chartAPI;
-  };
-  */
   chartAPI.linkWidth = function(_ = options.linkWidthField, _options = {}) {
     if (!arguments.length) return options.linkWidthValue;
     if (typeof (_) === "number") { 
@@ -178,24 +160,7 @@ export default function (_dataSpec) {
     if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
     return chartAPI;
   };
-  /*
-  chartAPI.linkStrength = function(_ = options.linkStrengthField, scale = options.linkStrengthScale, range = options.linkStrengthRange) {
-    if (!arguments.length) return options.linkStrengthValue;
-    if (typeof (_) === "number") { 
-      options.linkStrengthStatic = true;
-      options.linkStrengthValue = _;
-    }
-    else if (typeof(_) === "string") {
-      options.linkStrengthStatic = false;
-      options.linkStrengthField = _;
-      options.linkStrengthScale = scale;
-      options.linkStrengthRange = range;
-    }
-    
-    if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
-    return chartAPI;
-  };
-  */
+
   chartAPI.linkStrength = function(_ = options.linkStrengthField, _options = {}) {
     if (!arguments.length) return options.linkStrengthValue;
     if (typeof (_) === "number") { 
@@ -218,13 +183,6 @@ export default function (_dataSpec) {
     options.linkColorStatic = false;
     options.linkColorField = _;
     options.linkColorScale = scale;
-    if (typeof options.updateDefault === "function") options.updateDefault();
-    return chartAPI;
-  };
-
-  chartAPI.linkLabelColor = function(_) {
-    if (!arguments.length) return options.linkLabelColor;
-    options.linkLabelColor = _;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   }; 
@@ -267,7 +225,7 @@ export default function (_dataSpec) {
     } else {
       console.log("dataspec is not an object!");
     }
-    myData.fromFile = (typeof myData.data === "undefined") ? false : true;
+    myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
     myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
     options.keyField = myData.keyField;
     return myData;
