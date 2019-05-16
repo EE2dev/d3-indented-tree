@@ -125,8 +125,66 @@ World,Oceania,,38
       ...
 ``` 
 
+### 2.4. Embedding data into a html node
+In case you want to run hierarchy explorer without a server, you can put your data into a html node. The format of the data hase to be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>.
+The data source is then referenced in the `dataSpec` object by assigning the `source` property to a *string* denoting the selector to the node with the data.
 
+An example for embedded hierarchical csv data:
+```
+...
+<aside id="data">
+key,parent,population
+World,,
+Asia,World,4436
+China,Asia,1420
+India,Asia,1369
+Africa,World,1216
+Europe,World,739
+North America,World,579
+USA,North America,329
+South America,World,423
+Oceania,World,38
+</aside>
+...
+```
+Then the javascript part would look like:
+```js
+...
+    <script>
+      const dataSpec = {
+        source: "aside#data",
+      };
+      const myChart = reusableChart.chart(dataSpec);
+      ...
+``` 
 
+An example for embedded relational csv data:
+```
+...
+<aside id="data">
+all,continent,country,population
+World,Asia,,4436
+World,Asia,China,1420
+World,Asia,India,1369
+World,Africa,,1216
+World,Europe,,739
+World,North America,,579
+World,North America,USA,329
+World,South America,,423
+World,Oceania,,38
+</aside>
+...
+```
+```js
+...
+    <script>
+      const dataSpec = {
+        source: "aside#data",
+        hierarchyLevels: ["all", "continent", "country"],
+      };
+      const myChart = reusableChart.chart(dataSpec);
+      ...
+``` 
 
 ## 3.0 API reference
 
@@ -173,7 +231,7 @@ Transitions to the new number label on top of the links.
     
 2. argument (optional):
     * An *object* with the following properties can be used to further specify the mapping: 
-        * `unit` specifies a suffix *string* to the label (default is `""`).
+        * `unit` specifies a suffix *string* for the label (default is `""`).
         * `format` refers to the format *string* of the label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
         * `locale` is an *object* overriding the default locale format with the specified locale format. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
 
@@ -182,7 +240,7 @@ Transitions to the new number label on top of the links.
         * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
 
 * No argument:
-    * with no argument the function returns the static width of the links.
+    * with no argument the function returns the name of the numeric field for the link labels.
 
 <a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 

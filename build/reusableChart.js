@@ -56,7 +56,7 @@
     } else {
       // read data from DOM
       var data = readDataFromDOM(myData.delimiter, myData.data);
-      var hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn) : createHierarchy(data, myData.keyField);
+      var hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) : createHierarchy(data, myData.keyField);
       if (debugOn) {
         console.log("embedded data: ");console.log(hierarchy);
       }
