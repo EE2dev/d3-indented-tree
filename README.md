@@ -7,6 +7,7 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 
 ## Examples
 
+More examples demonstrating specific API calls:
 ## 1. How to use Hierarchy explorer
 
 ## 2. Data format
