@@ -16,13 +16,13 @@
     <script>
       const dataSpec = {
         source: "../data/flare.json",
+        key: "name",
       };
       const llc = value => value > 6000 ? "green" : "red";
       const myChart = reusableChart.chart(dataSpec)
         .debugOn(true)
         .propagateValue("size")
-        .linkLabel("size")
-        .linkLabelColor(llc);
+        .linkLabel("size", {color: llc, align: false})
       ;
       
       showChart(); 

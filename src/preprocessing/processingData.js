@@ -31,13 +31,13 @@ export function readData(myData, selection, debugOn, createChart) {
         });
       }
     } else {
-      console.log("File must end with .json or csv");
+      console.log("File must end with .json or .csv");
     }
   } 
   else { // read data from DOM
-    const data = readDataFromDOM(myData.delimiter);
+    const data = readDataFromDOM(myData.delimiter, myData.data);
     const hierarchy = (myData.flatData) ? 
-      createHierarchyFromFlatData(data, myData.hierarchyLevels, debugOn) : createHierarchy(data, myData.keyField);
+      createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) : createHierarchy(data, myData.keyField);
     if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
     createChart(selection, hierarchy);
     /*

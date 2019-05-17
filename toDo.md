@@ -46,6 +46,7 @@ https://gitlab.com/snippets/1703535
 * linkColor: Implementierung Gradient: 1) iterate through node and add all different parent-son color combinations to set
 * linkColor: 2) create gradients for these combinations (10% offset)
 
+* switch to crispEdges after transition is finished. (and switch back before next transition starts)
 * document CSS
 * check updateable function with collapsed nodes
 * selection.each() ?

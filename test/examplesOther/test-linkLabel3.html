@@ -11,7 +11,7 @@
   
   <!-- for local processing without web server, paste data inside the aside tag -->
   <aside id="data">
-name,parent,size,weight,color
+key,parent,size,weight,color
 Eve,,3.45,25,yellow
 Cain,Eve,4.647,20.3,black
 Seth,Eve,2,20.3,steelblue
@@ -25,6 +25,7 @@ Azura,Eve,2,30,red
   
     <script>
       const dataSpec = {
+        source: "aside#data", 
       };
 
       const localeGerman = {
@@ -39,7 +40,7 @@ Azura,Eve,2,30,red
         .debugOn(true)
         .propagateValue("size")
         .formatDefaultLocale(localeGerman)
-        .linkLabel("weight", " Euro", undefined, false)
+        .linkLabel("weight",{unit: " Euro", onTop: true, })
         .linkWidth(100)
       ;
       

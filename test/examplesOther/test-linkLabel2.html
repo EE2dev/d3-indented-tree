@@ -11,7 +11,7 @@
   
   <!-- for local processing without web server, paste data inside the aside tag -->
   <aside id="data">
-name,parent,size,weight,color
+key,parent,size,weight,color
 Eve,,3.45,25,yellow
 Cain,Eve,4.647,20.3,black
 Seth,Eve,3,20.3,steelblue
@@ -25,12 +25,13 @@ Azura,Eve,2,30,red
   
     <script>
       const dataSpec = {
+        source: "aside#data",  
       };
       const myChart = reusableChart.chart(dataSpec)
         .debugOn(true)
         .propagateValue("size")
-        .formatDefaultLocale("DE")
-        .linkLabel("weight", " Euro", ",.2f")
+        // .formatDefaultLocale("DE")
+        .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE", })
       ;
       
       showChart(); 
