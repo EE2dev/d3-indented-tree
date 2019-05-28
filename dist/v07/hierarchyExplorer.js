@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) :
-  (factory((global.reusableChart = {}),global.d3));
+  (factory((global.hierarchyExplorer = {}),global.d3));
 }(this, (function (exports,d3) { 'use strict';
 
   ////////////////////////////////////////////////////

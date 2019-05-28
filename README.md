@@ -71,7 +71,7 @@ Then the javascript part would look like:
         source: "../data/data1.json",
         key: "name",
       };
-      const myChart = reusableChart.chart(dataSpec);
+      const myChart = hierarchyExplorer.chart(dataSpec);
       ...
 ``` 
 ### 2.2. CSV (hierarchical) format
@@ -96,7 +96,7 @@ Then the javascript part would look like:
       const dataSpec = {
         source: "../data/data3.csv",
       };
-      const myChart = reusableChart.chart(dataSpec);
+      const myChart = hierarchyExplorer.chart(dataSpec);
       ...
 ``` 
 ### 2.3. CSV (relational) format
@@ -122,12 +122,12 @@ World,Oceania,,38
         source: "../data/data2.csv",
         hierarchyLevels: ["all", "continent", "country"],
       };
-      const myChart = reusableChart.chart(dataSpec);
+      const myChart = hierarchyExplorer.chart(dataSpec);
       ...
 ``` 
 
 ### 2.4. Embedding data into a html node
-In case you want to run hierarchy explorer without a server, you can put your data into a html node. The format of the data hase to be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>.
+In case you want to run hierarchy explorer without a server, you can put your data into a html node. The format of the data has to be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>.
 The data source is then referenced in the `dataSpec` object by assigning the `source` property to a *string* denoting the selector to the node with the data.
 
 An example for embedded hierarchical csv data:
@@ -155,7 +155,7 @@ Then the javascript part would look like:
       const dataSpec = {
         source: "aside#data",
       };
-      const myChart = reusableChart.chart(dataSpec);
+      const myChart = hierarchyExplorer.chart(dataSpec);
       ...
 ``` 
 
@@ -183,7 +183,7 @@ World,Oceania,,38
         source: "aside#data",
         hierarchyLevels: ["all", "continent", "country"],
       };
-      const myChart = reusableChart.chart(dataSpec);
+      const myChart = hierarchyExplorer.chart(dataSpec);
       ...
 ``` 
 

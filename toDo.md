@@ -28,6 +28,9 @@ https://gitlab.com/snippets/1703535
 
 [bug] test error for test_showcase_g.html
 * test linkLabel with just text
+* readme minimum code snippet
+* readme paragraph for hierarchyExplorer call
+* move new build (hierarchyExplorer to dist/ update block)
 
 * html template with all option properties
 * change function arguments to objects -> https://stackoverflow.com/questions/12826977/multiple-arguments-vs-options-object
@@ -51,6 +54,9 @@ https://gitlab.com/snippets/1703535
 * check updateable function with collapsed nodes
 * selection.each() ?
 * offer shape-rendering crispEdges and auto
+
+* implement themes (dark with glow effect)
+
 
 * support csv file and inline csv file
 * check is more updatable functions are necessary 

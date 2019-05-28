@@ -2,8 +2,8 @@
   <meta charset="utf-8">
   <head>
     <script src="https://d3js.org/d3.v5.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v07/d3_template_reusable.css">
-    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v07/reusableChart.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/d3_template_reusable.css">
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/reusableChart.js"></script>
   </head>
   
   <body>
@@ -17,7 +17,6 @@
         key: "name",
       };
       const myChart = reusableChart.chart(dataSpec)
-        .debugOn(true)
         .propagateValue("size")
       ;
 
@@ -28,10 +27,10 @@
       }, 2000);
       
       function showChart() {
-        const selection = d3.select("body")
+        d3.select("body")
           .append("div")
-          .attr("class", "chart");
-        selection.call(myChart);
+          .attr("class", "chart")
+          .call(myChart);
       }         
     </script>
   </body>
