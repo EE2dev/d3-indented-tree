@@ -300,12 +300,15 @@
   };
 
   linksAPI.getLinkTextPositionX = function (d) {
-    var shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
-    return (d.y - d.parent.y) / 2 + shiftAlign;
+    /*
+    const shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
+    return (d.y - d.parent.y) / 2 + shiftAlign; */
+    var shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 : (d.y - d.parent.y) / 2;
+    return shiftAlign;
   };
 
   linksAPI.computeLabelDimensions = function (trans) {
-    var dims = [undefined];
+    var dims = [];
     trans.each(function (d) {
       var labelDimensions = {};
       var height = d3.select(this).node().getBBox().height;
@@ -313,14 +316,20 @@
       var text = d3.select(this).text();
       if (!dims[d.depth]) {
         labelDimensions.maxX = width;
+        labelDimensions.minX = width;
         labelDimensions.maxY = height;
         labelDimensions.maxXText = text;
         labelDimensions.maxYText = text;
+        labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
         dims.push(labelDimensions);
       } else {
         if (dims[d.depth].maxX < width) {
           dims[d.depth].maxX = width;
           dims[d.depth].maxXText = text;
+        }
+        if (dims[d.depth].minX > width) {
+          dims[d.depth].minX = width;
+          dims[d.depth].posXCenter = (d.y - d.parent.y) / 2;
         }
         if (dims[d.depth].maxY < height) {
           dims[d.depth].maxY = height;
@@ -480,12 +489,15 @@
 
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append("g").attr("class", "node").attr("transform", function () {
-      return "translate(" + source.y0 + "," + source.x0 + ")";
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
     }).on("click", function (d) {
       return click(d, options, config);
     });
 
-    nodeEnter.append("circle").attr("r", 1e-6).style("fill", function (d) {
+    nodeEnter.append("circle")
+    // .attr("r", 1e-6) 
+    .attr("r", 4.5) // 2 node
+    .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
 
@@ -510,10 +522,12 @@
     var nodeUpdate = node.merge(nodeEnter).transition().duration(options.transitionDuration);
 
     nodeUpdate.attr("transform", function (d) {
-      return "translate(" + d.y + "," + d.x + ")";
+      return "translate(" + d.y + "," + d.x + ") scale(1,1)";
     });
 
-    nodeUpdate.select("circle").attr("r", 4.5).style("fill", function (d) {
+    nodeUpdate.select("circle")
+    //.attr("r", 4.5)
+    .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
 
@@ -523,10 +537,13 @@
     var nodeExit = node.exit().transition().duration(options.transitionDuration);
 
     nodeExit.attr("transform", function () {
-      return "translate(" + source.y + "," + source.x + ")";
+      return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
     }).remove();
 
-    nodeExit.select("circle").attr("r", 1e-6);
+    /* // 5 node
+    nodeExit.select("circle")
+      .attr("r", 1e-6);
+      */
 
     nodeExit.select("text").style("fill-opacity", 1e-6);
 

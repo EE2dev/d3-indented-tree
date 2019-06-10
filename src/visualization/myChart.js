@@ -147,12 +147,13 @@ function update(source, options, config){
   var nodeEnter = node.enter().append("g")
     .attr("class", "node")
     .attr("transform", function () {
-      return "translate(" + source.y0 + "," + source.x0 + ")";
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
     })
     .on("click", (d) => { return click (d, options, config); });
 
   nodeEnter.append("circle")
-    .attr("r", 1e-6)
+    // .attr("r", 1e-6) 
+    .attr("r", 4.5) // 2 node
     .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
@@ -185,11 +186,11 @@ function update(source, options, config){
   
   nodeUpdate
     .attr("transform", function (d) {
-      return "translate(" + d.y + "," + d.x + ")";
+      return "translate(" + d.y + "," + d.x + ") scale(1,1)";
     });
 
   nodeUpdate.select("circle")
-    .attr("r", 4.5)
+    //.attr("r", 4.5)
     .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
@@ -203,12 +204,14 @@ function update(source, options, config){
   
   nodeExit
     .attr("transform", function () {
-      return "translate(" + source.y + "," + source.x + ")";
+      return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
     })
     .remove();
 
+  /* // 5 node
   nodeExit.select("circle")
     .attr("r", 1e-6);
+    */
 
   nodeExit.select("text")
     .style("fill-opacity", 1e-6);

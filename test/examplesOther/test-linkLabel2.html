@@ -29,15 +29,18 @@ Azura,Eve,2,30,red
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
-        .propagateValue("size")
+        //.propagateValue("size")
         // .formatDefaultLocale("DE")
-        .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE", })
+        .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"})
+        .linkWidth("weight",{range: [100, 200]})
       ;
       
       showChart(); 
-      
+
       window.setTimeout(function() {
-          myChart.linkWidth(100);
+          myChart
+          .linkWidth("size")
+          .linkLabel("size");
       }, 2000);
 
       function showChart(_file, preprocessed) {

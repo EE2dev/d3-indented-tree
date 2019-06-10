@@ -96,12 +96,17 @@ linksAPI.getLinkLabelColor = function (d) {
 };
 
 linksAPI.getLinkTextPositionX = function (d) {
+  /*
   const shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
-  return (d.y - d.parent.y) / 2 + shiftAlign; 
+  return (d.y - d.parent.y) / 2 + shiftAlign; */
+  const shiftAlign = options.linkLabelAligned ? 
+    labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
+    : (d.y - d.parent.y) / 2;
+  return shiftAlign;
 };
 
 linksAPI.computeLabelDimensions = function (trans) {
-  let dims = [undefined];
+  let dims = [];
   trans
     .each(function(d) {
       let labelDimensions = {};
@@ -110,14 +115,20 @@ linksAPI.computeLabelDimensions = function (trans) {
       const text = d3.select(this).text();
       if (!dims[d.depth]) {
         labelDimensions.maxX = width;
+        labelDimensions.minX = width;
         labelDimensions.maxY = height;
         labelDimensions.maxXText = text;
         labelDimensions.maxYText = text;
+        labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
         dims.push(labelDimensions);
       } else {          
         if (dims[d.depth].maxX < width) {
           dims[d.depth].maxX = width;
           dims[d.depth].maxXText = text;
+        } 
+        if (dims[d.depth].minX > width) {
+          dims[d.depth].minX = width;
+          dims[d.depth].posXCenter = (d.y - d.parent.y) / 2;
         } 
         if (dims[d.depth].maxY < height) {
           dims[d.depth].maxY = height;

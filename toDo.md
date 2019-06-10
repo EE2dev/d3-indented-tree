@@ -27,6 +27,9 @@ https://gitlab.com/snippets/1703535
 [ok] alignLevaes(false) in test-showcase_g.html leads to thicker links
 
 [bug] test error for test_showcase_g.html
+
+
+* linkLabel align for longest and shortest
 * test linkLabel with just text
 * readme minimum code snippet
 * readme paragraph for hierarchyExplorer call

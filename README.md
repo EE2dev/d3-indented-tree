@@ -10,6 +10,35 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 More examples demonstrating specific API calls:
 ## 1. How to use Hierarchy explorer
 
+Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object*. 
+
+```html
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v5.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
+  </head>
+  
+  <body>
+  
+    <script>
+      const dataSpec = {source: "path/to/data/data.json"};
+      const myChart = hierarchyExplorer.chart(dataSpec);
+      showChart(); 
+      
+      function showChart() {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(myChart);
+      }            
+    </script>
+  </body>
+</html>  
+```
+
 ## 2. Data format
 Hierarchical data can be specified in one of the following three data formats. The examples contain the same data in the supported formats.
 
@@ -236,8 +265,8 @@ Transitions to the new number label on top of the links.
         * `format` refers to the format *string* of the label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
         * `locale` is an *object* overriding the default locale format with the specified locale format. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
 
-        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`).
-        * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth. Default is ```true```.
+        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`). If `onTop` is set to false and the label overlaps with the previous link due to increase font size, the *linkHeight* can be increased. 
+        * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth (centers the longest label per depth on the shortest link). Default is ```true```.
         * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
 
 * No argument:
@@ -264,7 +293,7 @@ Transitions the alignment of the leaves of the hierarchy. If leaves are aligned,
 
 ### 3.2 Nodes
 
-### 3.3 Other
+### 3.3 Other API calls
 <a name="other_debugOn" href="#other_debugOn">#</a> <i>myChart</i>.<b>debugOn</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Enables/disables debugging info on the console. 
@@ -320,6 +349,23 @@ Overrides the default locale format with the specified locale format
 }
 ```
 
+### 3.3 CSS styling
+```css
+  /* changing the font size for link labels and node labels */
+  div.chart {
+    font-size: 14px;
+  } 
+
+  /* changing the font size for node labels */
+  .node text {
+    font: 1em sans-serif;
+  }
+
+  /* changing the size of the outline for link labels */
+  .link text.label.ontop {
+    stroke-width: 5px;
+  }   
+```
 
 ## 4. License  
 This code is released under the [BSD license](https://github.com/EE2dev/hierarchy-explorer//blob/master/LICENSE).
