@@ -344,6 +344,61 @@
     }
   };
 
+  var nodesAPI = {};
+  var options$1 = void 0;
+
+  nodesAPI.initialize = function (_options) {
+    options$1 = _options;
+    console.log(options$1 + d3.scale);
+  };
+
+  nodesAPI.appendNode = function (selection) {
+    if (options$1.nodeImageFile) {
+      nodesAPI.appendNodeImage(selection);
+    } else {
+      options$1.nodeImageSelectionAppend && typeof options$1.nodeImageSelectionAppend === "function" ? options$1.nodeImageSelectionAppend(selection) : nodesAPI.appendNodeSVG(selection);
+    }
+  };
+
+  nodesAPI.updateNode = function (selection) {
+    if (options$1.nodeImageFile) {
+      if (options$1.nodeImageFileUpdate) {
+        nodesAPI.updateNodeImage(selection);
+      }
+    } else {
+      if (options$1.nodeImageSelectionUpdate && typeof options$1.nodeImageSelectionUpdate === "function") {
+        options$1.nodeImageSelectionUpdate(selection);
+      } else if (options$1.nodeImageSelectionAppend && typeof options$1.nodeImageSelectionAppend === "function") {
+        return; // do nothing - custom SVG append provided but no custom SVG update 
+      } else {
+        nodesAPI.updateNodeSVG(selection);
+      }
+    }
+  };
+
+  nodesAPI.appendNodeSVG = function (selection) {
+    selection.append("circle").attr("r", 4.5).style("fill", function (d) {
+      return d._children ? "lightsteelblue" : "#fff";
+    });
+  };
+
+  nodesAPI.updateNodeSVG = function (selection) {
+    selection.select("circle").style("fill", function (d) {
+      return d._children ? "lightsteelblue" : "#fff";
+    });
+  };
+
+  nodesAPI.appendNodeImage = function (selection) {
+    if (options$1.nodeImageSetBackground) {
+      selection.append("rect").attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY).style("fill", d3.select("div.chart").style("background-color"));
+    }
+    selection.append("image").attr("xlink:href", options$1.nodeImageFileAppend).attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY);
+  };
+
+  nodesAPI.updateNodeImage = function (selection) {
+    selection.select("image").attr("xlink:href", options$1.nodeImageFileAppend);
+  };
+
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
   //////////////////////////////////////////////////// 
@@ -483,6 +538,9 @@
     d3.select("svg").transition().duration(options.transitionDuration).attr("height", config.height);
 
     // 1. Update the nodes…
+    var n = nodesAPI;
+    n.initialize(options);
+
     var node = config.svg.selectAll("g.node").data(nodesSort, function (d) {
       return d.id || (d.id = ++config.i);
     });
@@ -494,21 +552,20 @@
       return click(d, options, config);
     });
 
+    /*
     nodeEnter.append("circle")
-    // .attr("r", 1e-6) 
-    .attr("r", 4.5) // 2 node
-    .style("fill", function (d) {
-      return d._children ? "lightsteelblue" : "#fff";
-    });
+      .attr("r", 4.5) 
+      .style("fill", function (d) {
+        return d._children ? "lightsteelblue" : "#fff";
+      });
+      */
+    nodeEnter.call(n.appendNode);
 
-    nodeEnter.append("text").attr("x", 10).attr("dy", ".35em").attr("text-anchor", "start")
-    // .attr("x", 0)
-    // .attr("y", -12)
-    // .attr("dy", ".35em")
-    // .attr("text-anchor", "middle") 
-    .text(function (d) {
-      if (d.data[options.keyField].length > options.maxNameLength) {
-        return d.data[options.keyField].substring(0, options.maxNameLength) + "...";
+    nodeEnter.append("text")
+    // .attr("x", 10)
+    .attr("x", options.nodeLabelPadding).attr("dy", ".35em").attr("text-anchor", "start").text(function (d) {
+      if (d.data[options.keyField].length > options.nodeLabelLength) {
+        return d.data[options.keyField].substring(0, options.nodeLabelLength) + "...";
       } else {
         return d.data[options.keyField];
       }
@@ -525,11 +582,13 @@
       return "translate(" + d.y + "," + d.x + ") scale(1,1)";
     });
 
+    /*
     nodeUpdate.select("circle")
-    //.attr("r", 4.5)
-    .style("fill", function (d) {
-      return d._children ? "lightsteelblue" : "#fff";
-    });
+      .style("fill", function (d) {
+        return d._children ? "lightsteelblue" : "#fff";
+      }); 
+      */
+    nodeUpdate.call(n.updateNode);
 
     nodeUpdate.select("text").style("fill-opacity", 1);
 
@@ -539,11 +598,6 @@
     nodeExit.attr("transform", function () {
       return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
     }).remove();
-
-    /* // 5 node
-    nodeExit.select("circle")
-      .attr("r", 1e-6);
-      */
 
     nodeExit.select("text").style("fill-opacity", 1e-6);
 
@@ -655,10 +709,23 @@
     options.debugOn = false;
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.svgDimensions = { height: 800, width: 1400 };
-    options.maxNameLength = 50;
+    options.nodeLabelLength = 50;
     options.transitionDuration = 750;
 
     options.defaultColor = "grey";
+
+    options.nodeImageFile = false; // node image from file or selection
+    options.nodeImageFileAppend = undefined; //callback function which returns a image URL
+    options.nodeImageSetBackground = false;
+    options.nodeImageWidth = 10;
+    options.nodeImageHeight = 10;
+    options.nodeImageX = options.nodeImageWidth / 2;
+    options.nodeImageY = options.nodeImageHeight / 2;
+    options.nodeImageSelectionAppend = undefined;
+    options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
+
+    options.nodeLabelPadding = 10;
+
     options.linkHeight = 20;
 
     options.linkLabelField = "value";
@@ -724,9 +791,15 @@
       return chartAPI;
     };
 
-    chartAPI.maxNameLength = function (_) {
-      if (!arguments.length) return options.maxNameLength;
-      options.maxNameLength = _;
+    chartAPI.nodeLabelLength = function (_) {
+      if (!arguments.length) return options.nodeLabelLength;
+      options.nodeLabelLength = _;
+      return chartAPI;
+    };
+
+    chartAPI.nodeLabelPadding = function (_) {
+      if (!arguments.length) return options.nodeLabelPadding;
+      options.nodeLabelPadding = _;
       return chartAPI;
     };
 
@@ -758,6 +831,30 @@
     };
 
     // 3. ADD getter-setter methods with updateable functions here
+    chartAPI.nodeImageFile = function (_callback) {
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (!arguments.length) return options.nodeImageFileAppend;
+      options.nodeImageFile = true;
+      options.nodeImageFileAppend = _callback;
+      options.nodeImageWidth = _options.width || options.nodeImageWidth;
+      options.nodeImageHeight = _options.height || options.nodeImageHeight;
+      options.nodeImageX = _options.x || -1 * options.nodeImageWidth / 2;
+      options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
+      options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
+      if (typeof options.updateDefault === "function") options.updateDefault();
+      return chartAPI;
+    };
+
+    chartAPI.nodeImageSelection = function (_append, _update) {
+      if (!arguments.length) return options.nodeImageSelectionAppend;
+      options.nodeImageSelectionAppend = _append;
+      options.nodeImageSelectionUpdate = _update;
+      options.nodeImageFile = false;
+      if (typeof options.updateDefault === "function") options.updateDefault();
+      return chartAPI;
+    };
+
     chartAPI.linkHeight = function (_) {
       if (!arguments.length) return options.linkHeight;
       options.linkHeight = _;

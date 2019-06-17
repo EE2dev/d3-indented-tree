@@ -25,9 +25,15 @@ https://gitlab.com/snippets/1703535
 [ok] optional alignment of link label (horizontally)
 [ok] docu data format
 [ok] alignLevaes(false) in test-showcase_g.html leads to thicker links
+[ok] test error for test_showcase_g.html
+[ok] doku for nodeLabelPadding
+[ok] switch maxNameLength to nodeLabelLength + readme 8switch to node section
 
-[bug] test error for test_showcase_g.html
-
+* nodeImageFile: option to first fill with background color
+* images fom https://icons8.de/icon/set/basketball/ios : 
+attribution: <a href="https://icons8.com/icon/37940/basketball-trikot">Basketball-Trikot icon by Icons8</a>
+https://www.flaticon.com/free-icon/t-shirt_1865354
+with attribution
 
 * linkLabel align for longest and shortest
 * test linkLabel with just text
@@ -52,14 +58,14 @@ https://gitlab.com/snippets/1703535
 * linkColor: Implementierung Gradient: 1) iterate through node and add all different parent-son color combinations to set
 * linkColor: 2) create gradients for these combinations (10% offset)
 
-* switch to crispEdges after transition is finished. (and switch back before next transition starts)
+* switch to crispEdges after transition is finished. (and switch back before next transition starts) 
+https://stackoverflow.com/questions/23126590/colour-issues-when-2-svg-lines-are-overlapping
 * document CSS
 * check updateable function with collapsed nodes
 * selection.each() ?
 * offer shape-rendering crispEdges and auto
 
 * implement themes (dark with glow effect)
-
 
 * support csv file and inline csv file
 * check is more updatable functions are necessary 

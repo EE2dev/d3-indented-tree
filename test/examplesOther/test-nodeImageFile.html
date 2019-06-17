@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="../../node_modules/d3/dist/d3.js"></script>
+    <!--script src="https://d3js.org/d3.v5.js"></script-->
+    <link rel="stylesheet" type="text/css" href="../../build/hierarchyExplorer.css">
+    <script src="../../build/hierarchyExplorer.js"></script>
+  </head>
+  
+  <body>
+  
+  <!-- for local processing without web server, paste data inside the aside tag -->
+  <aside id="data">
+key,parent,size,weight,color
+Eve,,3.45,25,yellow
+Cain,Eve,4.647,20.3,black
+Seth,Eve,3,20.3,steelblue
+Enos,Seth,4,3000,orange
+Noam,Seth,50000,30,green
+Abel,Eve,4,30,brown
+Awan,Eve,3,30,deeppink
+Enoch,Awan,7,30,blue
+Azura,Eve,2,30,red
+</aside>
+  
+    <script>
+      const dataSpec = {
+        source: "aside#data",  
+      };
+      const myChart = hierarchyExplorer.chart(dataSpec)
+        .debugOn(true)
+        .nodeImageFile("https://img.icons8.com/ios/20/000000/basketball-jersey.png", {width: 20, height: 20,})
+        .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"})
+        .linkWidth("weight",{range: [100, 200]})
+        .linkHeight(40)
+        .nodeLabelPadding(20)
+      ;
+      
+      showChart(); 
+
+      window.setTimeout(function() {
+          myChart
+          .linkWidth("size")
+          .linkLabel("size");
+      }, 2000);
+
+      function showChart(_file, preprocessed) {
+        const selection = d3.select("body")
+          .append("div")
+            .attr("class", "chart");
+        if (preprocessed) {
+          selection.datum(_file);
+        }
+        selection.call(myChart);
+      }     
+      
+    </script>
+  </body>
+</html>  

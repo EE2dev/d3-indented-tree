@@ -13,12 +13,25 @@ export default function (_dataSpec) {
   options.debugOn = false;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
   options.svgDimensions = {height: 800, width: 1400};
-  options.maxNameLength = 50;
+  options.nodeLabelLength = 50;
   options.transitionDuration = 750;
 
   options.defaultColor = "grey";
+
+  options.nodeImageFile = false; // node image from file or selection
+  options.nodeImageFileAppend = undefined; //callback function which returns a image URL
+  options.nodeImageSetBackground = false;
+  options.nodeImageWidth = 10;
+  options.nodeImageHeight = 10;
+  options.nodeImageX = options.nodeImageWidth / 2;
+  options.nodeImageY = options.nodeImageHeight / 2;
+  options.nodeImageSelectionAppend = undefined;
+  options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
+
+  options.nodeLabelPadding = 10;
+
   options.linkHeight = 20;
-  
+
   options.linkLabelField = "value";
   options.linkLabelOn = false;
   options.linkLabelUnit = "";
@@ -82,9 +95,15 @@ export default function (_dataSpec) {
     return chartAPI;
   }; 
     
-  chartAPI.maxNameLength = function(_) {
-    if (!arguments.length) return options.maxNameLength;
-    options.maxNameLength = _;
+  chartAPI.nodeLabelLength = function(_) {
+    if (!arguments.length) return options.nodeLabelLength;
+    options.nodeLabelLength = _;
+    return chartAPI;
+  };
+
+  chartAPI.nodeLabelPadding = function(_) {
+    if (!arguments.length) return options.nodeLabelPadding;
+    options.nodeLabelPadding = _;
     return chartAPI;
   };
 
@@ -116,6 +135,28 @@ export default function (_dataSpec) {
   }; 
 
   // 3. ADD getter-setter methods with updateable functions here
+  chartAPI.nodeImageFile = function(_callback, _options = {}) {
+    if (!arguments.length) return options.nodeImageFileAppend;
+    options.nodeImageFile = true;
+    options.nodeImageFileAppend = _callback;
+    options.nodeImageWidth = _options.width || options.nodeImageWidth;
+    options.nodeImageHeight = _options.height || options.nodeImageHeight;
+    options.nodeImageX = _options.x || -1 * options.nodeImageWidth / 2;
+    options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
+    options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeImageSelection = function(_append, _update) {
+    if (!arguments.length) return options.nodeImageSelectionAppend;
+    options.nodeImageSelectionAppend = _append;
+    options.nodeImageSelectionUpdate = _update;
+    options.nodeImageFile = false;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;
     options.linkHeight = _;

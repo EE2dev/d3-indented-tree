@@ -293,6 +293,47 @@ Transitions the alignment of the leaves of the hierarchy. If leaves are aligned,
 
 ### 3.2 Nodes
 
+<a name="other_nodeImageFile" href="#other_nodeImageFile">#</a> <i>myChart</i>.<b>nodeImageFile</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sets the node images based on an image file.  
+1. argument:
+    * a callback *function* which returns for each selected node a *URL* to the image to be used for this node.
+    The function is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]). 
+    E.g. with the current datum (d) the *URL* can be read from a field attached to each node. 
+    * a *string* denoting the *URL* to an image to be used for each node. 
+
+2. argument: (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `width` specifies the width of the image (default is `10`).
+        * `height` specifies the height of the image (default is `10`).
+
+With no arguments returns the callback *function* for the node images.
+
+<a name="other_nodeImageSelection" href="#other_nodeImageSelection">#</a> <i>myChart</i>.<b>nodeImageSelection</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sets the node images based on a selection.  
+1. argument:
+    * a callback *function*, which is called with a selection as an argument containing all newly entered `g.node`'s. 
+    * the callback function is expected to append to each node a graphical element as the node image. To enter a different image based on the node being expandable or not, the attached datum `d._children` can be used. 
+
+2. argument: (optional)
+    * a callback *function*, which is called with a selection as an argument containing all newly updated `g.node`'s. 
+    * the callback function is expected to update the graphical element as the node image for each node. The update function should be provided if a different node image based on the node being expandable or not is provided. 
+
+With no arguments returns the callback *function* for all newly entered `g.node`'s.
+
+<a name="other_nodeLabelPadding" href="#other_nodeLabelPadding">#</a> <i>myChart</i>.<b>nodeLabelPadding</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Adjusts the left-alignment of the node label. 
+* the first argument is an <i>integer</i> referencing the number of pixels padded left to the start of the node label (default is ```10```).
+* with no argument returns the number of pixels padded left to the start of the node label.
+
+<a name="other_nodeLabelLength" href="#other_nodeLabelLength">#</a> <i>myChart</i>.<b>nodeLabelLength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sets the maximum number of characters displayed as node label. All remaining characters are truncated and displayed as ```...```.  
+* the first argument is an <i>integer</i> referencing the maximum number of characters display as node label (default is ```50```).
+* with no argument returns the maximum number of characters displayed as node label.
+
 ### 3.3 Other API calls
 <a name="other_debugOn" href="#other_debugOn">#</a> <i>myChart</i>.<b>debugOn</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
@@ -317,12 +358,6 @@ Sets the margins for the SVG.
 Sets the dimensions for the SVG. 
 * the first argument is an <i>object</i> referencing the dimensions of the SVG (default is ```{width: 1400, height: 800}```).
 * with no argument returns the default SVG dimensions.
-
-<a name="other_maxNameLength" href="#other_maxNameLength">#</a> <i>myChart</i>.<b>maxNameLength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
-
-Sets the maximum number of characters displayed as node label. All remaining characters are truncated and displayed as ```...```.  
-* the first argument is an <i>integer</i> referencing the maximum number of characters display as node label (default is ```50```).
-* with no argument returns the maximum number of characters displayed as node label.
 
 <a name="other_transitionDuration" href="#other_transitionDuration">#</a> <i>myChart</i>.<b>transitionDuration</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 

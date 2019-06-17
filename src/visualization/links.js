@@ -96,9 +96,7 @@ linksAPI.getLinkLabelColor = function (d) {
 };
 
 linksAPI.getLinkTextPositionX = function (d) {
-  /*
-  const shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
-  return (d.y - d.parent.y) / 2 + shiftAlign; */
+  /* aligned: x center position of the shortest link + half the extent of the longest label */
   const shiftAlign = options.linkLabelAligned ? 
     labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
     : (d.y - d.parent.y) / 2;

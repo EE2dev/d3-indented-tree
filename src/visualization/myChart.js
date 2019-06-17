@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { linksAPI } from "./links.js";
+import { nodesAPI } from "./nodes.js";
 
 ////////////////////////////////////////////////////
 // add visualization specific processing here     //
@@ -138,6 +139,9 @@ function update(source, options, config){
     .attr("height", config.height);
 
   // 1. Update the nodes…
+  const n = nodesAPI;
+  n.initialize(options);
+
   let node = config.svg.selectAll("g.node")
     .data(nodesSort, function (d) {
       return d.id || (d.id = ++config.i);
@@ -151,24 +155,23 @@ function update(source, options, config){
     })
     .on("click", (d) => { return click (d, options, config); });
 
+  /*
   nodeEnter.append("circle")
-    // .attr("r", 1e-6) 
-    .attr("r", 4.5) // 2 node
+    .attr("r", 4.5) 
     .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
+    */
+  nodeEnter.call(n.appendNode);
 
   nodeEnter.append("text")
-    .attr("x", 10)
+    // .attr("x", 10)
+    .attr("x", options.nodeLabelPadding)
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
-    // .attr("x", 0)
-    // .attr("y", -12)
-    // .attr("dy", ".35em")
-    // .attr("text-anchor", "middle") 
     .text(function (d) {
-      if (d.data[options.keyField].length > options.maxNameLength) {
-        return d.data[options.keyField].substring(0, options.maxNameLength) + "...";
+      if (d.data[options.keyField].length > options.nodeLabelLength) {
+        return d.data[options.keyField].substring(0, options.nodeLabelLength) + "...";
       } else {
         return d.data[options.keyField];
       }
@@ -189,11 +192,13 @@ function update(source, options, config){
       return "translate(" + d.y + "," + d.x + ") scale(1,1)";
     });
 
+  /*
   nodeUpdate.select("circle")
-    //.attr("r", 4.5)
     .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
-    });
+    }); 
+    */
+  nodeUpdate.call(n.updateNode);
   
   nodeUpdate.select("text")
     .style("fill-opacity", 1);
@@ -207,11 +212,6 @@ function update(source, options, config){
       return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
     })
     .remove();
-
-  /* // 5 node
-  nodeExit.select("circle")
-    .attr("r", 1e-6);
-    */
 
   nodeExit.select("text")
     .style("fill-opacity", 1e-6);
