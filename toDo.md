@@ -28,6 +28,12 @@ https://gitlab.com/snippets/1703535
 [ok] test error for test_showcase_g.html
 [ok] doku for nodeLabelPadding
 [ok] switch maxNameLength to nodeLabelLength + readme 8switch to node section
+[ok] add readme for neodeImageFile
+[ok] sort readme functions
+
+* add json data from script directly
+
+* test nodeImage with URLs from data
 
 * nodeImageFile: option to first fill with background color
 * images fom https://icons8.de/icon/set/basketball/ios : 

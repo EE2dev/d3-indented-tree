@@ -266,7 +266,10 @@ export default function (_dataSpec) {
     } else {
       console.log("dataspec is not an object!");
     }
-    myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
+    myData.isJSON = typeof (myData.data) === "object";
+    if (!myData.isJSON){
+      myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
+    }
     myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
     options.keyField = myData.keyField;
     return myData;

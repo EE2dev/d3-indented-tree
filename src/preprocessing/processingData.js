@@ -35,10 +35,16 @@ export function readData(myData, selection, debugOn, createChart) {
     }
   } 
   else { // read data from DOM
-    const data = readDataFromDOM(myData.delimiter, myData.data);
-    const hierarchy = (myData.flatData) ? 
-      createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) : createHierarchy(data, myData.keyField);
-    if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+    let hierarchy;
+    if (myData.isJSON) {
+      hierarchy = d3.hierarchy(myData.data);
+    } else {
+      const data = readDataFromDOM(myData.delimiter, myData.data);
+      hierarchy = (myData.flatData)
+        ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) // csv Format 1
+        : createHierarchy(data, myData.keyField); // csv format 2
+      if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+    }
     createChart(selection, hierarchy);
     /*
     if (myData.flatData) { // CSV Format 1

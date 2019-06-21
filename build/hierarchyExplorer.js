@@ -55,10 +55,16 @@
       }
     } else {
       // read data from DOM
-      var data = readDataFromDOM(myData.delimiter, myData.data);
-      var hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) : createHierarchy(data, myData.keyField);
-      if (debugOn) {
-        console.log("embedded data: ");console.log(hierarchy);
+      var hierarchy = void 0;
+      if (myData.isJSON) {
+        hierarchy = d3.hierarchy(myData.data);
+      } else {
+        var data = readDataFromDOM(myData.delimiter, myData.data);
+        hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) // csv Format 1
+        : createHierarchy(data, myData.keyField); // csv format 2
+        if (debugOn) {
+          console.log("embedded data: ");console.log(hierarchy);
+        }
       }
       createChart(selection, hierarchy);
       /*
@@ -300,9 +306,7 @@
   };
 
   linksAPI.getLinkTextPositionX = function (d) {
-    /*
-    const shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].maxX / 2 : 0;
-    return (d.y - d.parent.y) / 2 + shiftAlign; */
+    /* aligned: x center position of the shortest link + half the extent of the longest label */
     var shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 : (d.y - d.parent.y) / 2;
     return shiftAlign;
   };
@@ -349,7 +353,6 @@
 
   nodesAPI.initialize = function (_options) {
     options$1 = _options;
-    console.log(options$1 + d3.scale);
   };
 
   nodesAPI.appendNode = function (selection) {
@@ -981,7 +984,10 @@
       } else {
         console.log("dataspec is not an object!");
       }
-      myData.fromFile = myData.data.endsWith(".json") || myData.data.endsWith(".csv") ? true : false;
+      myData.isJSON = _typeof(myData.data) === "object";
+      if (!myData.isJSON) {
+        myData.fromFile = myData.data.endsWith(".json") || myData.data.endsWith(".csv") ? true : false;
+      }
       myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
       options.keyField = myData.keyField;
       return myData;

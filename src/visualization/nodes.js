@@ -5,7 +5,6 @@ let options;
 
 nodesAPI.initialize = function(_options) { 
   options = _options; 
-  console.log(options + d3.scale);
 };
 
 nodesAPI.appendNode = function (selection) {
