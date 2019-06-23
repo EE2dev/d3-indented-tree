@@ -17,18 +17,16 @@ nodesAPI.appendNode = function (selection) {
   }
 };
 
-nodesAPI.updateNode = function (selection ) {
+nodesAPI.updateNode = function (transition) {
   if (options.nodeImageFile) {
-    if (options.nodeImageFileUpdate) {
-      nodesAPI.updateNodeImage(selection);
-    }
+    nodesAPI.updateNodeImage(transition);
   } else {
     if (options.nodeImageSelectionUpdate && typeof options.nodeImageSelectionUpdate === "function") {
-      options.nodeImageSelectionUpdate(selection);
+      options.nodeImageSelectionUpdate(transition);
     } else if (options.nodeImageSelectionAppend && typeof options.nodeImageSelectionAppend === "function") {
       return; // do nothing - custom SVG append provided but no custom SVG update 
     } 
-    else { nodesAPI.updateNodeSVG(selection); }
+    else { nodesAPI.updateNodeSVG(transition); }
   }
 };
 
@@ -40,8 +38,8 @@ nodesAPI.appendNodeSVG = function (selection) {
     });
 };
 
-nodesAPI.updateNodeSVG = function (selection) {
-  selection.select("circle")
+nodesAPI.updateNodeSVG = function (transition) {
+  transition.select("circle")
     .style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
@@ -64,8 +62,9 @@ nodesAPI.appendNodeImage = function (selection) {
     .attr("y", options.nodeImageY);
 };
 
-nodesAPI.updateNodeImage = function (selection) {
-  selection.select("image")
-    .attr("xlink:href", options.nodeImageFileAppend);
+nodesAPI.updateNodeImage = function (transition) {
+  transition
+    .select("image")
+    .attr("xlink:href", options.nodeImageFileAppend);    
 };
 

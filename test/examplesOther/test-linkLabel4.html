@@ -24,37 +24,25 @@ Azura,Eve,2,30,red
 </aside>
   
     <script>
-      appendNodeSVG = function (selection) {
-        selection.append("circle")
-          .attr("r", 7.5) 
-          .style("fill", function (d) {
-            return d._children ? "red" : "green";
-          });
-      };
-
-      updateNodeSVG = function (selection) {
-        selection.select("circle")
-          .style("fill", function (d) {
-            return d._children ? "red" : "green";
-          });
-      };
-
       const dataSpec = {
         source: "aside#data",  
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
         .margin({top: 50, right: 10, bottom: 20, left: 50})
-        .nodeImageSelection(appendNodeSVG, updateNodeSVG)
-        .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"})
-        .linkWidth("weight",{range: [100, 300]})
-        .linkHeight(40)
+        .nodeImageFile("https://img.icons8.com/ios/50/000000/basketball-jersey.png", { 
+          width: 50, height: 50, setBackground: true})
+        .linkLabel("color", {onTop: false, align: false})
+        .nodeLabelPadding(100)
+        .linkWidth("weight",{range: [150, 300]})
+        .linkHeight(50)
+        .nodeLabelPadding(20)
       ;
       
       showChart(); 
 
       window.setTimeout(function() {
-          myChart.linkWidth("size").linkLabel("size");
+         // myChart.linkWidth("size").linkLabel("size");
       }, 2000);
 
       function showChart() {
@@ -62,7 +50,7 @@ Azura,Eve,2,30,red
           .append("div")
           .attr("class", "chart")
           .call(myChart);
-      }           
+      }          
     </script>
   </body>
 </html>  

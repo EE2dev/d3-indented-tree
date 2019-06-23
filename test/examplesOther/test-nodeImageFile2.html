@@ -30,9 +30,10 @@ Azura,Eve,2,30,red
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
         .margin({top: 50, right: 10, bottom: 20, left: 50})
-        .nodeImageFile("https://img.icons8.com/ios/50/000000/basketball-jersey.png", 
-        {width: 50, height: 50, setBackground: true})
+        .nodeImageFile("https://img.icons8.com/ios/50/000000/basketball-jersey.png", { 
+          width: 50, height: 50, setBackground: true})
         .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"})
+        .nodeLabelPadding(100)
         .linkWidth("weight",{range: [150, 300]})
         .linkHeight(50)
         .nodeLabelPadding(20)
@@ -41,21 +42,15 @@ Azura,Eve,2,30,red
       showChart(); 
 
       window.setTimeout(function() {
-          myChart
-          .linkWidth("size")
-          .linkLabel("size");
+          myChart.linkWidth("size").linkLabel("size");
       }, 2000);
 
-      function showChart(_file, preprocessed) {
-        const selection = d3.select("body")
+      function showChart() {
+        d3.select("body")
           .append("div")
-            .attr("class", "chart");
-        if (preprocessed) {
-          selection.datum(_file);
-        }
-        selection.call(myChart);
-      }     
-      
+          .attr("class", "chart")
+          .call(myChart);
+      }          
     </script>
   </body>
 </html>  

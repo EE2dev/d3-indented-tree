@@ -39,19 +39,14 @@ Azura,Eve,2,30,red
       showChart(); 
 
       window.setTimeout(function() {
-          myChart
-          .linkWidth("size")
-          .linkLabel("size");
+          myChart.linkWidth("size").linkLabel("size");
       }, 2000);
 
-      function showChart(_file, preprocessed) {
-        const selection = d3.select("body")
+      function showChart() {
+        d3.select("body")
           .append("div")
-            .attr("class", "chart");
-        if (preprocessed) {
-          selection.datum(_file);
-        }
-        selection.call(myChart);
+          .attr("class", "chart")
+          .call(myChart);
       }     
       
     </script>

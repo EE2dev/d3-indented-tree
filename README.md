@@ -290,7 +290,7 @@ Transitions to the new width (horizontal length) of the links. The horizontal li
 Transitions to the new number label on top of the links. 
 
 1. argument:
-    * to set the label dynamically, provide the name of a numeric field as a *string*. 
+    * to set the label dynamically, provide the name of a field as a *string*. The values of the field can be *numeric* or *string*. 
     * to switch the label on or off provide a <i>boolean</i>. 
     
 2. argument (optional):
@@ -321,6 +321,7 @@ Sets the node images based on an image file.
     * An *object* with the following properties can be used to further specify the mapping: 
         * `width` specifies the width of the image (default is `10`).
         * `height` specifies the height of the image (default is `10`).
+        * `setBackground` determines if the background under the image should be fill with the background color first (e.g. in case the image has a transparant background) (default is `false`).
 
 With no arguments returns the callback *function* for the node images.
 

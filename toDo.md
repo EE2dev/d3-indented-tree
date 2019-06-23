@@ -30,10 +30,20 @@ https://gitlab.com/snippets/1703535
 [ok] switch maxNameLength to nodeLabelLength + readme 8switch to node section
 [ok] add readme for neodeImageFile
 [ok] sort readme functions
+[ok] add json data from script directly
+[ok] linkLabel with just string data from field
+[ok] test nodeImage with URLs from data (test collapsable)
 
-* add json data from script directly
+* new svg nodes with rectangles
+*  
+* nodeInfo
+* sort
+* color themes
+*
+* applications (chess, basketball, nfl, soccer, flags, d3.js)
+* observable
 
-* test nodeImage with URLs from data
+[bug] if links are in transition and collapse or expand is called, the links can get too long
 
 * nodeImageFile: option to first fill with background color
 * images fom https://icons8.de/icon/set/basketball/ios : 

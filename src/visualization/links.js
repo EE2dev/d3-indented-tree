@@ -68,17 +68,30 @@ linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
 };
 
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
+  if (!options.linkLabelOn) {
+    return "";
+  } // else if (typeof d.data[labelField] === "string") {
+  else if (isNaN(d.data[labelField])) {
+    return d.data[labelField];
+  } else {
+    return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
+  }
+  /*
   return (!options.linkLabelOn) ? "" :
     options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
+    */
 };
 
 linksAPI.getLinkTextTween = function(d) { 
   const selection = d3.select(this);
   if (!options.linkLabelOn) {
     return function() { selection.text(""); };
-  }
+  } 
   const numberStart = linksAPI.getLinkLabel(d, oldLabelField);
   const numberEnd = linksAPI.getLinkLabel(d, newLabelField);
+  if (isNaN(numberStart) || isNaN(numberEnd)) {
+    return function() { selection.text(numberEnd); };
+  }
   const i = d3.interpolateNumber(numberStart, numberEnd);
   return function(t) { selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); };
 };

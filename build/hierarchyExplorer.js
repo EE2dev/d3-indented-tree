@@ -275,7 +275,18 @@
   linksAPI.getLinkLabelFormatted = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    return !options.linkLabelOn ? "" : options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit;
+    if (!options.linkLabelOn) {
+      return "";
+    } // else if (typeof d.data[labelField] === "string") {
+    else if (isNaN(d.data[labelField])) {
+        return d.data[labelField];
+      } else {
+        return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit;
+      }
+    /*
+    return (!options.linkLabelOn) ? "" :
+      options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
+      */
   };
 
   linksAPI.getLinkTextTween = function (d) {
@@ -287,6 +298,11 @@
     }
     var numberStart = linksAPI.getLinkLabel(d, oldLabelField);
     var numberEnd = linksAPI.getLinkLabel(d, newLabelField);
+    if (isNaN(numberStart) || isNaN(numberEnd)) {
+      return function () {
+        selection.text(numberEnd);
+      };
+    }
     var i = d3.interpolateNumber(numberStart, numberEnd);
     return function (t) {
       selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit);
@@ -363,18 +379,16 @@
     }
   };
 
-  nodesAPI.updateNode = function (selection) {
+  nodesAPI.updateNode = function (transition) {
     if (options$1.nodeImageFile) {
-      if (options$1.nodeImageFileUpdate) {
-        nodesAPI.updateNodeImage(selection);
-      }
+      nodesAPI.updateNodeImage(transition);
     } else {
       if (options$1.nodeImageSelectionUpdate && typeof options$1.nodeImageSelectionUpdate === "function") {
-        options$1.nodeImageSelectionUpdate(selection);
+        options$1.nodeImageSelectionUpdate(transition);
       } else if (options$1.nodeImageSelectionAppend && typeof options$1.nodeImageSelectionAppend === "function") {
         return; // do nothing - custom SVG append provided but no custom SVG update 
       } else {
-        nodesAPI.updateNodeSVG(selection);
+        nodesAPI.updateNodeSVG(transition);
       }
     }
   };
@@ -385,8 +399,8 @@
     });
   };
 
-  nodesAPI.updateNodeSVG = function (selection) {
-    selection.select("circle").style("fill", function (d) {
+  nodesAPI.updateNodeSVG = function (transition) {
+    transition.select("circle").style("fill", function (d) {
       return d._children ? "lightsteelblue" : "#fff";
     });
   };
@@ -398,8 +412,8 @@
     selection.append("image").attr("xlink:href", options$1.nodeImageFileAppend).attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY);
   };
 
-  nodesAPI.updateNodeImage = function (selection) {
-    selection.select("image").attr("xlink:href", options$1.nodeImageFileAppend);
+  nodesAPI.updateNodeImage = function (transition) {
+    transition.select("image").attr("xlink:href", options$1.nodeImageFileAppend);
   };
 
   ////////////////////////////////////////////////////

@@ -11,58 +11,47 @@
   
   <!-- for local processing without web server, paste data inside the aside tag -->
   <aside id="data">
-key,parent,size,weight,color
-Eve,,3.45,25,yellow
-Cain,Eve,4.647,20.3,black
-Seth,Eve,3,20.3,steelblue
-Enos,Seth,4,3000,orange
-Noam,Seth,50000,30,green
-Abel,Eve,4,30,brown
-Awan,Eve,3,30,deeppink
-Enoch,Awan,7,30,blue
-Azura,Eve,2,30,red
+key,parent,size,weight,color,image1,image2
+Eve,,3.45,25,yellow,"../images/bK.svg","../images/wK.svg"
+Cain,Eve,4.647,20.3,black,"../images/bK.svg","../images/wK.svg"
+Seth,Eve,3,20.3,steelblue,"../images/bK.svg","../images/wK.svg"
+Enos,Seth,4,3000,orange,"../images/bK.svg","../images/wK.svg"
+Noam,Seth,50000,30,green,"../images/bK.svg","../images/wK.svg"
+Abel,Eve,4,30,brown,"../images/bK.svg","../images/wK.svg"
+Awan,Eve,3,30,deeppink,"../images/bK.svg","../images/wK.svg"
+Enoch,Awan,7,30,blue,"../images/bK.svg","../images/wK.svg"
+Azura,Eve,2,30,red,"../images/bK.svg","../images/wK.svg"
 </aside>
   
     <script>
-      appendNodeSVG = function (selection) {
-        selection.append("circle")
-          .attr("r", 7.5) 
-          .style("fill", function (d) {
-            return d._children ? "red" : "green";
-          });
-      };
-
-      updateNodeSVG = function (selection) {
-        selection.select("circle")
-          .style("fill", function (d) {
-            return d._children ? "red" : "green";
-          });
-      };
-
       const dataSpec = {
         source: "aside#data",  
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
         .margin({top: 50, right: 10, bottom: 20, left: 50})
-        .nodeImageSelection(appendNodeSVG, updateNodeSVG)
+        .nodeImageFile(d => d._children ? d.data.image1 : d.data.image2 , { width: 20, height: 20})
         .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"})
-        .linkWidth("weight",{range: [100, 300]})
-        .linkHeight(40)
+        .nodeLabelPadding(100)
+        .linkWidth("weight",{range: [150, 300]})
+        .linkHeight(50)
+        .nodeLabelPadding(20)
       ;
       
       showChart(); 
 
+      /*
       window.setTimeout(function() {
           myChart.linkWidth("size").linkLabel("size");
       }, 2000);
+      */
 
       function showChart() {
         d3.select("body")
           .append("div")
           .attr("class", "chart")
           .call(myChart);
-      }           
+      }          
     </script>
   </body>
 </html>  
