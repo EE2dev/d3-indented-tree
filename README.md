@@ -104,7 +104,7 @@ Then the javascript part would look like:
       ...
 ``` 
 
-Alternatively, the JSON source can also reference a JSON object which has been created in the javascript part instead of reading it from a file. The the javascript part would look like:
+Alternatively, the JSON source can also reference a JSON object which has been created in the javascript part instead of reading it from a file. Then the javascript part would look like:
 ```js
 ...
     <script>

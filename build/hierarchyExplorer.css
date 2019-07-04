@@ -29,9 +29,21 @@
       margin: auto;
     }
 */
+    /* not needed any more */
     .node circle {
       fill: #fff;
       stroke: steelblue;
+      stroke-width: 1px;
+    }
+
+    .node rect {
+      fill: #fff;
+      stroke:grey;
+      stroke-width: 1px;
+    }
+
+    .node line {
+      stroke: grey;
       stroke-width: 1px;
     }
 
