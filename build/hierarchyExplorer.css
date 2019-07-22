@@ -11,57 +11,39 @@
       width: 100%;
       height: 100%;
       background-color: white;
+      font-size: 14px;
     }
     
     aside#data {
       display:none;
     }
-  /*  
-    div.center {
-      width: 850px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    svg.chart {
-      display: block;
-      margin: auto;
-    }
-*/
-    /* not needed any more */
-    .node circle {
-      fill: #fff;
-      stroke: steelblue;
-      stroke-width: 1px;
-    }
 
-    .node rect {
-      fill: #fff;
-      stroke:grey;
-      stroke-width: 1px;
-    }
-
-    .node line {
+    .node .nodeImage {
       stroke: grey;
       stroke-width: 1px;
     }
 
-    div.chart{
-      font-size: 14px;
+    .node .invisible {
+      stroke: none;
     }
 
-    .node text {
+    .node rect {
+      fill: #fff;
+    }
+
+    .node .nodeLabel {
       font: 1em sans-serif;
+      fill: black;
     }
 
     .link {
       fill: none;
       stroke-width: 1px;
+      stroke: grey;
       /* shape-rendering: crispEdges; */
     }
 
-    .link text.label{
+    .link text.label {
       font: 0.8em sans-serif;
       paint-order: stroke;
       stroke: #fff;
@@ -72,11 +54,11 @@
       /*font-weight: 800; */
     }
 
-    .link text.label.ontop{
+    .link text.label.ontop {
       stroke-width: 5px;
     }    
 
-    .link text.label.above{
+    .link text.label.above {
       stroke-width: 0px;
     }
 

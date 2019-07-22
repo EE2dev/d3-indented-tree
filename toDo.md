@@ -34,9 +34,8 @@ https://gitlab.com/snippets/1703535
 [ok] linkLabel with just string data from field
 [ok] test nodeImage with URLs from data (test collapsable)
 [ok] nodeImageFile: option to first fill with background color
+[ok] new svg nodes with rectangles, see also https://bl.ocks.org/jfsiii/7772281
 
-* new svg nodes with rectangles
-https://bl.ocks.org/jfsiii/7772281
 * nodeInfo
 * sort
 * color themes
@@ -46,12 +45,16 @@ https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world
 * observable
 
 [bug] if links are in transition and collapse or expand is called, the links can get too long
-
-
+[bug] if you click very fast twice on node to expand collapse :Cannot read property 'posXCenter' of undefined
+    at SVGTextElement.linksAPI.getLinkTextPositionX (hierarchyExplorer.js:327)
+    
+* perfect alignment of dependent links under node
 * images fom https://icons8.de/icon/set/basketball/ios : 
 attribution: <a href="https://icons8.com/icon/37940/basketball-trikot">Basketball-Trikot icon by Icons8</a>
 https://www.flaticon.com/free-icon/t-shirt_1865354
 with attribution
+
+[info] antialiasing: https://stackoverflow.com/questions/23376308/avoiding-lines-between-adjecent-svg-rectangles/23376793#23376793
 
 * linkLabel align for longest and shortest
 * test linkLabel with just text

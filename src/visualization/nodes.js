@@ -2,6 +2,7 @@ import * as d3 from "d3";
 
 export let nodesAPI = {};
 let options;
+// let nodeImageColor;
 
 nodesAPI.initialize = function(_options) { 
   options = _options; 
@@ -46,28 +47,34 @@ nodesAPI.updateNodeSVG = function (transition) {
 */
 nodesAPI.appendNodeSVG = function (selection) {
   selection.append("rect")
+    .attr("class", "nodeImage")
     .attr("x", -5)
     .attr("y", -5) 
     .attr("width", 10)
     .attr("height", 10);
   
+  // nodeImageColor = d3.select(".node .nodeImage").style("stroke");
+
   //const sel2 = selection.filter(d => d._children);
   const sel2 = selection;
   sel2.append("line")
-    .attr("class", "cross")
+    // .attr("class", "cross nodeImage")
+    .attr("class", d => d._children ? "cross nodeImage" : "cross invisible")
     .attr("x1", 0)
     .attr("y1", -5) 
     .attr("x2", 0)
-    .attr("y2", 5)
-    .style("stroke", d => d._children ? "grey" : "none");
+    .attr("y2", 5);
+  // .style("stroke", d => d._children ? nodeImageColor : "none"); 
 
   sel2.append("line")
-    .attr("class", "cross")
+    //.attr("class", "cross nodeImage")
+    .attr("class", d => d._children ? "cross nodeImage" : "cross invisible")
     .attr("x1", -5)
     .attr("y1", 0) 
     .attr("x2", 5)
-    .attr("y2", 0)
-    .style("stroke", d => d._children ? "grey" : "none");
+    .attr("y2", 0);
+  // .style("stroke", d => d._children ? nodeImageColor : "none");
+  // .style("stroke", d => d._children ? "grey" : "none");
   // .style("fill", "none");
 };
 
@@ -88,19 +95,23 @@ nodeAPI.setNodePattern = function (svg) {
 nodesAPI.updateNodeSVG = function (transition) {
   // const trans2 = transition.select("rect").filter(d => d._children);
   transition.selectAll("line.cross")
-    .style("stroke", d => d._children ? "grey" : "none");
+    .attr("class", d => d._children ? "cross nodeImage" : "cross invisible");
+  // .style("stroke", d => d._children ? nodeImageColor : "none");
 };
 
 nodesAPI.appendNodeImage = function (selection) {
   if (options.nodeImageSetBackground) {
+    const col = d3.select("div.chart").style("background-color");
     selection.append("rect")
       .attr("width", options.nodeImageWidth)
       .attr("height", options.nodeImageHeight)
       .attr("x", options.nodeImageX)
       .attr("y", options.nodeImageY)
-      .style("fill", d3.select("div.chart").style("background-color"));
+      .style("stroke", col)
+      .style("fill", col);
   }
   selection.append("image")
+    .attr("class", "nodeImage")
     .attr("xlink:href", options.nodeImageFileAppend)
     .attr("width", options.nodeImageWidth)
     .attr("height", options.nodeImageHeight)
@@ -110,7 +121,7 @@ nodesAPI.appendNodeImage = function (selection) {
 
 nodesAPI.updateNodeImage = function (transition) {
   transition
-    .select("image")
+    .select(".nodeImage")
     .attr("xlink:href", options.nodeImageFileAppend);    
 };
 

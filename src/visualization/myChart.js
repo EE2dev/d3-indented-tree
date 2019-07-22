@@ -165,6 +165,7 @@ function update(source, options, config){
   nodeEnter.call(n.appendNode);
 
   nodeEnter.append("text")
+    .attr("class", "nodeLabel")
     // .attr("x", 10)
     .attr("x", options.nodeLabelPadding)
     .attr("dy", ".35em")
@@ -200,7 +201,7 @@ function update(source, options, config){
     */
   nodeUpdate.call(n.updateNode);
   
-  nodeUpdate.select("text")
+  nodeUpdate.select(".nodeLabel")
     .style("fill-opacity", 1);
 
   // Transition exiting nodes to the parent's new position (and remove the nodes)
@@ -213,7 +214,7 @@ function update(source, options, config){
     })
     .remove();
 
-  nodeExit.select("text")
+  nodeExit.select(".nodeLabel")
     .style("fill-opacity", 1e-6);
   
   // 2. Update the links…

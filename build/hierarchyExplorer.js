@@ -224,7 +224,8 @@
     var linkStrength = linksAPI.getLinkStrength(d, options);
     var path = void 0;
     if (direction === "down") {
-      path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
+      // path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
+      path = "M 0 " + -1 * linkStrengthParent / 2 + " V" + (d.x + linkStrength / 2 - d.parent.x);
     } else if (direction === "right") {
       path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
     }
@@ -366,6 +367,7 @@
 
   var nodesAPI = {};
   var options$1 = void 0;
+  // let nodeImageColor;
 
   nodesAPI.initialize = function (_options) {
     options$1 = _options;
@@ -408,17 +410,26 @@
   };
   */
   nodesAPI.appendNodeSVG = function (selection) {
-    selection.append("rect").attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
+    selection.append("rect").attr("class", "nodeImage").attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
+
+    // nodeImageColor = d3.select(".node .nodeImage").style("stroke");
 
     //const sel2 = selection.filter(d => d._children);
     var sel2 = selection;
-    sel2.append("line").attr("class", "cross").attr("x1", 0).attr("y1", -5).attr("x2", 0).attr("y2", 5).style("stroke", function (d) {
-      return d._children ? "grey" : "none";
-    });
+    sel2.append("line")
+    // .attr("class", "cross nodeImage")
+    .attr("class", function (d) {
+      return d._children ? "cross nodeImage" : "cross invisible";
+    }).attr("x1", 0).attr("y1", -5).attr("x2", 0).attr("y2", 5);
+    // .style("stroke", d => d._children ? nodeImageColor : "none"); 
 
-    sel2.append("line").attr("class", "cross").attr("x1", -5).attr("y1", 0).attr("x2", 5).attr("y2", 0).style("stroke", function (d) {
-      return d._children ? "grey" : "none";
-    });
+    sel2.append("line")
+    //.attr("class", "cross nodeImage")
+    .attr("class", function (d) {
+      return d._children ? "cross nodeImage" : "cross invisible";
+    }).attr("x1", -5).attr("y1", 0).attr("x2", 5).attr("y2", 0);
+    // .style("stroke", d => d._children ? nodeImageColor : "none");
+    // .style("stroke", d => d._children ? "grey" : "none");
     // .style("fill", "none");
   };
 
@@ -437,35 +448,22 @@
 
   nodesAPI.updateNodeSVG = function (transition) {
     // const trans2 = transition.select("rect").filter(d => d._children);
-    transition.selectAll("line.cross").style("stroke", function (d) {
-      return d._children ? "grey" : "none";
+    transition.selectAll("line.cross").attr("class", function (d) {
+      return d._children ? "cross nodeImage" : "cross invisible";
     });
-    /*
-    if (trans2.selectAll("line").size() !== 2) {
-      trans2.append("line")
-        .attr("x1", 0)
-        .attr("y1", -5) 
-        .attr("x2", 0)
-        .attr("y2", 5);
-        trans2.append("line")
-        .attr("x1", -5)
-        .attr("y1", 0) 
-        .attr("x2", 5)
-        .attr("y2", 0); 
-    }
-    // .style("fill", "none");
-    */
+    // .style("stroke", d => d._children ? nodeImageColor : "none");
   };
 
   nodesAPI.appendNodeImage = function (selection) {
     if (options$1.nodeImageSetBackground) {
-      selection.append("rect").attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY).style("fill", d3.select("div.chart").style("background-color"));
+      var col = d3.select("div.chart").style("background-color");
+      selection.append("rect").attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY).style("stroke", col).style("fill", col);
     }
-    selection.append("image").attr("xlink:href", options$1.nodeImageFileAppend).attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY);
+    selection.append("image").attr("class", "nodeImage").attr("xlink:href", options$1.nodeImageFileAppend).attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY);
   };
 
   nodesAPI.updateNodeImage = function (transition) {
-    transition.select("image").attr("xlink:href", options$1.nodeImageFileAppend);
+    transition.select(".nodeImage").attr("xlink:href", options$1.nodeImageFileAppend);
   };
 
   ////////////////////////////////////////////////////
@@ -630,7 +628,7 @@
       */
     nodeEnter.call(n.appendNode);
 
-    nodeEnter.append("text")
+    nodeEnter.append("text").attr("class", "nodeLabel")
     // .attr("x", 10)
     .attr("x", options.nodeLabelPadding).attr("dy", ".35em").attr("text-anchor", "start").text(function (d) {
       if (d.data[options.keyField].length > options.nodeLabelLength) {
@@ -659,7 +657,7 @@
       */
     nodeUpdate.call(n.updateNode);
 
-    nodeUpdate.select("text").style("fill-opacity", 1);
+    nodeUpdate.select(".nodeLabel").style("fill-opacity", 1);
 
     // Transition exiting nodes to the parent's new position (and remove the nodes)
     var nodeExit = node.exit().transition().duration(options.transitionDuration);
@@ -668,7 +666,7 @@
       return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
     }).remove();
 
-    nodeExit.select("text").style("fill-opacity", 1e-6);
+    nodeExit.select(".nodeLabel").style("fill-opacity", 1e-6);
 
     // 2. Update the links…
     var l = linksAPI;

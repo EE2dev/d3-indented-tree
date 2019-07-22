@@ -22,7 +22,8 @@ linksAPI.getLinkD = function (d, direction) {
   const linkStrength = linksAPI.getLinkStrength(d, options);
   let path;
   if (direction === "down"){
-    path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
+    // path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
+    path = "M 0 " + (-1 * linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
   } else if (direction === "right"){
     path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
   }

@@ -1,70 +1,63 @@
-    .unselect {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    
-    div.chart {
-      width: 100%;
-      height: 100%;
-      background-color: white;
-    }
-    
-    aside#data {
-      display:none;
-    }
-  /*  
-    div.center {
-      width: 850px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    svg.chart {
-      display: block;
-      margin: auto;
-    }
-*/
-    .node circle {
-      fill: #fff;
-      stroke: steelblue;
-      stroke-width: 1px;
-    }
+.unselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 
-    div.chart{
-      font-size: 14px;
-    }
+div.chart {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  font-size: 14px;
+}
 
-    .node text {
-      font: 1em sans-serif;
-    }
+aside#data {
+  display:none;
+}
 
-    .link {
-      fill: none;
-      stroke-width: 1px;
-      /* shape-rendering: crispEdges; */
-    }
+.node .nodeImage {
+  stroke: green;
+  stroke-width: 1px;
+}
 
-    .link text.label{
-      font: 0.8em sans-serif;
-      paint-order: stroke;
-      stroke: #fff;
-      fill: black;
-      /*stroke-width: 4px;*/
-      stroke-linecap: butt;
-      stroke-linejoin: miter;
-      /*font-weight: 800; */
-    }
+.node .invisible {
+  stroke: none;
+}
 
-    .link text.label.ontop{
-      stroke-width: 5px;
-    }    
+.node rect {
+  fill: #fff;
+}
 
-    .link text.label.above{
-      stroke-width: 0px;
-    }
+.node .nodeLabel {
+  font: 1em sans-serif;
+  fill: black;
+}
 
+.link {
+  fill: none;
+  stroke-width: 1px;
+  stroke: grey;
+  /* shape-rendering: crispEdges; */
+}
+
+.link text.label {
+  font: 0.8em sans-serif;
+  paint-order: stroke;
+  stroke: #fff;
+  fill: black;
+  /*stroke-width: 4px;*/
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  /*font-weight: 800; */
+}
+
+.link text.label.ontop {
+  stroke-width: 5px;
+}    
+
+.link text.label.above {
+  stroke-width: 0px;
+}

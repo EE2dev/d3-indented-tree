@@ -17,8 +17,8 @@ Here is a minimal template sufficient to call hierarchy explorer. A reference to
   <meta charset="utf-8">
   <head>
     <script src="https://d3js.org/d3.v5.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
     <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
   </head>
   
   <body>
@@ -329,8 +329,8 @@ With no arguments returns the callback *function* for the node images.
 
 Sets the node images based on a selection.  
 1. argument:
-    * a callback *function*, which is called with a selection as an argument containing all newly entered `g.node`'s. 
-    * the callback function is expected to append to each node a graphical element as the node image. To enter a different image based on the node being expandable or not, the attached datum `d._children` can be used. 
+    * a callback *function*, which is called with a selection as an argument containing all newly entered `g.node`'s. The function is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]).
+    * the callback function is expected to append to each node a graphical element as the node image. To enter a different image based on the node being expandable or not, the attached datum `d._children` can be used. In case no image node should be shown, an empty function can be passed.   
 
 2. argument: (optional)
     * a callback *function*, which is called with a selection as an argument containing all newly updated `g.node`'s. 
@@ -409,8 +409,18 @@ Sets the transition duration for the transitions.
   } 
 
   /* changing the font size for node labels */
-  .node text {
+  .node .nodeLabel {
     font: 1em sans-serif;
+  }
+
+  /* changing the color of the node labels */
+  .node .nodeLabel {
+    fill: black;
+  }
+
+  /* changing the color of the nodeImage (from default selection) */
+  .node .nodeImage {
+    stroke: green;
   }
 
   /* changing the size of the outline for link labels */
