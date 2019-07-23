@@ -23,7 +23,7 @@ linksAPI.getLinkD = function (d, direction) {
   let path;
   if (direction === "down"){
     // path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
-    path = "M 0 " + (-1 * linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
+    path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (d.x + linkStrength / 2 - d.parent.x);
   } else if (direction === "right"){
     path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
   }
@@ -117,9 +117,9 @@ linksAPI.getLinkTextPositionX = function (d) {
   return shiftAlign;
 };
 
-linksAPI.computeLabelDimensions = function (trans) {
+linksAPI.computeLabelDimensions = function (sel) {
   let dims = [];
-  trans
+  sel
     .each(function(d) {
       let labelDimensions = {};
       const height = d3.select(this).node().getBBox().height;

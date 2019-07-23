@@ -268,16 +268,19 @@ function update(source, options, config){
     .style("fill", l.getLinkLabelColor); 
 
   // Transition links to their new position.
-  const linkUpdate = linkMerge.transition()
+  const linkUpdate = linkMerge
+    //.style("shape-rendering", "geometricPrecision")
+    .transition()
     .duration(options.transitionDuration);
   
-  l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
+  // l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
+  l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
   linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
 
   linkUpdate.select("path.link.down")
     .attr("d", (d) => l.getLinkD(d, "down"))
-    .style("stroke", (d) => l.getLinkStroke(d.parent))
+    // .style("stroke", (d) => l.getLinkStroke(d.parent))
     .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
 
   linkUpdate.select("path.link.right")
@@ -293,6 +296,12 @@ function update(source, options, config){
     .attr("y", d => d.x - d.parent.x)
     .call(sel => sel.tween("text", l.getLinkTextTween))
     .style("opacity", 1); 
+
+  /*
+  linkUpdate.on("end", function(){
+    d3.select(this).style("shape-rendering", "crispEdges");
+  });
+  */
 
   // Transition exiting nodes to the parent's new position.
   const linkExit = link.exit().transition()

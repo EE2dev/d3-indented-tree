@@ -21,8 +21,7 @@ Here is a minimal template sufficient to call hierarchy explorer. A reference to
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
   </head>
   
-  <body>
-  
+  <body>  
     <script>
       const dataSpec = {source: "path/to/data/data.json"};
       const myChart = hierarchyExplorer.chart(dataSpec);
@@ -329,7 +328,7 @@ With no arguments returns the callback *function* for the node images.
 
 Sets the node images based on a selection.  
 1. argument:
-    * a callback *function*, which is called with a selection as an argument containing all newly entered `g.node`'s. The function is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]).
+    * a callback *function*, which is called with a selection as an argument containing all newly entered `g.node`'s. The function is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]). 
     * the callback function is expected to append to each node a graphical element as the node image. To enter a different image based on the node being expandable or not, the attached datum `d._children` can be used. In case no image node should be shown, an empty function can be passed.   
 
 2. argument: (optional)

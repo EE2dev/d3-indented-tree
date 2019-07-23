@@ -225,7 +225,7 @@
     var path = void 0;
     if (direction === "down") {
       // path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
-      path = "M 0 " + -1 * linkStrengthParent / 2 + " V" + (d.x + linkStrength / 2 - d.parent.x);
+      path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
     } else if (direction === "right") {
       path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
     }
@@ -328,9 +328,9 @@
     return shiftAlign;
   };
 
-  linksAPI.computeLabelDimensions = function (trans) {
+  linksAPI.computeLabelDimensions = function (sel) {
     var dims = [];
-    trans.each(function (d) {
+    sel.each(function (d) {
       var labelDimensions = {};
       var height = d3.select(this).node().getBBox().height;
       var width = d3.select(this).node().getBBox().width;
@@ -711,9 +711,12 @@
     }).style("fill", l.getLinkLabelColor);
 
     // Transition links to their new position.
-    var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
+    var linkUpdate = linkMerge
+    //.style("shape-rendering", "geometricPrecision")
+    .transition().duration(options.transitionDuration);
 
-    l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
+    // l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
+    l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
     linkUpdate.attr("transform", function (d) {
       return "translate(" + d.parent.y + " " + d.parent.x + ")";
@@ -721,9 +724,9 @@
 
     linkUpdate.select("path.link.down").attr("d", function (d) {
       return l.getLinkD(d, "down");
-    }).style("stroke", function (d) {
-      return l.getLinkStroke(d.parent);
-    }).style("stroke-width", function (d) {
+    })
+    // .style("stroke", (d) => l.getLinkStroke(d.parent))
+    .style("stroke-width", function (d) {
       return l.getLinkStrokeWidth(d.parent);
     });
 
@@ -736,6 +739,12 @@
     }).call(function (sel) {
       return sel.tween("text", l.getLinkTextTween);
     }).style("opacity", 1);
+
+    /*
+    linkUpdate.on("end", function(){
+      d3.select(this).style("shape-rendering", "crispEdges");
+    });
+    */
 
     // Transition exiting nodes to the parent's new position.
     var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
