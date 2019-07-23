@@ -234,7 +234,9 @@ function update(source, options, config){
     .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
   
   const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-  linkEnter.append("path")
+  linkEnter // filter to just draw this connector link for last child of parent
+    .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
+    .append("path")
     .attr("class", "link down")
     .attr("d", () => l.getLinkD(origin, "down"));
     
