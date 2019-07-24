@@ -9,36 +9,27 @@
   <body>
     <!-- paste data in aside tag -->
     <aside id="data">
-key,parent,color
-Eve,,2
-Cain,Eve,3
-Seth,Eve,3
-Enos,Seth,4
-Noam,Seth,5
-Abel,Eve,4
-Awan,Eve,3
-Enoch,Awan,7
-Azura,Eve,2
     </aside>
-      
+  
     <script>
       const dataSpec = {
-        source: "aside#data",
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/data1.json",
+        key: "name",
       };
       const myChart = hierarchyExplorer.chart(dataSpec);
 
       showChart(); 
       
       window.setTimeout(function() {
-          myChart.linkWidth(100);
+        myChart.linkWidth("population");
       }, 2000);
       
       function showChart() {
-        const selection = d3.select("body")
+        d3.select("body")
           .append("div")
-          .attr("class", "chart");
-        selection.call(myChart);
+          .attr("class", "chart")
+          .call(myChart);
       }         
     </script>
   </body>
-</html>  
+</html>

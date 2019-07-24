@@ -2,21 +2,37 @@
 
 Visualizing a hierarchy with an expandable/collapsable tree.
 
-### Credits
-This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
-
 ## Examples
 
 More examples demonstrating specific API calls:
+
+#### Data Format examples
+
+- [data format - relational csv file (readme example)](https://bl.ocks.org/EE2dev/08d87f3b57e25aa8311e857b8a582575)
+- [data format - hierarchical csv file (readme example)](https://bl.ocks.org/EE2dev/eb865fd642723365272c89f94e52e48f)
+- [data format - JSON file (readme example)](https://bl.ocks.org/EE2dev/2dac1c1714b456bc427bb7f5beaeca87)
+- [data format - relational csv file](https://bl.ocks.org/EE2dev/9b1959d2631892656f36d849a614e6ba)
+- [data format - relational csv file (2)](https://bl.ocks.org/EE2dev/baf7343706b595ec9e49758ec4ab0437)
+- [data format - relational csv file, different key](https://bl.ocks.org/EE2dev/f671f8f70ac355950572a45fa0cde022)
+- [data format - relational csv data embedded](https://bl.ocks.org/EE2dev/c823a392791797a1a021e3eb268a1502)
+- [data format - hierarchical csv file](https://bl.ocks.org/EE2dev/06652de4cf888e2a8bb16c76642ee05f)
+- [data format - hierarchical csv data embedded](https://bl.ocks.org/EE2dev/93fa64a7ad4c1d24a0be845c5c1f5f0b)
+- [data format - hierarchical csv data embedded, different key](https://bl.ocks.org/EE2dev/4fadf0f3bac11206ba2185c626a508b7)
+
+#### Other examples
+
+- [myChart.alignLeaves()](https://bl.ocks.org/EE2dev/6b2875538761cc8828a62275aea9456d)
+
+
 ## 1. How to use Hierarchy explorer
 
-Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object*. 
+Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object property*. 
 
 ```html
 <!DOCTYPE html>
   <meta charset="utf-8">
   <head>
-    <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
   </head>
@@ -240,7 +256,7 @@ Transitions the alignment of the leaves of the hierarchy. If leaves are aligned,
 
 <a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Transitions to the new color of the links. The horizontal link to and the vertical link from a node is denoted by its color.
+Transitions to the new color of the links. The horizontal link to is denoted by its color.
 * to set the link color statically, use instead <a href="#other_defaultColor"><i>myChart</i>.<b>defaultColor</b>()</a>
 * to set the link color dynamically, provide the name of a field (default is ```"value"``` after the first call). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale *function* used to map the values to the color (default is the identity function ```(value) => value``` assuming the field contains a valid color). This scale callback function is invoked for each instance of the field provided as first argument.  
 * with no argument returns the field used for the color.
@@ -431,7 +447,8 @@ Sets the transition duration for the transitions.
 ## 4. License  
 This code is released under the [BSD license](https://github.com/EE2dev/hierarchy-explorer//blob/master/LICENSE).
 
-
+## 5. Credits
+This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
 
 
 

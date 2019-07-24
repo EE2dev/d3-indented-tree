@@ -35,6 +35,30 @@ https://gitlab.com/snippets/1703535
 [ok] test nodeImage with URLs from data (test collapsable)
 [ok] nodeImageFile: option to first fill with background color
 [ok] new svg nodes with rectangles, see also https://bl.ocks.org/jfsiii/7772281
+[ok] if you click very fast twice on node to expand collapse :Cannot read property 'posXCenter' of undefined
+    at SVGTextElement.linksAPI.getLinkTextPositionX (hierarchyExplorer.js:327)
+
+### API examples for hierarchy explorer
+
+-------
+
+#### myChart.alignLeaves()
+
+This example shows how to align the leaves of the tree.
+
+For documentation, go to https://github.com/EE2dev/hierarchy-explorer
+
+#### Other API examples for hierarchy explorer:
+
+----------
+
+Acknowledgements:
+- [d3.js](https://d3js.org/)
+- [blockbuilder.org](https://blockbuilder.org)
+
+* Linkcolor options: are with path.down
+* Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram
+* No root -> key = space , options: rootNodeBlank: false kein node label und kein node Image
 
 * nodeInfo
 * sort
@@ -45,8 +69,7 @@ https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world
 * observable
 
 [bug] if links are in transition and collapse or expand is called, the links can get too long
-[bug] if you click very fast twice on node to expand collapse :Cannot read property 'posXCenter' of undefined
-    at SVGTextElement.linksAPI.getLinkTextPositionX (hierarchyExplorer.js:327)
+
     
 * perfect alignment of dependent links under node
 * images fom https://icons8.de/icon/set/basketball/ios : 

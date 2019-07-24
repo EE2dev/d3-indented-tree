@@ -9,7 +9,7 @@
   <body>
     <!-- paste data in aside tag -->
     <aside id="data">
-key,parent,color
+myKey,parent,color
 Eve,,2
 Cain,Eve,3
 Seth,Eve,3
@@ -20,14 +20,15 @@ Awan,Eve,3
 Enoch,Awan,7
 Azura,Eve,2
     </aside>
-      
+  
     <script>
       const dataSpec = {
         source: "aside#data",
+        key: "myKey",
       };
       const myChart = hierarchyExplorer.chart(dataSpec);
 
-      showChart(); 
+      showChart();
       
       window.setTimeout(function() {
           myChart.linkWidth(100);
@@ -38,7 +39,7 @@ Azura,Eve,2
           .append("div")
           .attr("class", "chart");
         selection.call(myChart);
-      }         
+      }    
     </script>
   </body>
 </html>  
