@@ -30,7 +30,6 @@ More examples demonstrating specific API calls:
 - [myChart.linkLabel() - 3](https://bl.ocks.org/EE2dev/10a3dba82372163a96de6632ca72c7a0)
 - [myChart.linkLabel() - 4](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 - [myChart.linkLabel() - 5](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
-
 - [myChart.linkWidth()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 
 #### API examples to customize the nodes

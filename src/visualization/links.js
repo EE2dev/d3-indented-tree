@@ -22,7 +22,6 @@ linksAPI.getLinkD = function (d, direction) {
   const linkStrength = linksAPI.getLinkStrength(d, options);
   let path;
   if (direction === "down"){
-    // path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
     path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (d.x + linkStrength / 2 - d.parent.x);
   } else if (direction === "right"){
     path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
@@ -77,10 +76,6 @@ linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField
   } else {
     return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
   }
-  /*
-  return (!options.linkLabelOn) ? "" :
-    options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
-    */
 };
 
 linksAPI.getLinkTextTween = function(d) { 

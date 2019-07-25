@@ -260,7 +260,6 @@ export default function (_dataSpec) {
     if (typeof dataSpec === "object"){ 
       myData.data = dataSpec.source;
       myData.hierarchyLevels = dataSpec.hierarchyLevels;
-      // myData.keyField = dataSpec.key ? dataSpec.key : (myData.hierarchyLevels ? "key" : "name");
       myData.keyField = dataSpec.key ? dataSpec.key : "key";
       myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
     } else {

@@ -36,7 +36,6 @@ function createTree(options, config, data) {
   config.root = config.tree(data);
   if (options.propagate) { config.root.sum(d => d[options.propagateField]);}
   
-  // baroptions.width = options.width *.8;
   config.root.each((d)=> {
     d.name = d.id; //transferring name to a name variable
     d.id = config.i; //Assigning numerical Ids
@@ -92,16 +91,6 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
-/*
-function collapse(d){
-  if (d.children) {
-    d._children = d.children;
-    d._children.forEach(collapse);
-    d.children = null;
-  }
-}
-*/
-
 function click(d, options, config){
   if (d.children) {
     d._children = d.children;
@@ -114,8 +103,6 @@ function click(d, options, config){
 }
 
 function update(source, options, config){
-  // config.width = 800;
-
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];
@@ -155,18 +142,10 @@ function update(source, options, config){
     })
     .on("click", (d) => { return click (d, options, config); });
 
-  /*
-  nodeEnter.append("circle")
-    .attr("r", 4.5) 
-    .style("fill", function (d) {
-      return d._children ? "lightsteelblue" : "#fff";
-    });
-    */
   nodeEnter.call(n.appendNode);
 
   nodeEnter.append("text")
     .attr("class", "nodeLabel")
-    // .attr("x", 10)
     .attr("x", options.nodeLabelPadding)
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
@@ -193,12 +172,6 @@ function update(source, options, config){
       return "translate(" + d.y + "," + d.x + ") scale(1,1)";
     });
 
-  /*
-  nodeUpdate.select("circle")
-    .style("fill", function (d) {
-      return d._children ? "lightsteelblue" : "#fff";
-    }); 
-    */
   nodeUpdate.call(n.updateNode);
   
   nodeUpdate.select(".nodeLabel")
@@ -223,7 +196,6 @@ function update(source, options, config){
 
   const link = config.svg.selectAll("g.link")
     .data(links, function (d) {
-      // return d.target.id;
       var id = d.id + "->" + d.parent.id;
       return id;
     });
@@ -244,18 +216,6 @@ function update(source, options, config){
     .attr("class", "link right")
     .attr("d", () => l.getLinkD(origin, "right"));
 
-  /*
-  linkEnter
-    .append("text")  
-    .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
-    .attr("dy", l.getDy) 
-    // .attr("dy", ".35em")
-    .attr("text-anchor", "end") 
-    // .attr("text-anchor", "middle") 
-    .text(d => l.getLinkLabelFormatted(d))
-    .style("opacity", 1e-6)
-    .style("fill", l.getLinkLabelColor);  
-    */    
   linkEnter
     .append("text")   
     .style("opacity", 1e-6);   
@@ -274,7 +234,6 @@ function update(source, options, config){
     .transition()
     .duration(options.transitionDuration);
   
-  // l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
   l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
   linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
