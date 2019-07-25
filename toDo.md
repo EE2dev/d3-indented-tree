@@ -38,6 +38,7 @@ https://gitlab.com/snippets/1703535
 [ok] if you click very fast twice on node to expand collapse :Cannot read property 'posXCenter' of undefined
     at SVGTextElement.linksAPI.getLinkTextPositionX (hierarchyExplorer.js:327)
 
+..........
 ### API examples for hierarchy explorer
 
 -------
@@ -46,15 +47,15 @@ https://gitlab.com/snippets/1703535
 
 This example shows how to align the leaves of the tree.
 
-For documentation, go to https://github.com/EE2dev/hierarchy-explorer
+---------
 
-#### Other API examples for hierarchy explorer:
-
-----------
+- for documentation, go to https://github.com/EE2dev/hierarchy-explorer
+- for other examples, go to https://github.com/EE2dev/hierarchy-explorer#examples
 
 Acknowledgements:
 - [d3.js](https://d3js.org/)
 - [blockbuilder.org](https://blockbuilder.org)
+..........
 
 * Linkcolor options: are with path.down
 * Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram

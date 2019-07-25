@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <aside id="data">
+key,parent,size,weight,color
+Eve,,3.45,25,yellow
+Cain,Eve,4.647,20.3,black
+Seth,Eve,3,20.3,steelblue
+Enos,Seth,4,3000,orange
+Noam,Seth,50000,30,green
+Abel,Eve,4,30,brown
+Awan,Eve,3,30,deeppink
+Enoch,Awan,7,30,blue
+Azura,Eve,2,30,red
+    </aside>
+      
+    <script>
+      const dataSpec = {
+        source: "aside#data",
+      };
+      const localeGerman = {
+        "decimal": ",",
+        "thousands": ".",
+        "grouping": [3],
+        "currency": ["", " €"]   
+      };
+
+      const myChart = hierarchyExplorer.chart(dataSpec)
+        .propagateValue("size")
+        .formatDefaultLocale(localeGerman)
+        .linkLabel("weight",{unit: " Euro", onTop: true, })
+        .linkWidth(100)
+      ;
+
+      showChart(); 
+      
+      function showChart() {
+        const selection = d3.select("body")
+          .append("div")
+          .attr("class", "chart");
+        selection.call(myChart);
+      }         
+    </script>
+  </body>
+</html>

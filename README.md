@@ -11,17 +11,40 @@ More examples demonstrating specific API calls:
 - [data format - relational csv file (readme example)](https://bl.ocks.org/EE2dev/08d87f3b57e25aa8311e857b8a582575)
 - [data format - hierarchical csv file (readme example)](https://bl.ocks.org/EE2dev/eb865fd642723365272c89f94e52e48f)
 - [data format - JSON file (readme example)](https://bl.ocks.org/EE2dev/2dac1c1714b456bc427bb7f5beaeca87)
+- [data format, JSON data from variable](https://bl.ocks.org/EE2dev/c5abbb6eb05564512ebf3b630440c0f7)
 - [data format - relational csv file](https://bl.ocks.org/EE2dev/9b1959d2631892656f36d849a614e6ba)
-- [data format - relational csv file (2)](https://bl.ocks.org/EE2dev/baf7343706b595ec9e49758ec4ab0437)
+- [data format - relational csv file - 2](https://bl.ocks.org/EE2dev/baf7343706b595ec9e49758ec4ab0437)
 - [data format - relational csv file, different key](https://bl.ocks.org/EE2dev/f671f8f70ac355950572a45fa0cde022)
 - [data format - relational csv data embedded](https://bl.ocks.org/EE2dev/c823a392791797a1a021e3eb268a1502)
 - [data format - hierarchical csv file](https://bl.ocks.org/EE2dev/06652de4cf888e2a8bb16c76642ee05f)
 - [data format - hierarchical csv data embedded](https://bl.ocks.org/EE2dev/93fa64a7ad4c1d24a0be845c5c1f5f0b)
 - [data format - hierarchical csv data embedded, different key](https://bl.ocks.org/EE2dev/4fadf0f3bac11206ba2185c626a508b7)
 
+#### API examples to customize the links
+
+- [myChart.linkColor()](https://bl.ocks.org/EE2dev/54fe30f1213b216575dcf300ee3ad4c0)
+- [myChart.linkColor() - 2](https://bl.ocks.org/EE2dev/c0fd7569102e194013e68855a7bb1076)
+- [myChart.linkHeight()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.linkLabel()](https://bl.ocks.org/EE2dev/423d4e8c040bed8d96e9b72e65ae8999)
+- [myChart.linkLabel() - 2](https://bl.ocks.org/EE2dev/e17f3e4930eb8b35cce66cf7aa0b462f)
+- [myChart.linkLabel() - 3](https://bl.ocks.org/EE2dev/10a3dba82372163a96de6632ca72c7a0)
+- [myChart.linkLabel() - 4](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.linkLabel() - 5](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
+
+- [myChart.linkWidth()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+
+#### API examples to customize the nodes
+
+- [myChart.nodeImageFile()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.nodeLabelPadding()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+
 #### Other examples
 
 - [myChart.alignLeaves()](https://bl.ocks.org/EE2dev/6b2875538761cc8828a62275aea9456d)
+- [myChart.defaultColor()](https://bl.ocks.org/EE2dev/530af345027f9bf4e63fe845d7173efa)
+- [myChart.formatDefaultLocale()](https://bl.ocks.org/EE2dev/10a3dba82372163a96de6632ca72c7a0)
+- [myChart.margin()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.propagateValue()](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
 
 
 ## 1. How to use Hierarchy explorer

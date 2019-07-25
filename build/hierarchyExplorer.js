@@ -714,9 +714,7 @@
     }).style("fill", l.getLinkLabelColor);
 
     // Transition links to their new position.
-    var linkUpdate = linkMerge
-    //.style("shape-rendering", "geometricPrecision")
-    .transition().duration(options.transitionDuration);
+    var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
 
     // l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
     l.computeLabelDimensions(d3.selectAll(".link text.label"));
@@ -729,7 +727,7 @@
       return l.getLinkD(d, "down");
     })
     // .style("stroke", (d) => l.getLinkStroke(d.parent))
-    .style("stroke-width", function (d) {
+    .style("stroke", "").style("stroke-width", function (d) {
       return l.getLinkStrokeWidth(d.parent);
     });
 
@@ -742,12 +740,6 @@
     }).call(function (sel) {
       return sel.tween("text", l.getLinkTextTween);
     }).style("opacity", 1);
-
-    /*
-    linkUpdate.on("end", function(){
-      d3.select(this).style("shape-rendering", "crispEdges");
-    });
-    */
 
     // Transition exiting nodes to the parent's new position.
     var linkExit = link.exit().transition().duration(options.transitionDuration).remove();

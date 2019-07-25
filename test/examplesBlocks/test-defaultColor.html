@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <aside id="data">
+    </aside>
+      
+    <script>
+      const dataSpec = {
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/flare.json",
+        key: "name",
+      };
+      const myChart = hierarchyExplorer.chart(dataSpec)
+        .defaultColor("deeppink");
+
+      showChart(); 
+      
+      window.setTimeout(function() {
+        myChart.alignLeaves(true);
+      }, 2000);
+      
+      function showChart() {
+        const selection = d3.select("body")
+          .append("div")
+          .attr("class", "chart");
+        selection.call(myChart);
+      }         
+    </script>
+  </body>
+</html>
