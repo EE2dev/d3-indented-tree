@@ -2,6 +2,9 @@
 
 Visualizing a hierarchy with an expandable/collapsable tree.
 
+## Credits
+This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
+
 ## Examples
 
 More examples demonstrating specific API calls:
@@ -11,7 +14,7 @@ More examples demonstrating specific API calls:
 - [data format - relational csv file (readme example)](https://bl.ocks.org/EE2dev/08d87f3b57e25aa8311e857b8a582575)
 - [data format - hierarchical csv file (readme example)](https://bl.ocks.org/EE2dev/eb865fd642723365272c89f94e52e48f)
 - [data format - JSON file (readme example)](https://bl.ocks.org/EE2dev/2dac1c1714b456bc427bb7f5beaeca87)
-- [data format, JSON data from variable](https://bl.ocks.org/EE2dev/c5abbb6eb05564512ebf3b630440c0f7)
+- [data format - JSON data from variable](https://bl.ocks.org/EE2dev/c5abbb6eb05564512ebf3b630440c0f7)
 - [data format - relational csv file](https://bl.ocks.org/EE2dev/9b1959d2631892656f36d849a614e6ba)
 - [data format - relational csv file - 2](https://bl.ocks.org/EE2dev/baf7343706b595ec9e49758ec4ab0437)
 - [data format - relational csv file, different key](https://bl.ocks.org/EE2dev/f671f8f70ac355950572a45fa0cde022)
@@ -468,9 +471,6 @@ Sets the transition duration for the transitions.
 
 ## 4. License  
 This code is released under the [BSD license](https://github.com/EE2dev/hierarchy-explorer//blob/master/LICENSE).
-
-## 5. Credits
-This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
 
 
 
