@@ -7,6 +7,8 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 
 ## Examples
 
+- [hierarchy explorer - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
+
 More examples demonstrating specific API calls:
 
 #### Data Format examples
@@ -33,6 +35,9 @@ More examples demonstrating specific API calls:
 - [myChart.linkLabel() - 3](https://bl.ocks.org/EE2dev/10a3dba82372163a96de6632ca72c7a0)
 - [myChart.linkLabel() - 4](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 - [myChart.linkLabel() - 5](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
+- [myChart.linkStrength()](https://bl.ocks.org/EE2dev/813d21f53643acce75c1794141746245)
+- [myChart.linkStrength() - 2](https://bl.ocks.org/EE2dev/84e22c8fa7a4b5fb202f7ce6fdb93b6e)
+- [myChart.linkStrength() - 3](https://bl.ocks.org/EE2dev/d2cf606e3a86bb268c5016a32f7ec9a7)
 - [myChart.linkWidth()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 
 #### API examples to customize the nodes
