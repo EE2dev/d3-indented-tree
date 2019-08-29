@@ -276,6 +276,11 @@ World,Oceania,,38
 
 ## 3.0 API reference
 
+The object (named *dataSpec* above) which is passed to the function ```hierarchyExplorer.chart()``` can have the following properties:
+* `source`: <i>string</i> containing the path/URL the selector to the data.
+* `hierarchyLevels`: <i>array</i> containing columns of each level in its top-down traversal order when the refered data is in the csv relational format.
+* `delimiter`: <i>string</i> containing the delimiter used in the csv data.
+
 ### 3.1 Links
 
 <a name="link_alignLeaves" href="#link_alignLeaves">#</a> <i>myChart</i>.<b>alignLeaves</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
@@ -342,7 +347,8 @@ Transitions to the new number label on top of the links.
     * An *object* with the following properties can be used to further specify the mapping: 
         * `unit` specifies a suffix *string* for the label (default is `""`).
         * `format` refers to the format *string* of the label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
-        * `locale` is an *object* overriding the default locale format with the specified locale format. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
+        * `locale` is an *object* overriding the default locale format with the specified locale format.
+        The locale is affecting the display of the link label if the `format` property is specified. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
 
         * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`). If `onTop` is set to false and the label overlaps with the previous link due to increase font size, the *linkHeight* can be increased. 
         * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth (centers the longest label per depth on the shortest link). Default is ```true```.
@@ -411,7 +417,7 @@ Sets the default color for the links and nodes.
 
 <a name="other_formatDefaultLocale" href="#other_formatDefaultLocale">#</a> <i>myChart</i>.<b>formatDefaultLocale</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
-Overrides the default locale format with the specified locale format 
+Overrides the default locale format with the specified locale format. The locale is affecting the display of the values (e.g link label) if its `format` property is specified.
 * the first argument is an <i>object</i> referencing the locale format. E.g. the object for the German Locale would be (as a shortcut you can also pass the <i>string</i>```"DE"```):
 ```
 {

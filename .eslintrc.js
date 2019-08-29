@@ -9,7 +9,9 @@ module.exports = {
   "parserOptions": {
       "sourceType": "module"
   },
+  // "plugins": ["prettier"],
   "rules": {
+      // "prettier/prettier": "error",
       "indent": [
           "warn",
           2

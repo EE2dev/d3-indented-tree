@@ -2,14 +2,14 @@
   <meta charset="utf-8">
   <head>
     <script src="https://d3js.org/d3.v5.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v07/hierarchyExplorer.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
     <!---script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v07/hierarchyExplorer.js"></script-->
-    <script src="../../dist/v07/hierarchyExplorer.js"></script>
+    <script src="../../dist/v10/hierarchyExplorer.js"></script>
     <style>
       div.text{
-        font-size: 48px;
+        font-size: 32px;
         color: grey;
-        padding-left: 50px;
+        padding-left: 30px;
       }
     </style>
   </head>
@@ -23,8 +23,10 @@
   
     <script>
       const dataSpec = {
-        source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/flare.json",
-        key: "name",
+        // source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/flare.json",
+        // source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/data4.csv",
+        source: "../data/data4.csv",
+        // key: "name",
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
@@ -38,10 +40,17 @@
       myFunctions.push({function: () => myChart.linkHeight(20), text: 'myChart.linkHeight(20)'});
       myFunctions.push({function: () => myChart.linkStrength(8), text: 'myChart.linkStrength(8)'});
       myFunctions.push({function: () => myChart.linkStrength("size"), text: 'myChart.linkStrength("size")'});
+      myFunctions.push({function: () => myChart.linkColor("color"), text: 'myChart.linkColor("color")'});
+      myFunctions.push({function: () => myChart.linkStrength(1), text: 'myChart.linkStrength(1)'});
       myFunctions.push({function: () => myChart.alignLeaves(true), text: 'myChart.alignLeaves(true)'});
       myFunctions.push({function: () => myChart.alignLeaves(false), text: 'myChart.alignLeaves(false)'});
-      myFunctions.push({function: () => myChart.linkWidth(50), text: 'myChart.linkWidth(50)'});
       myFunctions.push({function: () => myChart.linkWidth("size", {scale: d3.scaleLog(), range: [20, 100]}), text: 'myChart.linkWidth("size", {scale: d3.scaleLog(), range: [20, 100]})'});
+      myFunctions.push({function: () => myChart.linkWidth(50), text: 'myChart.linkWidth(50)'});
+      myFunctions.push({function: () => myChart.linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"}).linkWidth("weight",{range: [100, 200]}), 
+        text: 'myChart.linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"}).linkWidth("weight",{range: [100, 200]})'});
+      myFunctions.push({function: () => myChart.linkWidth("size").linkLabel("size"), text: 'myChart.linkWidth("size").linkLabel("size")'});
+      myFunctions.push({function: () => myChart.linkLabel("size", {color: value => value > 6000 ? "green" : "red", align: false}), text: 'myChart.linkLabel(("size", {color: value => value > 6000 ? "green" : "red", align: false}))'});
+      myFunctions.push({function: () => myChart.linkLabel(false), text: 'myChart.linkLabel(false)'});
 
       let counter = 0;
       let sel = d3.select(".text");

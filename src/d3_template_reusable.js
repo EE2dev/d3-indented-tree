@@ -17,7 +17,7 @@ export default function (_dataSpec) {
   options.transitionDuration = 750;
 
   options.defaultColor = "grey";
-
+  
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
   options.nodeImageSetBackground = false;

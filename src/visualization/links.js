@@ -107,28 +107,47 @@ linksAPI.getLinkLabelColor = function (d) {
 linksAPI.getLinkTextPositionX = function (d) {
   /* aligned: x center position of the shortest link + half the extent of the longest label */
   const shiftAlign = options.linkLabelAligned ? 
-    labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
+    // labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
+    labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 
     : (d.y - d.parent.y) / 2;
   return shiftAlign;
 };
 
 linksAPI.computeLabelDimensions = function (sel) {
-  let dims = [];
+  // let dims = [];
+  const dims = new Map();
   sel
     .each(function(d) {
       let labelDimensions = {};
       const height = d3.select(this).node().getBBox().height;
       const width = d3.select(this).node().getBBox().width;
       const text = d3.select(this).text();
-      if (!dims[d.depth]) {
+      // if (!dims[d.depth]) {
+      if (!dims.get(d.depth)) {
         labelDimensions.maxX = width;
         labelDimensions.minX = width;
         labelDimensions.maxY = height;
         labelDimensions.maxXText = text;
         labelDimensions.maxYText = text;
         labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
-        dims.push(labelDimensions);
-      } else {          
+        // dims.push(labelDimensions);
+        dims.set(d.depth, labelDimensions);
+      } else {  
+        labelDimensions = dims.get(d.depth);
+        if (labelDimensions.maxX < width) {   
+          labelDimensions.maxX = width;
+          labelDimensions.maxXText = text;
+        } 
+        if (labelDimensions.minX > width) {
+          labelDimensions.minX = width;
+          labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
+        } 
+        if (labelDimensions.maxY < height) {
+          labelDimensions.maxY = height;
+          labelDimensions.maxYText = text;
+        } 
+        dims.set(d.depth, labelDimensions);
+        /*        
         if (dims[d.depth].maxX < width) {
           dims[d.depth].maxX = width;
           dims[d.depth].maxXText = text;
@@ -141,6 +160,7 @@ linksAPI.computeLabelDimensions = function (sel) {
           dims[d.depth].maxY = height;
           dims[d.depth].maxYText = text;
         } 
+        */
       }
     });
   labelDimensions = dims;

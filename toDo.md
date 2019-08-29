@@ -64,6 +64,8 @@ Acknowledgements:
 * nodeInfo
 * sort
 * color themes
+* showcase updated (nicht alignLeave doppelt, mehr funktionen)
+
 *
 * applications (chess, basketball, nfl, soccer, flags, d3.js)
 https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world

@@ -67,19 +67,6 @@
         }
       }
       createChart(selection, hierarchy);
-      /*
-      if (myData.flatData) { // CSV Format 1
-        const data = readDataFromDOM(myData.delimiter);
-        const hierarchy = createHierarchyFromFlatData(data, myData.keyField, debugOn);
-        if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
-        createChart(selection, hierarchy);
-      } else { // CSV Format 2
-        const data = readDataFromDOM(myData.delimiter);
-        const hierarchy = createHierarchy(data, myData.keyField);
-        if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
-        createChart(selection, hierarchy);
-      } 
-      */
     }
   }
 
@@ -88,7 +75,6 @@
 
     var inputData = d3.select(selector).text();
     var inputData_cleaned = inputData.trim();
-    // const file = d3.csvParse(inputData_cleaned);
     var parser = d3.dsvFormat(delimiter);
     var file = parser.parse(inputData_cleaned);
     return file;
@@ -103,40 +89,6 @@
     return root;
   }
 
-  /*
-  function createHierarchyFromFlatData(data, keys, debugOn) {
-    let entries = d3.nest();
-    keys.forEach(key => entries.key(d => d[key]));
-    entries = entries.entries(data);
-    constructJson(entries);
-    let root = d3.hierarchy(entries[0], getChildren);
-    return root;
-
-    function getChildren(d){
-      let children = d.values;
-      if (typeof (children) === "undefined") {
-        return null;
-      }
-      children = children.filter(function(child) {
-        if (typeof (child.key) === "undefined") { 
-          return false; 
-        }
-        if (child.key.length !== 0) { 
-          return true;
-        }
-        else { 
-          return false;
-        }
-      }); 
-      
-      if (debugOn) { console.log("Key: " + d.key + " Children: " + children.length);}
-      return (children.length === 0) ? null : children;
-    }
-    function constructJson(entries){
-      return entries;
-    }
-  } */
-
   function createHierarchyFromFlatData(data, keys, keyField, debugOn) {
     var entries = d3.nest();
     keys.forEach(function (key) {
@@ -145,7 +97,6 @@
       });
     });
     entries = entries.map(data);
-    //let json = {key: entries.keys()[0]};
     var json = {};
     json[keyField] = entries.keys()[0];
     constructJson(json, entries.get(entries.keys()[0]), keyField);
@@ -154,31 +105,8 @@
       console.log(json);
     }
     var root = d3.hierarchy(json);
-    // let root = d3.hierarchy(entries[0], getChildren);
     return root;
 
-    /*
-    function getChildren(d){
-      let children = d.values;
-      if (typeof (children) === "undefined") {
-        return null;
-      }
-      children = children.filter(function(child) {
-        if (typeof (child.key) === "undefined") { 
-          return false; 
-        }
-        if (child.key.length !== 0) { 
-          return true;
-        }
-        else { 
-          return false;
-        }
-      }); 
-      
-      if (debugOn) { console.log("Key: " + d.key + " Children: " + children.length);}
-      return (children.length === 0) ? null : children;
-    }
-    */
     function constructJson(json, entries, keyField) {
       if (Array.isArray(entries)) {
         var obj = entries[0];
@@ -224,7 +152,6 @@
     var linkStrength = linksAPI.getLinkStrength(d, options);
     var path = void 0;
     if (direction === "down") {
-      // path = "M 0 0" + "V" + (d.x + linkStrength / 2 - d.parent.x);
       path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
     } else if (direction === "right") {
       path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
@@ -284,10 +211,6 @@
       } else {
         return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit;
       }
-    /*
-    return (!options.linkLabelOn) ? "" :
-      options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
-      */
   };
 
   linksAPI.getLinkTextTween = function (d) {
@@ -324,38 +247,59 @@
 
   linksAPI.getLinkTextPositionX = function (d) {
     /* aligned: x center position of the shortest link + half the extent of the longest label */
-    var shiftAlign = options.linkLabelAligned ? labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 : (d.y - d.parent.y) / 2;
+    var shiftAlign = options.linkLabelAligned ?
+    // labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
+    labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 : (d.y - d.parent.y) / 2;
     return shiftAlign;
   };
 
   linksAPI.computeLabelDimensions = function (sel) {
-    var dims = [];
+    // let dims = [];
+    var dims = new Map();
     sel.each(function (d) {
       var labelDimensions = {};
       var height = d3.select(this).node().getBBox().height;
       var width = d3.select(this).node().getBBox().width;
       var text = d3.select(this).text();
-      if (!dims[d.depth]) {
+      // if (!dims[d.depth]) {
+      if (!dims.get(d.depth)) {
         labelDimensions.maxX = width;
         labelDimensions.minX = width;
         labelDimensions.maxY = height;
         labelDimensions.maxXText = text;
         labelDimensions.maxYText = text;
         labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
-        dims.push(labelDimensions);
+        // dims.push(labelDimensions);
+        dims.set(d.depth, labelDimensions);
       } else {
+        labelDimensions = dims.get(d.depth);
+        if (labelDimensions.maxX < width) {
+          labelDimensions.maxX = width;
+          labelDimensions.maxXText = text;
+        }
+        if (labelDimensions.minX > width) {
+          labelDimensions.minX = width;
+          labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
+        }
+        if (labelDimensions.maxY < height) {
+          labelDimensions.maxY = height;
+          labelDimensions.maxYText = text;
+        }
+        dims.set(d.depth, labelDimensions);
+        /*        
         if (dims[d.depth].maxX < width) {
           dims[d.depth].maxX = width;
           dims[d.depth].maxXText = text;
-        }
+        } 
         if (dims[d.depth].minX > width) {
           dims[d.depth].minX = width;
           dims[d.depth].posXCenter = (d.y - d.parent.y) / 2;
-        }
+        } 
         if (dims[d.depth].maxY < height) {
           dims[d.depth].maxY = height;
           dims[d.depth].maxYText = text;
-        }
+        } 
+        */
       }
     });
     labelDimensions = dims;
@@ -367,7 +311,6 @@
 
   var nodesAPI = {};
   var options$1 = void 0;
-  // let nodeImageColor;
 
   nodesAPI.initialize = function (_options) {
     options$1 = _options;
@@ -395,63 +338,23 @@
     }
   };
 
-  /*
-  nodesAPI.appendNodeSVG = function (selection) {
-    selection.append("circle")
-      .attr("r", 4.5) 
-      .style("fill", function (d) {
-        return d._children ? "lightsteelblue" : "#fff";
-      });
-  };
-
-  nodesAPI.updateNodeSVG = function (transition) {
-    transition.select("circle")
-      .style("fill", "none");
-  };
-  */
   nodesAPI.appendNodeSVG = function (selection) {
     selection.append("rect").attr("class", "nodeImage").attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
 
-    // nodeImageColor = d3.select(".node .nodeImage").style("stroke");
-
-    //const sel2 = selection.filter(d => d._children);
     var sel2 = selection;
-    sel2.append("line")
-    // .attr("class", "cross nodeImage")
-    .attr("class", function (d) {
+    sel2.append("line").attr("class", function (d) {
       return d._children ? "cross nodeImage" : "cross invisible";
     }).attr("x1", 0).attr("y1", -5).attr("x2", 0).attr("y2", 5);
-    // .style("stroke", d => d._children ? nodeImageColor : "none"); 
 
-    sel2.append("line")
-    //.attr("class", "cross nodeImage")
-    .attr("class", function (d) {
+    sel2.append("line").attr("class", function (d) {
       return d._children ? "cross nodeImage" : "cross invisible";
     }).attr("x1", -5).attr("y1", 0).attr("x2", 5).attr("y2", 0);
-    // .style("stroke", d => d._children ? nodeImageColor : "none");
-    // .style("stroke", d => d._children ? "grey" : "none");
-    // .style("fill", "none");
   };
 
-  /*
-  nodeAPI.setNodePattern = function (svg) {
-    svg.append("pattern")
-      .attr("id", "node-pattern")
-    <pattern id="pattern-checkers" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse" >
-      <!-- Two instances of the same checker, only positioned apart on the `x` and `y` axis -->
-      <!-- We will define the `fill` in the CSS for flexible use -->
-      <rect class="checker" x="0" width="100" height="100" y="0"/>
-      <rect class="checker" x="100" width="100" height="100" y="100"/>
-    </pattern>
-  }
-  */
-
   nodesAPI.updateNodeSVG = function (transition) {
-    // const trans2 = transition.select("rect").filter(d => d._children);
     transition.selectAll("line.cross").attr("class", function (d) {
       return d._children ? "cross nodeImage" : "cross invisible";
     });
-    // .style("stroke", d => d._children ? nodeImageColor : "none");
   };
 
   nodesAPI.appendNodeImage = function (selection) {
@@ -500,7 +403,6 @@
       });
     }
 
-    // baroptions.width = options.width *.8;
     config.root.each(function (d) {
       d.name = d.id; //transferring name to a name variable
       d.id = config.i; //Assigning numerical Ids
@@ -560,16 +462,6 @@
     };
   }
 
-  /*
-  function collapse(d){
-    if (d.children) {
-      d._children = d.children;
-      d._children.forEach(collapse);
-      d.children = null;
-    }
-  }
-  */
-
   function click(d, options, config) {
     if (d.children) {
       d._children = d.children;
@@ -582,8 +474,6 @@
   }
 
   function update(source, options, config) {
-    // config.width = 800;
-
     // Compute the new tree layout.
     var nodes = config.tree(config.root);
     var nodesSort = [];
@@ -619,18 +509,9 @@
       return click(d, options, config);
     });
 
-    /*
-    nodeEnter.append("circle")
-      .attr("r", 4.5) 
-      .style("fill", function (d) {
-        return d._children ? "lightsteelblue" : "#fff";
-      });
-      */
     nodeEnter.call(n.appendNode);
 
-    nodeEnter.append("text").attr("class", "nodeLabel")
-    // .attr("x", 10)
-    .attr("x", options.nodeLabelPadding).attr("dy", ".35em").attr("text-anchor", "start").text(function (d) {
+    nodeEnter.append("text").attr("class", "nodeLabel").attr("x", options.nodeLabelPadding).attr("dy", ".35em").attr("text-anchor", "start").text(function (d) {
       if (d.data[options.keyField].length > options.nodeLabelLength) {
         return d.data[options.keyField].substring(0, options.nodeLabelLength) + "...";
       } else {
@@ -649,12 +530,6 @@
       return "translate(" + d.y + "," + d.x + ") scale(1,1)";
     });
 
-    /*
-    nodeUpdate.select("circle")
-      .style("fill", function (d) {
-        return d._children ? "lightsteelblue" : "#fff";
-      }); 
-      */
     nodeUpdate.call(n.updateNode);
 
     nodeUpdate.select(".nodeLabel").style("fill-opacity", 1);
@@ -673,7 +548,6 @@
     l.initialize(options);
 
     var link = config.svg.selectAll("g.link").data(links, function (d) {
-      // return d.target.id;
       var id = d.id + "->" + d.parent.id;
       return id;
     });
@@ -693,18 +567,6 @@
       return l.getLinkD(origin, "right");
     });
 
-    /*
-    linkEnter
-      .append("text")  
-      .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
-      .attr("dy", l.getDy) 
-      // .attr("dy", ".35em")
-      .attr("text-anchor", "end") 
-      // .attr("text-anchor", "middle") 
-      .text(d => l.getLinkLabelFormatted(d))
-      .style("opacity", 1e-6)
-      .style("fill", l.getLinkLabelColor);  
-      */
     linkEnter.append("text").style("opacity", 1e-6);
 
     // update merged selection before transition
@@ -716,7 +578,6 @@
     // Transition links to their new position.
     var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
 
-    // l.computeLabelDimensions(linkUpdate.selectAll("text.label"));
     l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
     linkUpdate.attr("transform", function (d) {
@@ -1046,7 +907,6 @@
       if ((typeof dataSpec === "undefined" ? "undefined" : _typeof(dataSpec)) === "object") {
         myData.data = dataSpec.source;
         myData.hierarchyLevels = dataSpec.hierarchyLevels;
-        // myData.keyField = dataSpec.key ? dataSpec.key : (myData.hierarchyLevels ? "key" : "name");
         myData.keyField = dataSpec.key ? dataSpec.key : "key";
         myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
       } else {

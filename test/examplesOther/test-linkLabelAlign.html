@@ -13,11 +13,11 @@
   <aside id="data">
 key,parent,size,weight,color
 Eve,,3.45,25,yellow
-Cain,Eve,4.647,20.3,black
-Seth,Eve,2,20.3,steelblue
-Enos,Seth,4,30,orange
-Noam,Seth,5,14000,green
-Abel,Eve,4,3000,brown
+Cain,Eve,434647,20.3,black
+Seth,Eve,32131,20.3,steelblue
+Enos,Seth,4,3000,orange
+Noam,Seth,50000,30,green
+Abel,Eve,4,30,brown
 Awan,Eve,3,30,deeppink
 Enoch,Awan,7,30,blue
 Azura,Eve,2,30,red
@@ -25,31 +25,26 @@ Azura,Eve,2,30,red
   
     <script>
       const dataSpec = {
-        source: "aside#data", 
+        source: "aside#data",  
       };
-
-      const localeGerman = {
-        "decimal": ",",
-        "thousands": ".",
-        "grouping": [3],
-        "currency": ["", " €"]   
-      };
-
-      // const format = localeGerman.format("+,.0f");
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
-        .propagateValue("size")
-        .formatDefaultLocale(localeGerman)
-        .linkLabel("weight",{unit: " Euro", format:  onTop: true, })
-        .linkWidth(100)
+        //.propagateValue("size")
+        // .formatDefaultLocale("DE")
+        .linkLabel("size", {unit: " Euro", format: ",.2f", locale: "DE"})
+        .linkWidth("size",{range: [80, 300]})
       ;
       
       showChart(); 
-      /*
+
+/*
       window.setTimeout(function() {
-          myChart.linkWidth("value").linkLabel("value");
+          myChart
+          .linkWidth("size")
+          .linkLabel("size");
       }, 2000);
       */
+
       function showChart(_file, preprocessed) {
         const selection = d3.select("body")
           .append("div")

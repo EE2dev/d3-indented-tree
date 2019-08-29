@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+    <style>
+      div.text{
+        font-size: 48px;
+        color: grey;
+        padding-left: 50px;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <aside id="data">
+    </aside>
+    <div class="text">See one-liners for each transition</div>
+  
+    <script>
+      const dataSpec = {
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/flare.json",
+        key: "name",
+      };
+      const myChart = hierarchyExplorer.chart(dataSpec)
+        .propagateValue("size")
+      ;
+
+      showChart(); 
+
+      const myFunctions = [];
+      myFunctions.push({function: () => myChart.linkHeight(50), text: 'myChart.linkHeight(100)'});
+      myFunctions.push({function: () => myChart.linkHeight(20), text: 'myChart.linkHeight(20)'});
+      myFunctions.push({function: () => myChart.linkStrength(8), text: 'myChart.linkStrength(8)'});
+      myFunctions.push({function: () => myChart.linkStrength("size"), text: 'myChart.linkStrength("size")'});
+      myFunctions.push({function: () => myChart.alignLeaves(true), text: 'myChart.alignLeaves(true)'});
+      myFunctions.push({function: () => myChart.alignLeaves(false), text: 'myChart.alignLeaves(false)'});
+      myFunctions.push({function: () => myChart.linkWidth(50), text: 'myChart.linkWidth(50)'});
+      myFunctions.push({function: () => myChart.linkWidth("size", {scale: d3.scaleLog(), range: [20, 100]}), text: 'myChart.linkWidth("size", {scale: d3.scaleLog(), range: [20, 100]})'});
+
+      let counter = 0;
+      const sel = d3.select(".text");
+      window.setInterval(function(){
+        myFunctions[counter % myFunctions.length].function();
+        sel.text(myFunctions[counter % myFunctions.length].text);
+        counter = counter + 1;
+      }, 3000); 
+      
+      function showChart() {
+        const selection = d3.select("body")
+          .append("div")
+          .attr("class", "chart");
+        selection.call(myChart);
+      } 
+    </script>
+  </body>
+</html>  
