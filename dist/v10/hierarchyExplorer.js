@@ -257,49 +257,34 @@
     // let dims = [];
     var dims = new Map();
     sel.each(function (d) {
-      var labelDimensions = {};
+      var dimProperties = {};
       var height = d3.select(this).node().getBBox().height;
       var width = d3.select(this).node().getBBox().width;
       var text = d3.select(this).text();
       // if (!dims[d.depth]) {
       if (!dims.get(d.depth)) {
-        labelDimensions.maxX = width;
-        labelDimensions.minX = width;
-        labelDimensions.maxY = height;
-        labelDimensions.maxXText = text;
-        labelDimensions.maxYText = text;
-        labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
-        // dims.push(labelDimensions);
-        dims.set(d.depth, labelDimensions);
+        dimProperties.maxX = width;
+        dimProperties.minX = width;
+        dimProperties.maxY = height;
+        dimProperties.maxXText = text;
+        dimProperties.maxYText = text;
+        dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+        // dims.push(dimProperties);
+        dims.set(d.depth, dimProperties);
       } else {
-        labelDimensions = dims.get(d.depth);
-        if (labelDimensions.maxX < width) {
-          labelDimensions.maxX = width;
-          labelDimensions.maxXText = text;
+        dimProperties = dims.get(d.depth);
+        if (dimProperties.maxX < width) {
+          dimProperties.maxX = width;
+          dimProperties.maxXText = text;
         }
-        if (labelDimensions.minX > width) {
-          labelDimensions.minX = width;
-          labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
+        if (dimProperties.posXCenter < (d.y - d.parent.y) / 2) {
+          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
         }
-        if (labelDimensions.maxY < height) {
-          labelDimensions.maxY = height;
-          labelDimensions.maxYText = text;
+        if (dimProperties.maxY < height) {
+          dimProperties.maxY = height;
+          dimProperties.maxYText = text;
         }
-        dims.set(d.depth, labelDimensions);
-        /*        
-        if (dims[d.depth].maxX < width) {
-          dims[d.depth].maxX = width;
-          dims[d.depth].maxXText = text;
-        } 
-        if (dims[d.depth].minX > width) {
-          dims[d.depth].minX = width;
-          dims[d.depth].posXCenter = (d.y - d.parent.y) / 2;
-        } 
-        if (dims[d.depth].maxY < height) {
-          dims[d.depth].maxY = height;
-          dims[d.depth].maxYText = text;
-        } 
-        */
+        dims.set(d.depth, dimProperties);
       }
     });
     labelDimensions = dims;
@@ -586,11 +571,12 @@
 
     linkUpdate.select("path.link.down").attr("d", function (d) {
       return l.getLinkD(d, "down");
-    })
-    // .style("stroke", (d) => l.getLinkStroke(d.parent))
-    .style("stroke", "").style("stroke-width", function (d) {
+    }).style("stroke", function (d) {
+      return options.linkColorInherit ? l.getLinkStroke(d.parent) : "";
+    }).style("stroke-width", function (d) {
       return l.getLinkStrokeWidth(d.parent);
     });
+    // git commit -m "link label alignment fixed, linkColor API updated"
 
     linkUpdate.select("path.link.right").attr("d", function (d) {
       return l.getLinkD(d, "right");
@@ -690,6 +676,7 @@
       return value;
     }; // id function as default - assuming linkColorField contains colors
     options.linkColorField = "color";
+    options.linkColorInherit = true; // vertical link inherits color from parent
 
     options.propagate = false; // default: no propagation
     options.propagateField = "value"; // default field for propagation
@@ -864,15 +851,26 @@
     chartAPI.linkColor = function () {
       var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkColorField;
 
-      var scale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkColorScale;
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
+      if (!arguments.length) return options.linkColorField;
+      options.linkColorStatic = false;
+      options.linkColorField = _;
+      options.linkColorScale = _options.scale || options.linkColorScale;
+      options.linkColorInherit = typeof _options.inherit !== "undefined" ? _options.inherit : options.linkColorInherit;
+      if (typeof options.updateDefault === "function") options.updateDefault();
+      return chartAPI;
+    };
+    /*
+    chartAPI.linkColor = function(_ = options.linkColorField, scale = options.linkColorScale) {
       if (!arguments.length) return options.linkColorField;
       options.linkColorStatic = false;
       options.linkColorField = _;
       options.linkColorScale = scale;
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
-    };
+    }; 
+    */
 
     chartAPI.alignLeaves = function (_) {
       if (!arguments.length) return options.alignLeaves;
