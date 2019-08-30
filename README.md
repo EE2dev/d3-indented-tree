@@ -277,7 +277,7 @@ World,Oceania,,38
 ## 3.0 API reference
 
 The object (named *dataSpec* above) which is passed to the function ```hierarchyExplorer.chart()``` can have the following properties:
-* `source`: <i>string</i> containing the path/URL the selector to the data.
+* `source`: <i>string</i> containing the path/URL to the data or the selector referencing the DOM element containing the data.
 * `hierarchyLevels`: <i>array</i> containing columns of each level in its top-down traversal order when the refered data is in the csv relational format.
 * `delimiter`: <i>string</i> containing the delimiter used in the csv data.
 
@@ -292,8 +292,15 @@ Transitions the alignment of the leaves of the hierarchy. If leaves are aligned,
 <a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new color of the links. The horizontal link to is denoted by its color.
-* to set the link color statically, use instead <a href="#other_defaultColor"><i>myChart</i>.<b>defaultColor</b>()</a>
-* to set the link color dynamically, provide the name of a field (default is ```"value"``` after the first call). In addition to the field name, an optional second argument can be used to further specify the mapping. The second argument refers to a scale *function* used to map the values to the color (default is the identity function ```(value) => value``` assuming the field contains a valid color). This scale callback function is invoked for each instance of the field provided as first argument.  
+
+1. argument:
+    * to set the link color dynamically, provide the name of a field as a *string* (default is ```"value"```).
+    
+2. argument (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `scale` defines the scale used to map the values to the color (default is the identity function ```(value) => value``` assuming the field contains a valid color). This scale callback function is invoked for each instance of the field provided as first argument. 
+        * `inherit` refers to the color of the vertical links. In case `inherit` is set to `false` the default color will be used for the vertical links, if `true` the color of the parent is used (default is `true`). 
+
 * with no argument returns the field used for the color.
 
 <a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")

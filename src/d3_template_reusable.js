@@ -62,6 +62,7 @@ export default function (_dataSpec) {
   options.linkColorStatic = true;
   options.linkColorScale = (value) => value; // id function as default - assuming linkColorField contains colors
   options.linkColorField = "color";
+  options.linkColorInherit = true; // vertical link inherits color from parent
 
   options.propagate = false; // default: no propagation
   options.propagateField = "value"; // default field for propagation
@@ -219,6 +220,16 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
+  chartAPI.linkColor = function(_ = options.linkColorField, _options = {}) {
+    if (!arguments.length) return options.linkColorField;
+    options.linkColorStatic = false;
+    options.linkColorField = _;
+    options.linkColorScale = _options.scale || options.linkColorScale;
+    options.linkColorInherit = (typeof (_options.inherit) !== "undefined") ? _options.inherit : options.linkColorInherit;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  }; 
+  /*
   chartAPI.linkColor = function(_ = options.linkColorField, scale = options.linkColorScale) {
     if (!arguments.length) return options.linkColorField;
     options.linkColorStatic = false;
@@ -227,6 +238,7 @@ export default function (_dataSpec) {
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   }; 
+  */
 
   chartAPI.alignLeaves = function(_) {
     if (!arguments.length) return options.alignLeaves;

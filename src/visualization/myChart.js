@@ -240,8 +240,7 @@ function update(source, options, config){
 
   linkUpdate.select("path.link.down")
     .attr("d", (d) => l.getLinkD(d, "down"))
-    // .style("stroke", (d) => l.getLinkStroke(d.parent))
-    .style("stroke", "")
+    .style("stroke", (d) => options.linkColorInherit ? l.getLinkStroke(d.parent) : "")
     .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
 
   linkUpdate.select("path.link.right")

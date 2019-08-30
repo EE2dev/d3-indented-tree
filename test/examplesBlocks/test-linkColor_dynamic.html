@@ -22,7 +22,7 @@
         .unknown("lightgrey");
       const myChart = hierarchyExplorer.chart(dataSpec)
         .propagateValue("size")
-        .linkColor("name", colorScale) // passing a function for setting a dynamic link color
+        .linkColor("name", {scale: colorScale}) // passing a function for setting a dynamic link color
         .linkStrength(8)
       ;
 

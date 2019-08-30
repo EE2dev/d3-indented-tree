@@ -118,49 +118,34 @@ linksAPI.computeLabelDimensions = function (sel) {
   const dims = new Map();
   sel
     .each(function(d) {
-      let labelDimensions = {};
+      let dimProperties = {};
       const height = d3.select(this).node().getBBox().height;
       const width = d3.select(this).node().getBBox().width;
       const text = d3.select(this).text();
       // if (!dims[d.depth]) {
       if (!dims.get(d.depth)) {
-        labelDimensions.maxX = width;
-        labelDimensions.minX = width;
-        labelDimensions.maxY = height;
-        labelDimensions.maxXText = text;
-        labelDimensions.maxYText = text;
-        labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
-        // dims.push(labelDimensions);
-        dims.set(d.depth, labelDimensions);
+        dimProperties.maxX = width;
+        dimProperties.minX = width;
+        dimProperties.maxY = height;
+        dimProperties.maxXText = text;
+        dimProperties.maxYText = text;
+        dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+        // dims.push(dimProperties);
+        dims.set(d.depth, dimProperties);
       } else {  
-        labelDimensions = dims.get(d.depth);
-        if (labelDimensions.maxX < width) {   
-          labelDimensions.maxX = width;
-          labelDimensions.maxXText = text;
+        dimProperties = dims.get(d.depth);
+        if (dimProperties.maxX < width) {   
+          dimProperties.maxX = width;
+          dimProperties.maxXText = text;
         } 
-        if (labelDimensions.minX > width) {
-          labelDimensions.minX = width;
-          labelDimensions.posXCenter = (d.y - d.parent.y) / 2;
+        if (dimProperties.posXCenter < (d.y - d.parent.y) / 2) {
+          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
         } 
-        if (labelDimensions.maxY < height) {
-          labelDimensions.maxY = height;
-          labelDimensions.maxYText = text;
+        if (dimProperties.maxY < height) {
+          dimProperties.maxY = height;
+          dimProperties.maxYText = text;
         } 
-        dims.set(d.depth, labelDimensions);
-        /*        
-        if (dims[d.depth].maxX < width) {
-          dims[d.depth].maxX = width;
-          dims[d.depth].maxXText = text;
-        } 
-        if (dims[d.depth].minX > width) {
-          dims[d.depth].minX = width;
-          dims[d.depth].posXCenter = (d.y - d.parent.y) / 2;
-        } 
-        if (dims[d.depth].maxY < height) {
-          dims[d.depth].maxY = height;
-          dims[d.depth].maxYText = text;
-        } 
-        */
+        dims.set(d.depth, dimProperties);
       }
     });
   labelDimensions = dims;
