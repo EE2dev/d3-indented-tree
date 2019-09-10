@@ -5,7 +5,8 @@ import * as d3 from "d3";
 //////////////////////////////////////////////////// 
 
 // XHR to load data   
-export function readData(myData, selection, debugOn, createChart) {
+export function readData(myData, selection, options, createChart) {
+  const debugOn = options.debugOn;
   if (myData.fromFile) { // read data from file 
     if (myData.data.endsWith(".json")) { // JSON Format
       d3.json(myData.data).then(function(data){
@@ -15,6 +16,7 @@ export function readData(myData, selection, debugOn, createChart) {
         createChart(selection, hierarchy);
       });
     } else if (myData.data.endsWith(".csv")) {
+      /*
       if (myData.flatData){ // CSV Format 1
         d3.dsv(myData.delimiter, myData.data).then(function(data) {
           if (debugOn) { console.log(data);}
@@ -30,19 +32,36 @@ export function readData(myData, selection, debugOn, createChart) {
           createChart(selection, hierarchy);
         });
       }
+      */
+      d3.dsv(myData.delimiter, myData.data).then(function(data) {
+        if (debugOn) { console.log(data);}
+        if (myData.flatData) {
+          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, options); // csv Format 1
+        }
+        const hierarchy = createHierarchy(data, myData.keyField);
+        if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
+        createChart(selection, hierarchy);
+      });
     } else {
       console.log("File must end with .json or .csv");
     }
   } 
-  else { // read data from DOM
+  else { // read data from DOM or JSON variable
     let hierarchy;
     if (myData.isJSON) {
       hierarchy = d3.hierarchy(myData.data);
     } else {
-      const data = readDataFromDOM(myData.delimiter, myData.data);
+      let data = readDataFromDOM(myData.delimiter, myData.data);
+      if (myData.flatData) {
+        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, options); // csv Format 1
+      }
+      hierarchy = createHierarchy(data, myData.keyField); // csv format 2
+      /*
       hierarchy = (myData.flatData)
-        ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) // csv Format 1
+        // ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) // csv Format 1
+        ? createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, debugOn) // csv Format 1
         : createHierarchy(data, myData.keyField); // csv format 2
+        */
       if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
     }
     createChart(selection, hierarchy);
@@ -64,6 +83,131 @@ function createHierarchy(data, key) {
   return root;
 }
 
+/*
+function buildKey(row, keys, keyIndex, delimiter){
+  const key = keys[keyIndex];
+  let pcKey = (keyIndex === 1) ? keys[0] : keys[keyIndex-1] + row[keys[keyIndex-1]];
+  pcKey += delimiter + key + row[key];
+  return pcKey;
+} */
+
+function buildKey(row, keys, keyIndex, delimiter, keySeparator){
+  let parent = getParent(row, keys, keyIndex, keySeparator);
+  let child = parent + keySeparator + row[keys[keyIndex]];
+  const pcKey = parent + delimiter + child;
+  return pcKey;
+} 
+
+function getParent(row, keys, keyIndex, keySeparator){
+  let parent = (keyIndex === 1) ? keys[0] : row[keys[keyIndex-1]];
+  for (let i = 0; i < keyIndex; i++) {
+    if (i === 0) { parent = keys[0];}
+    else {
+      parent += keySeparator + row[keys[i]];
+    }
+  }
+  return parent;
+}
+
+function createLinkedData(data, keys, keyField, delimiter, options) {
+  const debugOn = options.debugOn;
+  /*
+  const nodeLabel = "__he_name";
+  const keySeparator = "$";
+  */
+  
+  const nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
+  const keySeparator = options.flatDataSeparator; // "$"
+  
+  let linkedDataString;
+  let linkedDataArray;
+  let parentChild = new Map();
+  let pcKey;
+  let pcValue;
+  let setAll = (obj, val) => Object.keys(obj).forEach(k => obj[k] = val);
+  let setNull = obj => setAll(obj, "");
+  let newRow;
+  let rowString;
+
+  data.forEach((row) => {
+    keys.forEach( (key, j) => {
+      if (j > 0) {
+        pcValue = {};        
+        if (!row[key] || j === keys.length-1) { 
+          /*
+          pcKey = (j === 1) ? keys[0] : keys[j-1] + row[keys[j-1]];
+          pcKey += delimiter + key + row[key];
+          */
+          pcKey = buildKey( row, keys, j, delimiter, keySeparator);
+          if (!parentChild.get(pcKey)) {
+            Object.assign(pcValue, row);
+            pcValue[nodeLabel] = row[key];
+            parentChild.set(pcKey, pcValue);
+          }
+        } else  {
+          /*
+          pcKey = (j === 1) ? keys[0] : keys[j-1] + row[keys[j-1]];
+          pcKey += delimiter + key + row[key];
+          */
+          pcKey = buildKey( row, keys, j, delimiter, keySeparator);
+          if (!parentChild.get(pcKey)) {
+            Object.assign(pcValue, row);
+            setNull(pcValue);
+            pcValue[nodeLabel] = row[key];
+            parentChild.set(pcKey, pcValue);
+          }
+        }
+      } 
+    });
+  });
+
+  // build the String in the linked data format
+  // add column names to string
+  console.log(parentChild);
+  
+  rowString = "parent" + delimiter + keyField;
+  Object.keys(data[0]).forEach( (key) => { rowString += delimiter + key; });
+  rowString += delimiter + nodeLabel;
+
+  linkedDataString = rowString + "\n";
+
+  // add root node to string
+  rowString = delimiter + keys[0] + delimiter;
+  rowString += delimiter.repeat(Object.keys(data[0]).length);
+  if (keys[0] !== keySeparator) { rowString += keys[0]; } 
+  /*
+  if (!parentChild.get(null)) {
+    rowString += delimiter.repeat(keys.length - 1);
+  } else {
+    newRow = Object.values(parentChild.get(null));
+    newRow.forEach(d => { rowString += delimiter + d;});
+  } */
+  linkedDataString += rowString + "\n";
+
+  // all other nodes
+  for (var [key, value] of parentChild) {
+    rowString = key;
+    newRow = Object.values(value);
+    newRow.forEach(d => { rowString += delimiter + d;});
+    linkedDataString += rowString + "\n";
+  }
+
+  if (debugOn) {
+    console.log("converted linked Data:");
+    console.log(linkedDataString);
+  }
+
+  linkedDataArray = d3.dsvFormat(delimiter).parse(linkedDataString);
+
+  if (debugOn) {
+    console.log("converted linked Data array:");
+    console.log(linkedDataArray);
+  }
+
+  return linkedDataArray;
+}
+
+/*
 function createHierarchyFromFlatData(data, keys, keyField, debugOn) {
   let entries = d3.nest();
   keys.forEach(key => entries.key(d => d[key]));
@@ -98,3 +242,4 @@ function createHierarchyFromFlatData(data, keys, keyField, debugOn) {
     return json;
   }
 } 
+*/

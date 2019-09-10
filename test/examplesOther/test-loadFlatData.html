@@ -11,23 +11,23 @@
   
   <!-- for local processing without web server, paste data inside the aside tag -->
   <aside id="data">
-all,continent,country,population
-World,,,120939
-World,Asia,,4436
-World,Asia,China,1420
-World,Asia,India,1369
-World,Africa,,1216
-World,Europe,,739
-World,North America,,579
-World,North America,USA,329
-World,South America,,423
-World,Oceania,,38
+all,continent,country,population,likeit
+World,Asia,China,1420,yes
+World,Asia,India,1369,yes
+</aside>
+<aside id="data2">
+parent,key,all,continent,country,population,likeit
+,root,,,,
+root,World,,,,,
+World,Asia,,,,,
+Asia,China,World,Asia,China,1420,yes
+Asia,India,World,Asia,India,1369,yes
 </aside>
   
     <script>
       const dataSpec = {
         source: "aside#data",  
-        hierarchyLevels: ["all", "continent", "country"],
+        hierarchyLevels: ["$", "all", "continent", "country"],
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)

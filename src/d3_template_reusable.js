@@ -13,7 +13,6 @@ export default function (_dataSpec) {
   options.debugOn = false;
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
   options.svgDimensions = {height: 800, width: 1400};
-  options.nodeLabelLength = 50;
   options.transitionDuration = 750;
 
   options.defaultColor = "grey";
@@ -28,6 +27,11 @@ export default function (_dataSpec) {
   options.nodeImageSelectionAppend = undefined;
   options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
 
+  options.flatDataSeparator = "$"; // separator for constructing a key for flat data
+
+  options.nodeLabelField = undefined;
+  options.nodeLabelFieldFlatData = "__he_name";
+  options.nodeLabelLength = 50;
   options.nodeLabelPadding = 10;
 
   options.linkHeight = 20;
@@ -261,7 +265,7 @@ export default function (_dataSpec) {
       }
       else { // data processing here
         const myData = createDataInfo(_dataSpec);
-        readData(myData, selection, options.debugOn, createChart);
+        readData(myData, selection, options, createChart);
       }
     });
   }  
@@ -283,6 +287,7 @@ export default function (_dataSpec) {
     }
     myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
     options.keyField = myData.keyField;
+    options.nodeLabelField = myData.flatData ? options.nodeLabelFieldFlatData : myData.keyField;
     return myData;
   }
 

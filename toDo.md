@@ -37,21 +37,33 @@ https://gitlab.com/snippets/1703535
 [ok] new svg nodes with rectangles, see also https://bl.ocks.org/jfsiii/7772281
 [ok] if you click very fast twice on node to expand collapse :Cannot read property 'posXCenter' of undefined
     at SVGTextElement.linksAPI.getLinkTextPositionX (hierarchyExplorer.js:327)
+[ok] Linkcolor options: are with path.down
 
-
-* Linkcolor options: are with path.down
 * Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram
 * No root -> key = space , options: rootNodeBlank: false kein node label und kein node Image
 
-[bug] load data with flat file
+* blocks with .min.js
+* add slow expansion of tree https://stackoverflow.com/questions/35834304/d3js-collapsible-tree-entering-transition-using-depth-first-style/35838978#35838978
+* check example for linkColor - 2
+
+[bug] load data with flat file 8for DOM and file 
+    --> add root node
+    --> convert string to array of objects
 * nodeInfo
-* sort
+* sort --> updatable, 
+at myChart.js // compute the new tree:
+config.tree(root ....) sort there
+
+for link.down change in l.getLinkD (x == nodeSorted) ? new.. : x nach index
+enter vs update
+
+
 * color themes
-* showcase updated (nicht alignLeave doppelt, mehr funktionen)
+* showcase updated (nicht alignLeave doppelt (linkWidth zurück), mehr funktionen)
 * load data with same keys (key, name) for flat data
 * test linkLabel alignment
 *
-
+* umstellung bei blocks auf .min.js
 
 *
 * applications (chess, basketball, nfl, soccer, flags, d3.js)

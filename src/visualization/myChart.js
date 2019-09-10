@@ -150,16 +150,16 @@ function update(source, options, config){
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
     .text(function (d) {
-      if (d.data[options.keyField].length > options.nodeLabelLength) {
-        return d.data[options.keyField].substring(0, options.nodeLabelLength) + "...";
+      if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
+        return d.data[options.nodeLabelField].substring(0, options.nodeLabelLength) + "...";
       } else {
-        return d.data[options.keyField];
+        return d.data[options.nodeLabelField];
       }
     })
     .style("fill-opacity", 1e-6);
 
   nodeEnter.append("svg:title").text(function (d) {
-    return d.data[options.keyField];
+    return d.data[options.nodeLabelField];
   });
 
   // Transition nodes to their new position.

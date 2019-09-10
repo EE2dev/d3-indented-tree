@@ -4,12 +4,57 @@
   (factory((global.hierarchyExplorer = {}),global.d3));
 }(this, (function (exports,d3) { 'use strict';
 
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+  var slicedToArray = function () {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+
+      try {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+
+          if (i && _arr.length === i) break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"]) _i["return"]();
+        } finally {
+          if (_d) throw _e;
+        }
+      }
+
+      return _arr;
+    }
+
+    return function (arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+
   ////////////////////////////////////////////////////
   // Processing data                                //
   //////////////////////////////////////////////////// 
 
   // XHR to load data   
-  function readData(myData, selection, debugOn, createChart) {
+  function readData(myData, selection, options, createChart) {
+    var debugOn = options.debugOn;
     if (myData.fromFile) {
       // read data from file 
       if (myData.data.endsWith(".json")) {
@@ -25,43 +70,56 @@
           createChart(selection, hierarchy);
         });
       } else if (myData.data.endsWith(".csv")) {
-        if (myData.flatData) {
-          // CSV Format 1
-          d3.dsv(myData.delimiter, myData.data).then(function (data) {
-            if (debugOn) {
-              console.log(data);
-            }
-            var hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn);
-            if (debugOn) {
-              console.log("hierarchy: ");console.log(hierarchy);
-            }
+        /*
+        if (myData.flatData){ // CSV Format 1
+          d3.dsv(myData.delimiter, myData.data).then(function(data) {
+            if (debugOn) { console.log(data);}
+            const hierarchy = createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn);
+            if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
             createChart(selection, hierarchy);
           });
-        } else {
-          // CSV Format 2
-          d3.dsv(myData.delimiter, myData.data).then(function (data) {
-            if (debugOn) {
-              console.log(data);
-            }
-            var hierarchy = createHierarchy(data, myData.keyField);
-            if (debugOn) {
-              console.log("hierarchy: ");console.log(hierarchy);
-            }
+        } else { // CSV Format 2
+          d3.dsv(myData.delimiter, myData.data).then(function(data) {
+            if (debugOn) { console.log(data);}
+            const hierarchy = createHierarchy(data, myData.keyField);
+            if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
             createChart(selection, hierarchy);
           });
         }
+        */
+        d3.dsv(myData.delimiter, myData.data).then(function (data) {
+          if (debugOn) {
+            console.log(data);
+          }
+          if (myData.flatData) {
+            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, options); // csv Format 1
+          }
+          var hierarchy = createHierarchy(data, myData.keyField);
+          if (debugOn) {
+            console.log("hierarchy: ");console.log(hierarchy);
+          }
+          createChart(selection, hierarchy);
+        });
       } else {
         console.log("File must end with .json or .csv");
       }
     } else {
-      // read data from DOM
+      // read data from DOM or JSON variable
       var hierarchy = void 0;
       if (myData.isJSON) {
         hierarchy = d3.hierarchy(myData.data);
       } else {
         var data = readDataFromDOM(myData.delimiter, myData.data);
-        hierarchy = myData.flatData ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) // csv Format 1
-        : createHierarchy(data, myData.keyField); // csv format 2
+        if (myData.flatData) {
+          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, options); // csv Format 1
+        }
+        hierarchy = createHierarchy(data, myData.keyField); // csv format 2
+        /*
+        hierarchy = (myData.flatData)
+          // ? createHierarchyFromFlatData(data, myData.hierarchyLevels, myData.keyField, debugOn) // csv Format 1
+          ? createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, debugOn) // csv Format 1
+          : createHierarchy(data, myData.keyField); // csv format 2
+          */
         if (debugOn) {
           console.log("embedded data: ");console.log(hierarchy);
         }
@@ -89,44 +147,167 @@
     return root;
   }
 
-  function createHierarchyFromFlatData(data, keys, keyField, debugOn) {
-    var entries = d3.nest();
-    keys.forEach(function (key) {
-      return entries.key(function (d) {
-        return d[key];
+  /*
+  function buildKey(row, keys, keyIndex, delimiter){
+    const key = keys[keyIndex];
+    let pcKey = (keyIndex === 1) ? keys[0] : keys[keyIndex-1] + row[keys[keyIndex-1]];
+    pcKey += delimiter + key + row[key];
+    return pcKey;
+  } */
+
+  function buildKey(row, keys, keyIndex, delimiter, keySeparator) {
+    var parent = getParent(row, keys, keyIndex, keySeparator);
+    var child = parent + keySeparator + row[keys[keyIndex]];
+    var pcKey = parent + delimiter + child;
+    return pcKey;
+  }
+
+  function getParent(row, keys, keyIndex, keySeparator) {
+    var parent = keyIndex === 1 ? keys[0] : row[keys[keyIndex - 1]];
+    for (var i = 0; i < keyIndex; i++) {
+      if (i === 0) {
+        parent = keys[0];
+      } else {
+        parent += keySeparator + row[keys[i]];
+      }
+    }
+    return parent;
+  }
+
+  function createLinkedData(data, keys, keyField, delimiter, options) {
+    var debugOn = options.debugOn;
+    /*
+    const nodeLabel = "__he_name";
+    const keySeparator = "$";
+    */
+
+    var nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
+    var keySeparator = options.flatDataSeparator; // "$"
+
+    var linkedDataString = void 0;
+    var linkedDataArray = void 0;
+    var parentChild = new Map();
+    var pcKey = void 0;
+    var pcValue = void 0;
+    var setAll = function setAll(obj, val) {
+      return Object.keys(obj).forEach(function (k) {
+        return obj[k] = val;
+      });
+    };
+    var setNull = function setNull(obj) {
+      return setAll(obj, "");
+    };
+    var newRow = void 0;
+    var rowString = void 0;
+
+    data.forEach(function (row) {
+      keys.forEach(function (key, j) {
+        if (j > 0) {
+          pcValue = {};
+          if (!row[key] || j === keys.length - 1) {
+            /*
+            pcKey = (j === 1) ? keys[0] : keys[j-1] + row[keys[j-1]];
+            pcKey += delimiter + key + row[key];
+            */
+            pcKey = buildKey(row, keys, j, delimiter, keySeparator);
+            if (!parentChild.get(pcKey)) {
+              Object.assign(pcValue, row);
+              pcValue[nodeLabel] = row[key];
+              parentChild.set(pcKey, pcValue);
+            }
+          } else {
+            /*
+            pcKey = (j === 1) ? keys[0] : keys[j-1] + row[keys[j-1]];
+            pcKey += delimiter + key + row[key];
+            */
+            pcKey = buildKey(row, keys, j, delimiter, keySeparator);
+            if (!parentChild.get(pcKey)) {
+              Object.assign(pcValue, row);
+              setNull(pcValue);
+              pcValue[nodeLabel] = row[key];
+              parentChild.set(pcKey, pcValue);
+            }
+          }
+        }
       });
     });
-    entries = entries.map(data);
-    var json = {};
-    json[keyField] = entries.keys()[0];
-    constructJson(json, entries.get(entries.keys()[0]), keyField);
-    if (debugOn) {
-      console.log("converted JSON:");
-      console.log(json);
-    }
-    var root = d3.hierarchy(json);
-    return root;
 
-    function constructJson(json, entries, keyField) {
-      if (Array.isArray(entries)) {
-        var obj = entries[0];
-        for (var property in obj) {
-          json[property] = obj[property];
-        }
-      } else {
-        entries.entries().forEach(function (ele) {
-          if (ele[keyField] === "") {
-            constructJson(json, ele.value);
-          } else {
-            json.children = !json.children ? [] : json.children;
-            var newObject = {};
-            newObject[keyField] = ele[keyField];
-            json.children.push(constructJson(newObject, ele.value, keyField));
-          }
-        });
-      }
-      return json;
+    // build the String in the linked data format
+    // add column names to string
+    console.log(parentChild);
+
+    rowString = "parent" + delimiter + keyField;
+    Object.keys(data[0]).forEach(function (key) {
+      rowString += delimiter + key;
+    });
+    rowString += delimiter + nodeLabel;
+
+    linkedDataString = rowString + "\n";
+
+    // add root node to string
+    rowString = delimiter + keys[0] + delimiter;
+    rowString += delimiter.repeat(Object.keys(data[0]).length);
+    if (keys[0] !== keySeparator) {
+      rowString += keys[0];
     }
+    /*
+    if (!parentChild.get(null)) {
+      rowString += delimiter.repeat(keys.length - 1);
+    } else {
+      newRow = Object.values(parentChild.get(null));
+      newRow.forEach(d => { rowString += delimiter + d;});
+    } */
+    linkedDataString += rowString + "\n";
+
+    // all other nodes
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = parentChild[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var _ref = _step.value;
+
+        var _ref2 = slicedToArray(_ref, 2);
+
+        var key = _ref2[0];
+        var value = _ref2[1];
+
+        rowString = key;
+        newRow = Object.values(value);
+        newRow.forEach(function (d) {
+          rowString += delimiter + d;
+        });
+        linkedDataString += rowString + "\n";
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+
+    if (debugOn) {
+      console.log("converted linked Data:");
+      console.log(linkedDataString);
+    }
+
+    linkedDataArray = d3.dsvFormat(delimiter).parse(linkedDataString);
+
+    if (debugOn) {
+      console.log("converted linked Data array:");
+      console.log(linkedDataArray);
+    }
+
+    return linkedDataArray;
   }
 
   var linksAPI = {};
@@ -497,15 +678,15 @@
     nodeEnter.call(n.appendNode);
 
     nodeEnter.append("text").attr("class", "nodeLabel").attr("x", options.nodeLabelPadding).attr("dy", ".35em").attr("text-anchor", "start").text(function (d) {
-      if (d.data[options.keyField].length > options.nodeLabelLength) {
-        return d.data[options.keyField].substring(0, options.nodeLabelLength) + "...";
+      if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
+        return d.data[options.nodeLabelField].substring(0, options.nodeLabelLength) + "...";
       } else {
-        return d.data[options.keyField];
+        return d.data[options.nodeLabelField];
       }
     }).style("fill-opacity", 1e-6);
 
     nodeEnter.append("svg:title").text(function (d) {
-      return d.data[options.keyField];
+      return d.data[options.nodeLabelField];
     });
 
     // Transition nodes to their new position.
@@ -576,7 +757,6 @@
     }).style("stroke-width", function (d) {
       return l.getLinkStrokeWidth(d.parent);
     });
-    // git commit -m "link label alignment fixed, linkColor API updated"
 
     linkUpdate.select("path.link.right").attr("d", function (d) {
       return l.getLinkD(d, "right");
@@ -611,12 +791,6 @@
     });
   }
 
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  };
-
   function d3_template_reusable (_dataSpec) {
 
     ///////////////////////////////////////////////////
@@ -627,7 +801,6 @@
     options.debugOn = false;
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.svgDimensions = { height: 800, width: 1400 };
-    options.nodeLabelLength = 50;
     options.transitionDuration = 750;
 
     options.defaultColor = "grey";
@@ -642,6 +815,11 @@
     options.nodeImageSelectionAppend = undefined;
     options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
 
+    options.flatDataSeparator = "$"; // separator for constructing a key for flat data
+
+    options.nodeLabelField = undefined;
+    options.nodeLabelFieldFlatData = "__he_name";
+    options.nodeLabelLength = 50;
     options.nodeLabelPadding = 10;
 
     options.linkHeight = 20;
@@ -894,7 +1072,7 @@
         } else {
           // data processing here
           var myData = createDataInfo(_dataSpec);
-          readData(myData, selection, options.debugOn, createChart);
+          readData(myData, selection, options, createChart);
         }
       });
     }
@@ -916,6 +1094,7 @@
       }
       myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
       options.keyField = myData.keyField;
+      options.nodeLabelField = myData.flatData ? options.nodeLabelFieldFlatData : myData.keyField;
       return myData;
     }
 
