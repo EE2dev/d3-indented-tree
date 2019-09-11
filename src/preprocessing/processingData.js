@@ -19,7 +19,7 @@ export function readData(myData, selection, options, createChart) {
       d3.dsv(myData.delimiter, myData.data).then(function(data) {
         if (debugOn) { console.log(data);}
         if (myData.flatData) {
-          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, options); // csv Format 1
+          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
         }
         const hierarchy = createHierarchy(data, myData.keyField);
         if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
@@ -36,7 +36,7 @@ export function readData(myData, selection, options, createChart) {
     } else {
       let data = readDataFromDOM(myData.delimiter, myData.data);
       if (myData.flatData) {
-        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, options); // csv Format 1
+        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
       }
       hierarchy = createHierarchy(data, myData.keyField); // csv format 2
       if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
@@ -78,10 +78,9 @@ function getParent(row, keys, keyIndex, keySeparator){
   return parent;
 }
 
-function createLinkedData(data, keys, keyField, delimiter, options) {
+function createLinkedData(data, keys, keyField, delimiter, keySeparator, options) {
   const debugOn = options.debugOn;
   const nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
-  const keySeparator = options.flatDataSeparator; // "$"
   
   let linkedDataString;
   let linkedDataArray;

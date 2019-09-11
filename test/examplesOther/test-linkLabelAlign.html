@@ -31,8 +31,9 @@ Azura,Eve,2,30,red
         .debugOn(true)
         //.propagateValue("size")
         // .formatDefaultLocale("DE")
-        .linkLabel("size", {unit: " Euro", format: ",.2f", locale: "DE"})
         .linkWidth("size",{range: [150, 300]})
+        .linkLabel("size", {unit: " Euro", format: ",.2f", locale: "DE", align: true})
+        
       ;
       
       showChart(); 

@@ -27,8 +27,6 @@ export default function (_dataSpec) {
   options.nodeImageSelectionAppend = undefined;
   options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
 
-  options.flatDataSeparator = "$"; // separator for constructing a key for flat data
-
   options.nodeLabelField = undefined;
   options.nodeLabelFieldFlatData = "__he_name";
   options.nodeLabelLength = 50;
@@ -278,6 +276,7 @@ export default function (_dataSpec) {
       myData.hierarchyLevels = dataSpec.hierarchyLevels;
       myData.keyField = dataSpec.key ? dataSpec.key : "key";
       myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
+      myData.separator = dataSpec.separator ?  dataSpec.separator : "$";
     } else {
       console.log("dataspec is not an object!");
     }

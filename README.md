@@ -188,8 +188,9 @@ Then the javascript part would look like:
 ``` 
 ### 2.3. CSV (relational) format
 A csv file format consisting of one row for each node. Each row contains the keys of each node traversed from the root down to the specific node and the corresponding data for that node.
-The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference the columns of each level in its top-down traversal order with the property ```hierarchyLevels```  (see below for the example). 
+The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference the columns of each level in its top-down traversal order with the property ```hierarchyLevels``` (see below for the example). The first element contains a *string* that is used as the root (while the other elements reference column names). It the first element is ```"$"``` then the root node will stay without a node label.
 
+Internally, the separator ```"$"``` is used when the node key is build by concatenating the corresponding columns. If this character is contained in the data, the separator can be changed by specifying the ```separator```property of the *dataSpec* object. The column name ```"__he_name"``` is reserved internally for storing the node label.
 ```
 all,continent,country,population
 World,Asia,,4436

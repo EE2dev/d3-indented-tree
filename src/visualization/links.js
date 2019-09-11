@@ -138,7 +138,7 @@ linksAPI.computeLabelDimensions = function (sel) {
           dimProperties.maxX = width;
           dimProperties.maxXText = text;
         } 
-        if (dimProperties.posXCenter < (d.y - d.parent.y) / 2) {
+        if (dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
           dimProperties.posXCenter = (d.y - d.parent.y) / 2;
         } 
         if (dimProperties.maxY < height) {
