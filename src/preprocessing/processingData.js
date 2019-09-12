@@ -91,12 +91,15 @@ function createLinkedData(data, keys, keyField, delimiter, keySeparator, options
   let setNull = obj => setAll(obj, "");
   let newRow;
   let rowString;
+  let proceed = true;
 
   data.forEach((row) => {
+    proceed = true;
     keys.forEach( (key, j) => {
-      if (j > 0) {
-        pcValue = {};        
-        if (!row[key] || j === keys.length-1) { 
+      if (j > 0 && proceed) {
+        pcValue = {};      
+        if (row[key]) { console.log("!row[key]"); console.log(row); console.log(key); }  
+        if (j === keys.length-1) { 
           pcKey = buildKey( row, keys, j, delimiter, keySeparator);
           if (!parentChild.get(pcKey)) {
             Object.assign(pcValue, row);
@@ -105,11 +108,18 @@ function createLinkedData(data, keys, keyField, delimiter, keySeparator, options
           }
         } else  {
           pcKey = buildKey( row, keys, j, delimiter, keySeparator);
-          if (!parentChild.get(pcKey)) {
+          if (!row[keys[j+1]]) {
             Object.assign(pcValue, row);
-            setNull(pcValue);
             pcValue[nodeLabel] = row[key];
             parentChild.set(pcKey, pcValue);
+            proceed = false;
+          } else {
+            if (!parentChild.get(pcKey)) {
+              Object.assign(pcValue, row);
+              setNull(pcValue);
+              pcValue[nodeLabel] = row[key];
+              parentChild.set(pcKey, pcValue);
+            }
           }
         }
       } 

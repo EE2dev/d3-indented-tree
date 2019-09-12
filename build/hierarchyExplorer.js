@@ -162,12 +162,17 @@
     };
     var newRow = void 0;
     var rowString = void 0;
+    var proceed = true;
 
     data.forEach(function (row) {
+      proceed = true;
       keys.forEach(function (key, j) {
-        if (j > 0) {
+        if (j > 0 && proceed) {
           pcValue = {};
-          if (!row[key] || j === keys.length - 1) {
+          if (row[key]) {
+            console.log("!row[key]");console.log(row);console.log(key);
+          }
+          if (j === keys.length - 1) {
             pcKey = buildKey(row, keys, j, delimiter, keySeparator);
             if (!parentChild.get(pcKey)) {
               Object.assign(pcValue, row);
@@ -176,11 +181,18 @@
             }
           } else {
             pcKey = buildKey(row, keys, j, delimiter, keySeparator);
-            if (!parentChild.get(pcKey)) {
+            if (!row[keys[j + 1]]) {
               Object.assign(pcValue, row);
-              setNull(pcValue);
               pcValue[nodeLabel] = row[key];
               parentChild.set(pcKey, pcValue);
+              proceed = false;
+            } else {
+              if (!parentChild.get(pcKey)) {
+                Object.assign(pcValue, row);
+                setNull(pcValue);
+                pcValue[nodeLabel] = row[key];
+                parentChild.set(pcKey, pcValue);
+              }
             }
           }
         }

@@ -16,9 +16,10 @@
     <script>
       const dataSpec = {
         source: "../data/data2.csv",
-        hierarchyLevels: ["all", "continent", "country"],
+        hierarchyLevels: ["World", "continent", "country"],
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
+        .debugOn(true)
       ;
 
       showChart(); // for preprocessing data see below

@@ -1,10 +1,10 @@
-all,continent,country,population
-World,Asia,,4436
-World,Asia,China,1420
-World,Asia,India,1369
-World,Africa,,1216
-World,Europe,,739
-World,North America,,579
-World,North America,USA,329
-World,South America,,423
-World,Oceania,,38
+continent,country,population
+Asia,,4436
+Asia,China,1420
+Asia,India,1369
+Africa,,1216
+Europe,,739
+North America,,579
+North America,USA,329
+South America,,423
+Oceania,,38
