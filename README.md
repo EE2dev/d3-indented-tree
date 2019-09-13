@@ -165,16 +165,16 @@ Alternatively, the JSON source can also reference a JSON object which has been c
 A csv file format consisting of one row for each node. Each row contains ```key```as the key in the first column, ```parent``` as its parent key in the second column and the remaning data for each node.  
 ```
 key,parent,population
-,
-Asia,4436
+World,,
+Asia,World,4436
 China,Asia,1420
 India,Asia,1369
-Africa,1216
-Europe,739
-North America,579
+Africa,World,1216
+Europe,World,739
+North America,World,579
 USA,North America,329
-South America,423
-Oceania,38
+South America,World,423
+Oceania,World,38
 ```
 Then the javascript part would look like:
 ```js
@@ -187,7 +187,7 @@ Then the javascript part would look like:
       ...
 ``` 
 ### 2.3. CSV (relational) format
-A csv file format consisting of one row for each node. Each row contains the keys of each node traversed from the root down to the specific node and the corresponding data for that node.
+A csv file format consisting of one row for each leaf. Each row contains the keys of each node traversed from the root down to the leaf and the corresponding data for that leaf.
 The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference the columns of each level in its top-down traversal order with the property ```hierarchyLevels``` (see below for the example). The first element contains a *string* that is used as the root while the other elements reference column names. It the first element is ```"$"``` then the root node will stay without a node label.
 
 Internally, the separator ```"$"``` is used when the node key is build by concatenating the corresponding columns. If this character is contained in the data, the separator can be changed by specifying the ```separator```property of the *dataSpec* object. The column name ```"__he_name"``` is reserved internally for storing the node label.
@@ -208,7 +208,7 @@ Oceania,,38
     <script>
       const dataSpec = {
         source: "../data/data2.csv",
-        hierarchyLevels: ["all", "continent", "country"],
+        hierarchyLevels: ["World", "continent", "country"],
       };
       const myChart = hierarchyExplorer.chart(dataSpec);
       ...
@@ -223,16 +223,16 @@ An example for embedded hierarchical csv data:
 ...
 <aside id="data">
 key,parent,population
-,
-Asia,4436
+World,,
+Asia,World,4436
 China,Asia,1420
 India,Asia,1369
-Africa,1216
-Europe,739
-North America,579
+Africa,World,1216
+Europe,World,739
+North America,World,579
 USA,North America,329
-South America,423
-Oceania,38
+South America,World,423
+Oceania,World,38
 </aside>
 ...
 ```
@@ -251,7 +251,7 @@ An example for embedded relational csv data:
 ```
 ...
 <aside id="data">
-all,continent,country,population
+continent,country,population
 Asia,,4436
 Asia,China,1420
 Asia,India,1369
@@ -269,7 +269,7 @@ Oceania,,38
     <script>
       const dataSpec = {
         source: "aside#data",
-        hierarchyLevels: ["all", "continent", "country"],
+        hierarchyLevels: ["World", "continent", "country"],
       };
       const myChart = hierarchyExplorer.chart(dataSpec);
       ...
