@@ -13,15 +13,15 @@ More examples demonstrating specific API calls:
 
 #### Data Format examples
 
-- [data format - relational csv file (readme example)](https://bl.ocks.org/EE2dev/08d87f3b57e25aa8311e857b8a582575)
-- [data format - hierarchical csv file (readme example)](https://bl.ocks.org/EE2dev/eb865fd642723365272c89f94e52e48f)
 - [data format - JSON file (readme example)](https://bl.ocks.org/EE2dev/2dac1c1714b456bc427bb7f5beaeca87)
+- [data format - hierarchical csv file (readme example)](https://bl.ocks.org/EE2dev/eb865fd642723365272c89f94e52e48f)
+- [data format - relational csv file (readme example)](https://bl.ocks.org/EE2dev/08d87f3b57e25aa8311e857b8a582575)
 - [data format - JSON data from variable](https://bl.ocks.org/EE2dev/c5abbb6eb05564512ebf3b630440c0f7)
 - [data format - relational csv file](https://bl.ocks.org/EE2dev/9b1959d2631892656f36d849a614e6ba)
 - [data format - relational csv file - 2](https://bl.ocks.org/EE2dev/baf7343706b595ec9e49758ec4ab0437)
-- [data format - relational csv file, different key](https://bl.ocks.org/EE2dev/f671f8f70ac355950572a45fa0cde022)
 - [data format - relational csv data embedded](https://bl.ocks.org/EE2dev/c823a392791797a1a021e3eb268a1502)
 - [data format - hierarchical csv file](https://bl.ocks.org/EE2dev/06652de4cf888e2a8bb16c76642ee05f)
+- [data format - hierarchical csv file, different key](https://bl.ocks.org/EE2dev/f671f8f70ac355950572a45fa0cde022)
 - [data format - hierarchical csv data embedded](https://bl.ocks.org/EE2dev/93fa64a7ad4c1d24a0be845c5c1f5f0b)
 - [data format - hierarchical csv data embedded, different key](https://bl.ocks.org/EE2dev/4fadf0f3bac11206ba2185c626a508b7)
 
@@ -39,10 +39,14 @@ More examples demonstrating specific API calls:
 - [myChart.linkStrength() - 2](https://bl.ocks.org/EE2dev/84e22c8fa7a4b5fb202f7ce6fdb93b6e)
 - [myChart.linkStrength() - 3](https://bl.ocks.org/EE2dev/d2cf606e3a86bb268c5016a32f7ec9a7)
 - [myChart.linkWidth()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.linkWidth() - 2](https://bl.ocks.org/EE2dev/3896ed6a6e221762355a15fbf7c49832)
 
 #### API examples to customize the nodes
 
 - [myChart.nodeImageFile()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.nodeImageFile() - 2](https://bl.ocks.org/EE2dev/ca01964c928a37de65bd429f8f094a1c)
+- [myChart.nodeImageSelection()](https://bl.ocks.org/EE2dev/43fffd334158b6d10454e5b8c6689786)
+- [myChart.nodeImageSelection() - 2](https://bl.ocks.org/EE2dev/cd5567cccdecb65d59a6cab1fd6ecab2)
 - [myChart.nodeLabelPadding()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 
 #### Other examples
@@ -389,7 +393,8 @@ With no arguments returns the callback *function* for the node images.
 Sets the node images based on a selection.  
 1. argument:
     * a callback *function*, which is called with a selection as an argument containing all newly entered `g.node`'s. The function is evaluated for each selected element, in order, being passed the current datum (d), the current index (i), and the current group (nodes), with this as the current DOM element (nodes[i]). 
-    * the callback function is expected to append to each node a graphical element as the node image. To enter a different image based on the node being expandable or not, the attached datum `d._children` can be used. In case no image node should be shown, an empty function can be passed.   
+    * the callback function is expected to append to each node a graphical element as the node image. To enter a different image based on the node being expandable or not, the attached datum `d._children` can be used. 
+    * if the first argument is *boolean* `false` no node image is shown.   
 
 2. argument: (optional)
     * a callback *function*, which is called with a selection as an argument containing all newly updated `g.node`'s. 

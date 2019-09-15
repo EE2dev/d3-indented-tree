@@ -153,7 +153,7 @@ export default function (_dataSpec) {
 
   chartAPI.nodeImageSelection = function(_append, _update) {
     if (!arguments.length) return options.nodeImageSelectionAppend;
-    options.nodeImageSelectionAppend = _append;
+    options.nodeImageSelectionAppend = (_append === false) ? function() {} : _append;
     options.nodeImageSelectionUpdate = _update;
     options.nodeImageFile = false;
     if (typeof options.updateDefault === "function") options.updateDefault();
