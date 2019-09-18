@@ -32,6 +32,54 @@ export default function (_dataSpec) {
   options.nodeLabelLength = 50;
   options.nodeLabelPadding = 10;
 
+  options.nodeResort = false;
+  options.nodeResortAscending = false;
+  options.nodeResortField = "value";
+  //options.nodeResortFieldType = "string";
+  options.sortByDepth = true;
+  options.nodeResortFunction = 
+  /*
+    function(a, b) { 
+      let ret;
+      if (options.nodeResortFieldType === "string") {
+        ret = b.height - a.height || a.data[options.nodeResortField].localeCompare(b.data[options.nodeResortField]);
+      } else if (options.nodeResortFieldType === "number") {
+        ret = b.height - a.height || b.data[options.nodeResortField] - a.data[options.nodeResortField];
+      }
+      if (!options.nodeResortAscending) { ret *= -1; }
+      return ret;
+    };
+    */
+
+    /*
+   function(a, b) { 
+    let ret;
+    if (options.nodeResortFieldType === "number") {
+      a.data[options.nodeResortField] = +a.data[options.nodeResortField];
+      b.data[options.nodeResortField] = +b.data[options.nodeResortField];
+    }
+    if (typeof (a.data[options.nodeResortField]) === "string") {
+      ret = b.height - a.height || a.data[options.nodeResortField].localeCompare(b.data[options.nodeResortField]);
+    } else if (typeof (a.data[options.nodeResortField]) === "number") {
+      ret = b.height - a.height || b.data[options.nodeResortField] - a.data[options.nodeResortField];
+    }
+    if (!options.nodeResortAscending) { ret *= -1; }
+    return ret;
+  };
+  */
+    function(a, b) { 
+      let ret = options.sortByDepth ? b.depth - a.depth : b.height - a.height;
+      if (ret === 0) {
+        if (typeof (a.data[options.nodeResortField]) === "string") {
+          ret = a.data[options.nodeResortField].localeCompare(b.data[options.nodeResortField]);
+        } else {
+          ret = b.data[options.nodeResortField] - a.data[options.nodeResortField];
+        }
+      }
+      if (!options.nodeResortAscending) { ret *= -1; }
+      return ret;
+    };
+
   options.linkHeight = 20;
 
   options.linkLabelField = "value";
@@ -160,6 +208,19 @@ export default function (_dataSpec) {
     return chartAPI;
   };
 
+  chartAPI.nodeSort = function(_ = options.nodeSortField, _options = {}) {
+    if (!arguments.length) return options.nodeSortField;
+    if (typeof(_)  === "string")  {
+      options.nodeResort = true;
+      options.nodeResortAscending = (typeof (_options.ascending) !== "undefined") ? _options.ascending : options.nodeResortAscending;
+      // options.nodeResortFieldType = _options.type || options.nodeResortFieldType;
+      options.sortByDepth = (typeof (_options.sortByDepth) !== "undefined") ? _options.sortByDepth : options.sortByDepth;
+      options.nodeResortField = _;
+    }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;
     options.linkHeight = _;
@@ -231,16 +292,6 @@ export default function (_dataSpec) {
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   }; 
-  /*
-  chartAPI.linkColor = function(_ = options.linkColorField, scale = options.linkColorScale) {
-    if (!arguments.length) return options.linkColorField;
-    options.linkColorStatic = false;
-    options.linkColorField = _;
-    options.linkColorScale = scale;
-    if (typeof options.updateDefault === "function") options.updateDefault();
-    return chartAPI;
-  }; 
-  */
 
   chartAPI.alignLeaves = function(_) {
     if (!arguments.length) return options.alignLeaves;
@@ -277,6 +328,7 @@ export default function (_dataSpec) {
       myData.keyField = dataSpec.key ? dataSpec.key : "key";
       myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
       myData.separator = dataSpec.separator ?  dataSpec.separator : "$";
+      myData.autoConvert = (typeof (dataSpec.autoConvert) !== "undefined") ? dataSpec.autoConvert : true;
     } else {
       console.log("dataspec is not an object!");
     }

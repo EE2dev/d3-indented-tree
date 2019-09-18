@@ -103,6 +103,7 @@ function click(d, options, config){
 }
 
 function update(source, options, config){
+  if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];
@@ -239,7 +240,7 @@ function update(source, options, config){
   linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
 
   linkUpdate.select("path.link.down")
-    .attr("d", (d) => l.getLinkD(d, "down"))
+    .attr("d", (d) => l.getLinkD(d, "down", true))
     .style("stroke", (d) => options.linkColorInherit ? l.getLinkStroke(d.parent) : "")
     .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
 

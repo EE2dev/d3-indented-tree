@@ -17,12 +17,17 @@ linksAPI.initialize = function(_options) {
   }
 };
 
-linksAPI.getLinkD = function (d, direction) {
+linksAPI.getLinkD = function (d, direction, updatePattern = false) {
   const linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
   const linkStrength = linksAPI.getLinkStrength(d, options);
   let path;
   if (direction === "down"){
-    path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (d.x + linkStrength / 2 - d.parent.x);
+    if (updatePattern) { // for updated links use .x of last child to support resorted nodes/links
+      const xLastChild = d.parent.children[d.parent.children.length - 1].x;
+      path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (xLastChild + linkStrength / 2 - d.parent.x);
+    } else {
+      path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (d.x + linkStrength / 2 - d.parent.x);
+    }
   } else if (direction === "right"){
     path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
   }

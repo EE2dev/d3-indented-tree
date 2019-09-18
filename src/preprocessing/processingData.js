@@ -16,15 +16,16 @@ export function readData(myData, selection, options, createChart) {
         createChart(selection, hierarchy);
       });
     } else if (myData.data.endsWith(".csv")) {
-      d3.dsv(myData.delimiter, myData.data).then(function(data) {
-        if (debugOn) { console.log(data);}
-        if (myData.flatData) {
-          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
-        }
-        const hierarchy = createHierarchy(data, myData.keyField);
-        if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
-        createChart(selection, hierarchy);
-      });
+      d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? d3.autoType : undefined)
+        .then(function(data) {
+          if (debugOn) { console.log(data);}
+          if (myData.flatData) {
+            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
+          }
+          const hierarchy = createHierarchy(data, myData.keyField);
+          if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
+          createChart(selection, hierarchy);
+        });
     } else {
       console.log("File must end with .json or .csv");
     }
@@ -34,7 +35,7 @@ export function readData(myData, selection, options, createChart) {
     if (myData.isJSON) {
       hierarchy = d3.hierarchy(myData.data);
     } else {
-      let data = readDataFromDOM(myData.delimiter, myData.data);
+      let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert);
       if (myData.flatData) {
         data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
       }
@@ -45,11 +46,11 @@ export function readData(myData, selection, options, createChart) {
   }
 }
 
-function readDataFromDOM(delimiter, selector = "aside#data") {
+function readDataFromDOM(delimiter, selector = "aside#data", autoConvert = true) {
   const inputData = d3.select(selector).text();
   const inputData_cleaned = inputData.trim();
   const parser = d3.dsvFormat(delimiter);
-  const file = parser.parse(inputData_cleaned);
+  const file = parser.parse(inputData_cleaned, autoConvert ? d3.autoType : undefined);
   return file; 
 }
 

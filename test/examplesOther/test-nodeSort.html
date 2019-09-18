@@ -9,47 +9,39 @@
   
   <body>
   
-  <!-- for local processing without web server, paste data inside the aside tag -->
+  <!-- paste data in aside tag -->
   <aside id="data">
-key,parent,size,weight,color
-Eve,,3.45,25,yellow
-Cain,Eve,4.647,20.3,black
-Seth,Eve,2,20.3,steelblue
-Enos,Seth,4,30,orange
-Noam,Seth,5,14000,green
-Abel,Eve,4,3000,brown
-Awan,Eve,3,30,deeppink
-Enoch,Awan,7,30,blue
-Azura,Eve,2,30,red
-</aside>
+name,parent,num,tex
+Eve,,2,a
+Cain,Eve,33,b
+Seth,Eve,3,c
+Enos,Seth,4,d
+Noam,Seth,5,e
+Hansi,Seth,9,j
+Georg,Seth,1,k
+Abel,Eve,4,f 
+Awan,Eve,3,g
+Enoch,Awan,7,h
+Azura,Eve,2,i
+    </aside>
   
     <script>
       const dataSpec = {
-        source: "aside#data", 
+        source: "aside#data",
+        key: "name",
       };
-
-      const localeGerman = {
-        "decimal": ",",
-        "thousands": ".",
-        "grouping": [3],
-        "currency": ["", " €"]   
-      };
-
-      // const format = localeGerman.format("+,.0f");
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
         .propagateValue("size")
-        .formatDefaultLocale(localeGerman)
-        .linkLabel("weight",{unit: " Euro", onTop: true, })
-        .linkWidth(100)
+        .linkLabel("num")
       ;
       
-      showChart(); 
-      /*
+      showChart(); // for preprocessing data see below
+      
       window.setTimeout(function() {
-          myChart.linkWidth("value").linkLabel("value");
+          myChart.linkWidth(100).nodeSort("num", { "ascending": false});
       }, 2000);
-      */
+      
       function showChart(_file, preprocessed) {
         const selection = d3.select("body")
           .append("div")
@@ -59,6 +51,7 @@ Azura,Eve,2,30,red
         }
         selection.call(myChart);
       }         
+
     </script>
   </body>
 </html>  

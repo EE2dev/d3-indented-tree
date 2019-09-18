@@ -285,6 +285,7 @@ The object (named *dataSpec* above) which is passed to the function ```hierarchy
 * `source`: <i>string</i> containing the path/URL to the data or the selector referencing the DOM element containing the data.
 * `hierarchyLevels`: <i>array</i> containing columns of each level in its top-down traversal order when the refered data is in the csv relational format.
 * `delimiter`: <i>string</i> containing the delimiter used in the csv data.
+* `autoConvert`: <i>boolean</i> setting a flag if the data should to converted to types automatically (based on [d3.autotype](https://github.com/d3/d3-dsv#autoType)). Otherwise all columns are parsed as <i>string<i>. Default is *true*.
 
 ### 3.1 Links
 

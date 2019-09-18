@@ -38,26 +38,35 @@ https://gitlab.com/snippets/1703535
 [ok] if you click very fast twice on node to expand collapse :Cannot read property 'posXCenter' of undefined
     at SVGTextElement.linksAPI.getLinkTextPositionX (hierarchyExplorer.js:327)
 [ok] Linkcolor options: are with path.down
-
-* Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram
-* No root -> key = space , options: rootNodeBlank: false kein node label und kein node Image
-
-* blocks with .min.js
-* add slow expansion of tree https://stackoverflow.com/questions/35834304/d3js-collapsible-tree-entering-transition-using-depth-first-style/35838978#35838978
-* check example for linkColor - 2
-
-[bug] load data with flat file 8for DOM and file 
+[ok] blocks with .min.js
+[ok] No root -> key = space , options: rootNodeBlank: false kein node label und kein node Image
+[ok] check example for linkColor - 2
+[ok] load data with flat file 8for DOM and file 
     --> add root node
     --> convert string to array of objects
-* nodeInfo
-* sort --> updatable, 
+[ok] perfect alignment of dependent links under node
+
+
+[0] sort --> updatable, 
 at myChart.js // compute the new tree:
 config.tree(root ....) sort there
+[bug] nodeSort1 ok nodesort2 doesnt let you resort again ?
+* doku nodeSort in Readme
+* add 2 blocks
+* delete comments in data processing and template_reusable
 
-for link.down change in l.getLinkD (x == nodeSorted) ? new.. : x nach index
+[1] for link.down change in l.getLinkD (x == nodeSorted) ? new.. : x nach index
 enter vs update
 
+[2] sort unexpanded part of tree
 
+-> [3] check logic
+ascending/ descending just on last term of ||
+converting numbers correct?
+add block
+update readme
+
+* nodeInfo
 * color themes
 * showcase updated (nicht alignLeave doppelt (linkWidth zurück), mehr funktionen)
 * load data with same keys (key, name) for flat data
@@ -71,9 +80,10 @@ https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world
 * observable
 
 [bug] if links are in transition and collapse or expand is called, the links can get too long
-
+* add slow expansion of tree https://stackoverflow.com/questions/35834304/d3js-collapsible-tree-entering-transition-using-depth-first-style/35838978#35838978
     
-* perfect alignment of dependent links under node
+* Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram
+
 * images fom https://icons8.de/icon/set/basketball/ios : 
 attribution: <a href="https://icons8.com/icon/37940/basketball-trikot">Basketball-Trikot icon by Icons8</a>
 https://www.flaticon.com/free-icon/t-shirt_1865354
@@ -81,6 +91,7 @@ with attribution
 
 [info] antialiasing: https://stackoverflow.com/questions/23376308/avoiding-lines-between-adjecent-svg-rectangles/23376793#23376793
 
+* add own sort function
 * linkLabel align for longest and shortest
 * test linkLabel with just text
 * readme minimum code snippet
