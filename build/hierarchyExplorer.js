@@ -797,48 +797,17 @@
     options.nodeResort = false;
     options.nodeResortAscending = false;
     options.nodeResortField = "value";
-    //options.nodeResortFieldType = "string";
-    options.sortByDepth = true;
-    options.nodeResortFunction =
-    /*
-      function(a, b) { 
-        let ret;
-        if (options.nodeResortFieldType === "string") {
-          ret = b.height - a.height || a.data[options.nodeResortField].localeCompare(b.data[options.nodeResortField]);
-        } else if (options.nodeResortFieldType === "number") {
-          ret = b.height - a.height || b.data[options.nodeResortField] - a.data[options.nodeResortField];
-        }
-        if (!options.nodeResortAscending) { ret *= -1; }
-        return ret;
-      };
-      */
-
-    /*
-    function(a, b) { 
-    let ret;
-    if (options.nodeResortFieldType === "number") {
-      a.data[options.nodeResortField] = +a.data[options.nodeResortField];
-      b.data[options.nodeResortField] = +b.data[options.nodeResortField];
-    }
-    if (typeof (a.data[options.nodeResortField]) === "string") {
-      ret = b.height - a.height || a.data[options.nodeResortField].localeCompare(b.data[options.nodeResortField]);
-    } else if (typeof (a.data[options.nodeResortField]) === "number") {
-      ret = b.height - a.height || b.data[options.nodeResortField] - a.data[options.nodeResortField];
-    }
-    if (!options.nodeResortAscending) { ret *= -1; }
-    return ret;
-    };
-    */
-    function (a, b) {
-      var ret = options.sortByDepth ? b.depth - a.depth : b.height - a.height;
+    options.nodeResortByHeight = false;
+    options.nodeResortFunction = function (a, b) {
+      var ret = options.nodeResortByHeight ? b.height - a.height : 0;
       if (ret === 0) {
         if (typeof a.data[options.nodeResortField] === "string") {
-          ret = a.data[options.nodeResortField].localeCompare(b.data[options.nodeResortField]);
+          ret = b.data[options.nodeResortField].localeCompare(a.data[options.nodeResortField]);
         } else {
           ret = b.data[options.nodeResortField] - a.data[options.nodeResortField];
         }
       }
-      if (!options.nodeResortAscending) {
+      if (options.nodeResortAscending) {
         ret *= -1;
       }
       return ret;
@@ -983,8 +952,7 @@
       if (typeof _ === "string") {
         options.nodeResort = true;
         options.nodeResortAscending = typeof _options.ascending !== "undefined" ? _options.ascending : options.nodeResortAscending;
-        // options.nodeResortFieldType = _options.type || options.nodeResortFieldType;
-        options.sortByDepth = typeof _options.sortByDepth !== "undefined" ? _options.sortByDepth : options.sortByDepth;
+        options.nodeResortByHeight = typeof _options.sortByHeight !== "undefined" ? _options.sortByHeight : options.nodeResortByHeight;
         options.nodeResortField = _;
       }
       if (typeof options.updateDefault === "function") options.updateDefault();

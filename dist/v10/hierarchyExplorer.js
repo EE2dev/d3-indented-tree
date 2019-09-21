@@ -70,7 +70,7 @@
           createChart(selection, hierarchy);
         });
       } else if (myData.data.endsWith(".csv")) {
-        d3.dsv(myData.delimiter, myData.data).then(function (data) {
+        d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? d3.autoType : undefined).then(function (data) {
           if (debugOn) {
             console.log(data);
           }
@@ -92,7 +92,7 @@
       if (myData.isJSON) {
         hierarchy = d3.hierarchy(myData.data);
       } else {
-        var data = readDataFromDOM(myData.delimiter, myData.data);
+        var data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert);
         if (myData.flatData) {
           data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
         }
@@ -107,11 +107,12 @@
 
   function readDataFromDOM(delimiter) {
     var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "aside#data";
+    var autoConvert = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
     var inputData = d3.select(selector).text();
     var inputData_cleaned = inputData.trim();
     var parser = d3.dsvFormat(delimiter);
-    var file = parser.parse(inputData_cleaned);
+    var file = parser.parse(inputData_cleaned, autoConvert ? d3.autoType : undefined);
     return file;
   }
 
@@ -291,11 +292,19 @@
   };
 
   linksAPI.getLinkD = function (d, direction) {
+    var updatePattern = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
     var linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
     var linkStrength = linksAPI.getLinkStrength(d, options);
     var path = void 0;
     if (direction === "down") {
-      path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
+      if (updatePattern) {
+        // for updated links use .x of last child to support resorted nodes/links
+        var xLastChild = d.parent.children[d.parent.children.length - 1].x;
+        path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (xLastChild + linkStrength / 2 - d.parent.x);
+      } else {
+        path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
+      }
     } else if (direction === "right") {
       path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
     }
@@ -602,6 +611,9 @@
   }
 
   function update(source, options, config) {
+    if (options.nodeResort) {
+      config.root.sort(options.nodeResortFunction);
+    }
     // Compute the new tree layout.
     var nodes = config.tree(config.root);
     var nodesSort = [];
@@ -713,7 +725,7 @@
     });
 
     linkUpdate.select("path.link.down").attr("d", function (d) {
-      return l.getLinkD(d, "down");
+      return l.getLinkD(d, "down", true);
     }).style("stroke", function (d) {
       return options.linkColorInherit ? l.getLinkStroke(d.parent) : "";
     }).style("stroke-width", function (d) {
@@ -781,6 +793,25 @@
     options.nodeLabelFieldFlatData = "__he_name";
     options.nodeLabelLength = 50;
     options.nodeLabelPadding = 10;
+
+    options.nodeResort = false;
+    options.nodeResortAscending = false;
+    options.nodeResortField = "value";
+    options.nodeResortByHeight = false;
+    options.nodeResortFunction = function (a, b) {
+      var ret = options.nodeResortByHeight ? b.height - a.height : 0;
+      if (ret === 0) {
+        if (typeof a.data[options.nodeResortField] === "string") {
+          ret = b.data[options.nodeResortField].localeCompare(a.data[options.nodeResortField]);
+        } else {
+          ret = b.data[options.nodeResortField] - a.data[options.nodeResortField];
+        }
+      }
+      if (options.nodeResortAscending) {
+        ret *= -1;
+      }
+      return ret;
+    };
 
     options.linkHeight = 20;
 
@@ -912,6 +943,22 @@
       return chartAPI;
     };
 
+    chartAPI.nodeSort = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeSortField;
+
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (!arguments.length) return options.nodeSortField;
+      if (typeof _ === "string") {
+        options.nodeResort = true;
+        options.nodeResortAscending = typeof _options.ascending !== "undefined" ? _options.ascending : options.nodeResortAscending;
+        options.nodeResortByHeight = typeof _options.sortByHeight !== "undefined" ? _options.sortByHeight : options.nodeResortByHeight;
+        options.nodeResortField = _;
+      }
+      if (typeof options.updateDefault === "function") options.updateDefault();
+      return chartAPI;
+    };
+
     chartAPI.linkHeight = function (_) {
       if (!arguments.length) return options.linkHeight;
       options.linkHeight = _;
@@ -999,16 +1046,6 @@
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;
     };
-    /*
-    chartAPI.linkColor = function(_ = options.linkColorField, scale = options.linkColorScale) {
-      if (!arguments.length) return options.linkColorField;
-      options.linkColorStatic = false;
-      options.linkColorField = _;
-      options.linkColorScale = scale;
-      if (typeof options.updateDefault === "function") options.updateDefault();
-      return chartAPI;
-    }; 
-    */
 
     chartAPI.alignLeaves = function (_) {
       if (!arguments.length) return options.alignLeaves;
@@ -1046,6 +1083,7 @@
         myData.keyField = dataSpec.key ? dataSpec.key : "key";
         myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
         myData.separator = dataSpec.separator ? dataSpec.separator : "$";
+        myData.autoConvert = typeof dataSpec.autoConvert !== "undefined" ? dataSpec.autoConvert : true;
       } else {
         console.log("dataspec is not an object!");
       }

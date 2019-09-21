@@ -48,6 +48,8 @@ More examples demonstrating specific API calls:
 - [myChart.nodeImageSelection()](https://bl.ocks.org/EE2dev/43fffd334158b6d10454e5b8c6689786)
 - [myChart.nodeImageSelection() - 2](https://bl.ocks.org/EE2dev/cd5567cccdecb65d59a6cab1fd6ecab2)
 - [myChart.nodeLabelPadding()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.nodeSort()](https://bl.ocks.org/EE2dev/0e65cb00f7a55f9f5944e5f7e6ded08c)
+- [myChart.nodeSort() - 2](https://bl.ocks.org/EE2dev/7d866c0fd487fd42402832f9c8d3c6c3)
 
 #### Other examples
 
@@ -285,7 +287,7 @@ The object (named *dataSpec* above) which is passed to the function ```hierarchy
 * `source`: <i>string</i> containing the path/URL to the data or the selector referencing the DOM element containing the data.
 * `hierarchyLevels`: <i>array</i> containing columns of each level in its top-down traversal order when the refered data is in the csv relational format.
 * `delimiter`: <i>string</i> containing the delimiter used in the csv data.
-* `autoConvert`: <i>boolean</i> setting a flag if the data should to converted to types automatically (based on [d3.autotype](https://github.com/d3/d3-dsv#autoType)). Otherwise all columns are parsed as <i>string<i>. Default is *true*.
+* `autoConvert`: <i>boolean</i> setting a flag if the data should to converted to types automatically (based on [d3.autotype](https://github.com/d3/d3-dsv#autoType)). Otherwise all columns are parsed as <i>string</i>. Default is *true*.
 
 ### 3.1 Links
 
@@ -415,6 +417,19 @@ Sets the maximum number of characters displayed as node label. All remaining cha
 Adjusts the left-alignment of the node label. 
 * the first argument is an <i>integer</i> referencing the number of pixels padded left to the start of the node label (default is ```10```).
 * with no argument returns the number of pixels padded left to the start of the node label.
+
+<a name="node_nodeSort" href="#node_nodeSort">#</a> <i>myChart</i>.<b>nodeSort</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sorts the nodes of the tree.  
+1. argument:
+    *  A *string* denoting the name of a field based on which the nodes should be sorted.
+
+2. argument: (optional):
+    * An *object* with the following properties can be used to further specify the sorting: 
+        * `ascending` (*boolean*) specifies whether the order should be ascending or descending (default is `false`).
+        * `sortByHeight` specifies whether the order should be determined by the height of the nodes first (default is `false`).
+
+With no arguments returns the name of the field based on which the nodes are sorted.
 
 ### 3.3 Other API calls
 <a name="other_debugOn" href="#other_debugOn">#</a> <i>myChart</i>.<b>debugOn</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
