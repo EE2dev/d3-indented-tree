@@ -45,26 +45,20 @@ https://gitlab.com/snippets/1703535
     --> add root node
     --> convert string to array of objects
 [ok] perfect alignment of dependent links under node
-
-
-[0] sort --> updatable, 
-at myChart.js // compute the new tree:
-config.tree(root ....) sort there
-[bug] nodeSort1 ok nodesort2 doesnt let you resort again ?
-* doku nodeSort in Readme
-* add 2 blocks
-* delete comments in data processing and template_reusable
-
-[1] for link.down change in l.getLinkD (x == nodeSorted) ? new.. : x nach index
-enter vs update
-
-[2] sort unexpanded part of tree
-
--> [3] check logic
-ascending/ descending just on last term of ||
-converting numbers correct?
-add block
-update readme
+[ok] sort --> updatable, 
+[ok] at myChart.js // compute the new tree: config.tree(root ....) sort there
+[ok] nodeSort1 ok nodesort2 doesnt let you resort again ?
+[ok] doku nodeSort in Readme
+[ok] add 2 blocks
+[ok] delete comments in data processing and template_reusable
+[ok] for link.down change in l.getLinkD (x == nodeSorted) ? new.. : x nach index - enter vs update
+[ok] sort unexpanded part of tree
+[ok] check logic
+  --> ascending/ descending just on last term of ||
+  --> converting numbers correct?
+  --> add block
+  --> update readme
+[ok] umstellung bei blocks auf .min.js
 
 * nodeInfo
 * color themes
@@ -72,7 +66,7 @@ update readme
 * load data with same keys (key, name) for flat data
 * test linkLabel alignment
 *
-* umstellung bei blocks auf .min.js
+
 
 *
 * applications (chess, basketball, nfl, soccer, flags, d3.js)
@@ -84,11 +78,7 @@ https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world
     
 * Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram
 
-* images fom https://icons8.de/icon/set/basketball/ios : 
-attribution: <a href="https://icons8.com/icon/37940/basketball-trikot">Basketball-Trikot icon by Icons8</a>
-https://www.flaticon.com/free-icon/t-shirt_1865354
-with attribution
-
+* change css camelCase to hyphen
 [info] antialiasing: https://stackoverflow.com/questions/23376308/avoiding-lines-between-adjecent-svg-rectangles/23376793#23376793
 
 * add own sort function
@@ -155,7 +145,7 @@ http://www.svgopen.org/2009/papers/12-Using_Canvas_in_SVG/
 * tooltip based on attributes from data
 * additional info (quatity) right aligned, title, colored bar on top optionally, moveover -> set opacity 0.9 for other nodes/links
 * allow graphics before text for each node
-* option: save as pgn/svg in function call to add buttons
+* option: save as png/svg in function call to add buttons
 * change data input to just object
 
 [improvements]

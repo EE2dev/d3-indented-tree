@@ -20,7 +20,8 @@ export function readData(myData, selection, options, createChart) {
         .then(function(data) {
           if (debugOn) { console.log(data);}
           if (myData.flatData) {
-            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
+            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
+              , myData.delimiter, myData.separator, options, myData.autoConvert); // csv Format 1
           }
           const hierarchy = createHierarchy(data, myData.keyField);
           if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
@@ -37,7 +38,8 @@ export function readData(myData, selection, options, createChart) {
     } else {
       let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert);
       if (myData.flatData) {
-        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
+        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
+          , myData.delimiter, myData.separator, options, myData.autoConvert); // csv Format 1
       }
       hierarchy = createHierarchy(data, myData.keyField); // csv format 2
       if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
@@ -79,7 +81,7 @@ function getParent(row, keys, keyIndex, keySeparator){
   return parent;
 }
 
-function createLinkedData(data, keys, keyField, delimiter, keySeparator, options) {
+function createLinkedData(data, keys, keyField, delimiter, keySeparator, options, autoConvert) {
   const debugOn = options.debugOn;
   const nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
   
@@ -99,7 +101,12 @@ function createLinkedData(data, keys, keyField, delimiter, keySeparator, options
     keys.forEach( (key, j) => {
       if (j > 0 && proceed) {
         pcValue = {};      
-        if (row[key]) { console.log("!row[key]"); console.log(row); console.log(key); }  
+        if (debugOn && row[key]) { 
+          console.log("row[key]: "); 
+          console.log(row); 
+          console.log("key: ");
+          console.log(key); 
+        }  
         if (j === keys.length-1) { 
           pcKey = buildKey( row, keys, j, delimiter, keySeparator);
           if (!parentChild.get(pcKey)) {
@@ -156,7 +163,10 @@ function createLinkedData(data, keys, keyField, delimiter, keySeparator, options
     console.log(linkedDataString);
   }
 
-  linkedDataArray = d3.dsvFormat(delimiter).parse(linkedDataString);
+  const parser = d3.dsvFormat(delimiter);
+  linkedDataArray = parser.parse(linkedDataString, autoConvert ? d3.autoType : undefined);
+  // if nodeLabel === " " it was converted to null, so here its changed to " "  
+  linkedDataArray.map(ele => { ele[nodeLabel] = ele[nodeLabel] ? ele[nodeLabel] : " ";});
 
   if (debugOn) {
     console.log("converted linked Data array:");
