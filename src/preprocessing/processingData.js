@@ -16,12 +16,12 @@ export function readData(myData, selection, options, createChart) {
         createChart(selection, hierarchy);
       });
     } else if (myData.data.endsWith(".csv")) {
-      d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? d3.autoType : undefined)
+      d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? myData.convertTypesFunction : undefined)
         .then(function(data) {
           if (debugOn) { console.log(data);}
           if (myData.flatData) {
             data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
-              , myData.delimiter, myData.separator, options, myData.autoConvert); // csv Format 1
+              , myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
           }
           const hierarchy = createHierarchy(data, myData.keyField);
           if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
@@ -36,10 +36,11 @@ export function readData(myData, selection, options, createChart) {
     if (myData.isJSON) {
       hierarchy = d3.hierarchy(myData.data);
     } else {
-      let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert);
+      // let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert, myData.convertTypesFunction);
+      let data = readDataFromDOM(myData.delimiter, myData.data, false, myData.convertTypesFunction);
       if (myData.flatData) {
         data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
-          , myData.delimiter, myData.separator, options, myData.autoConvert); // csv Format 1
+          , myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
       }
       hierarchy = createHierarchy(data, myData.keyField); // csv format 2
       if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
@@ -48,11 +49,11 @@ export function readData(myData, selection, options, createChart) {
   }
 }
 
-function readDataFromDOM(delimiter, selector = "aside#data", autoConvert = true) {
+function readDataFromDOM(delimiter, selector = "aside#data", autoConvert = true, convertTypesFunction) {
   const inputData = d3.select(selector).text();
   const inputData_cleaned = inputData.trim();
   const parser = d3.dsvFormat(delimiter);
-  const file = parser.parse(inputData_cleaned, autoConvert ? d3.autoType : undefined);
+  const file = parser.parse(inputData_cleaned, autoConvert ? convertTypesFunction : undefined);
   return file; 
 }
 
@@ -81,7 +82,8 @@ function getParent(row, keys, keyIndex, keySeparator){
   return parent;
 }
 
-function createLinkedData(data, keys, keyField, delimiter, keySeparator, options, autoConvert) {
+function createLinkedData(data, keys, keyField, delimiter, keySeparator
+  , options, autoConvert, convertTypesFunction) {
   const debugOn = options.debugOn;
   const nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
   
@@ -164,7 +166,7 @@ function createLinkedData(data, keys, keyField, delimiter, keySeparator, options
   }
 
   const parser = d3.dsvFormat(delimiter);
-  linkedDataArray = parser.parse(linkedDataString, autoConvert ? d3.autoType : undefined);
+  linkedDataArray = parser.parse(linkedDataString, autoConvert ? convertTypesFunction : undefined);
   // if nodeLabel === " " it was converted to null, so here its changed to " "  
   linkedDataArray.map(ele => { ele[nodeLabel] = ele[nodeLabel] ? ele[nodeLabel] : " ";});
 

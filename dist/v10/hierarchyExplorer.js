@@ -70,12 +70,12 @@
           createChart(selection, hierarchy);
         });
       } else if (myData.data.endsWith(".csv")) {
-        d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? d3.autoType : undefined).then(function (data) {
+        d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? myData.convertTypesFunction : undefined).then(function (data) {
           if (debugOn) {
             console.log(data);
           }
           if (myData.flatData) {
-            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
+            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
           }
           var hierarchy = createHierarchy(data, myData.keyField);
           if (debugOn) {
@@ -92,9 +92,10 @@
       if (myData.isJSON) {
         hierarchy = d3.hierarchy(myData.data);
       } else {
-        var data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert);
+        // let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert, myData.convertTypesFunction);
+        var data = readDataFromDOM(myData.delimiter, myData.data, false, myData.convertTypesFunction);
         if (myData.flatData) {
-          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options); // csv Format 1
+          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
         }
         hierarchy = createHierarchy(data, myData.keyField); // csv format 2
         if (debugOn) {
@@ -108,11 +109,12 @@
   function readDataFromDOM(delimiter) {
     var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "aside#data";
     var autoConvert = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+    var convertTypesFunction = arguments[3];
 
     var inputData = d3.select(selector).text();
     var inputData_cleaned = inputData.trim();
     var parser = d3.dsvFormat(delimiter);
-    var file = parser.parse(inputData_cleaned, autoConvert ? d3.autoType : undefined);
+    var file = parser.parse(inputData_cleaned, autoConvert ? convertTypesFunction : undefined);
     return file;
   }
 
@@ -144,7 +146,7 @@
     return parent;
   }
 
-  function createLinkedData(data, keys, keyField, delimiter, keySeparator, options) {
+  function createLinkedData(data, keys, keyField, delimiter, keySeparator, options, autoConvert, convertTypesFunction) {
     var debugOn = options.debugOn;
     var nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
 
@@ -170,8 +172,11 @@
       keys.forEach(function (key, j) {
         if (j > 0 && proceed) {
           pcValue = {};
-          if (row[key]) {
-            console.log("!row[key]");console.log(row);console.log(key);
+          if (debugOn && row[key]) {
+            console.log("row[key]: ");
+            console.log(row);
+            console.log("key: ");
+            console.log(key);
           }
           if (j === keys.length - 1) {
             pcKey = buildKey(row, keys, j, delimiter, keySeparator);
@@ -263,7 +268,12 @@
       console.log(linkedDataString);
     }
 
-    linkedDataArray = d3.dsvFormat(delimiter).parse(linkedDataString);
+    var parser = d3.dsvFormat(delimiter);
+    linkedDataArray = parser.parse(linkedDataString, autoConvert ? convertTypesFunction : undefined);
+    // if nodeLabel === " " it was converted to null, so here its changed to " "  
+    linkedDataArray.map(function (ele) {
+      ele[nodeLabel] = ele[nodeLabel] ? ele[nodeLabel] : " ";
+    });
 
     if (debugOn) {
       console.log("converted linked Data array:");
@@ -662,6 +672,31 @@
     nodeEnter.append("svg:title").text(function (d) {
       return d.data[options.nodeLabelField];
     });
+
+    // add nodeInfo
+
+    var xEnd = 600;
+
+    nodeEnter.append("path").style("class", "node-info connector").attr("d", function (d) {
+      // const nodePos = d3.select(this.parentNode).select("text").node().getBoundingClientRect();
+      var nodeBBox = d3.select(this.parentNode).node().getBBox();
+      var len = xEnd - (d.y + nodeBBox.width + 5);
+      return "M " + (nodeBBox.width + 5) + " 0 h " + len;
+    }).style("stroke-dasharray", 2).style("stroke", "green");
+
+    nodeEnter.append("rect").style("class", "node-info box").style("stroke", "green").attr("x", function (d) {
+      return xEnd - d.y - 40;
+    }).attr("y", -8).attr("width", 40).attr("height", 16);
+
+    nodeEnter.append("text").style("class", "node-info label").attr("text-anchor", "end").attr("x", function (d) {
+      return xEnd - d.y;
+    }).attr("dy", ".35em")
+    //.text(d => l.getLinkLabelFormatted(d))
+    .text(function (d) {
+      return d.data.population;
+    }).style("font-size", ".8em").style("fill", "green");
+
+    // end nodeInfo
 
     // Transition nodes to their new position.
     var nodeUpdate = node.merge(nodeEnter).transition().duration(options.transitionDuration);
@@ -1080,10 +1115,33 @@
       if ((typeof dataSpec === "undefined" ? "undefined" : _typeof(dataSpec)) === "object") {
         myData.data = dataSpec.source;
         myData.hierarchyLevels = dataSpec.hierarchyLevels;
+        myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
         myData.keyField = dataSpec.key ? dataSpec.key : "key";
         myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
         myData.separator = dataSpec.separator ? dataSpec.separator : "$";
-        myData.autoConvert = typeof dataSpec.autoConvert !== "undefined" ? dataSpec.autoConvert : true;
+
+        myData.autoConvert = true;
+        myData.convertTypesFunction = d3.autoType;
+        if (dataSpec.convertTypes === "none") {
+          myData.autoConvert = false;
+        } else {
+          if (typeof dataSpec.convertTypes === "function") {
+            if (myData.flatData) {
+              // add key, parent and __he_name as columns, since the conversion is applied
+              // after the flat data is transformed to hierarchical data
+              var functionWrapper = function functionWrapper(d) {
+                var row = dataSpec.convertTypes(d);
+                row.key = d.key;
+                row.parent = d.parent;
+                row.__he_name = d.__he_name;
+                return row;
+              };
+              myData.convertTypesFunction = functionWrapper;
+            } else {
+              myData.convertTypesFunction = dataSpec.convertTypes;
+            }
+          }
+        }
       } else {
         console.log("dataspec is not an object!");
       }
@@ -1091,7 +1149,7 @@
       if (!myData.isJSON) {
         myData.fromFile = myData.data.endsWith(".json") || myData.data.endsWith(".csv") ? true : false;
       }
-      myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
+
       options.keyField = myData.keyField;
       options.nodeLabelField = myData.flatData ? options.nodeLabelFieldFlatData : myData.keyField;
       return myData;

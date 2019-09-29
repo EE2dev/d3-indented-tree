@@ -17,7 +17,7 @@ Eve;Seth;Enos;3;2;4;rgb(100 23 80)
 Eve;Seth;Noam;3;2;4;rgb(100 23 80)
 Eve;Abel;;32;2;4;rgb(100 23 80)
 Eve;Awan;Enoch;3;2;4;rgb(100 23 80)
-Eve;Azura;;3;2;4;rgb(100 23 80)
+Eve;Azura;;5;2;4;rgb(100 23 80)
 ;;;3;2;4;rgb(100 23 80)
   </aside>
 
@@ -26,6 +26,17 @@ Eve;Azura;;3;2;4;rgb(100 23 80)
       source: "aside#data",
       hierarchyLevels: ["$", "level1", "level2", "level3"],
       delimiter: ";",
+      convertTypes: d => {
+          return {
+            level1: d.level1,
+            level2: d.level2,
+            level3: d.level3,
+            size1: +d.size1,
+            size2: +d.size2,
+            size3: +d.size3,
+            color: d.color,
+          };
+      },
     };
     const myChart = hierarchyExplorer.chart(dataSpec)
       .debugOn(true)

@@ -62,6 +62,7 @@ https://gitlab.com/snippets/1703535
 
 * nodeInfo
 * color themes
+* allow negativ values for linkWidth range for the tree to go left 
 * showcase updated (nicht alignLeave doppelt (linkWidth zurück), mehr funktionen)
 * load data with same keys (key, name) for flat data
 * test linkLabel alignment

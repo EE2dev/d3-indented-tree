@@ -294,10 +294,34 @@ export default function (_dataSpec) {
     if (typeof dataSpec === "object"){ 
       myData.data = dataSpec.source;
       myData.hierarchyLevels = dataSpec.hierarchyLevels;
+      myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
       myData.keyField = dataSpec.key ? dataSpec.key : "key";
       myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
       myData.separator = dataSpec.separator ?  dataSpec.separator : "$";
-      myData.autoConvert = (typeof (dataSpec.autoConvert) !== "undefined") ? dataSpec.autoConvert : true;
+
+      myData.autoConvert = true; 
+      myData.convertTypesFunction = d3.autoType;
+      if (dataSpec.convertTypes === "none") {
+        myData.autoConvert = false;
+      } else {
+        if (typeof (dataSpec.convertTypes) === "function") {
+          if (myData.flatData) {
+            // add key, parent and __he_name as columns, since the conversion is applied
+            // after the flat data is transformed to hierarchical data
+            const functionWrapper = function(d) {
+              let row = dataSpec.convertTypes(d);
+              row.key = d.key;
+              row.parent = d.parent;
+              row.__he_name = d.__he_name;
+              return row;
+            };
+            myData.convertTypesFunction = functionWrapper;
+          } else {
+            myData.convertTypesFunction = dataSpec.convertTypes;
+          }
+        }
+      }
+
     } else {
       console.log("dataspec is not an object!");
     }
@@ -305,7 +329,7 @@ export default function (_dataSpec) {
     if (!myData.isJSON){
       myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
     }
-    myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
+
     options.keyField = myData.keyField;
     options.nodeLabelField = myData.flatData ? options.nodeLabelFieldFlatData : myData.keyField;
     return myData;

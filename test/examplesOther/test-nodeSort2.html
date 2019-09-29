@@ -16,7 +16,7 @@ Eve,,2,a
 Cain,Eve,33,b
 Seth,Eve,3,c
 Enos,Seth,4,d
-Noam,Seth,5,e
+Noam,Seth,44,e
 Hansi,Seth,9,j
 Georg,Seth,1,k
 Abel,Eve,4,f 
@@ -29,7 +29,7 @@ Azura,Eve,2,i
       const dataSpec = {
         source: "aside#data",
         key: "name",
-        autoConvert: false,
+        convertTypes: "none",
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
