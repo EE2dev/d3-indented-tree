@@ -58,11 +58,14 @@ https://gitlab.com/snippets/1703535
   --> converting numbers correct?
   --> add block
   --> update readme
+  --> convert Types function
 [ok] umstellung bei blocks auf .min.js
 
 * nodeInfo
 * color themes
 * allow negativ values for linkWidth range for the tree to go left 
+* image referencing API
+* linkLabel background: not stroke but rectangle with background color and 20% tranparency, rounded corners 
 * showcase updated (nicht alignLeave doppelt (linkWidth zurück), mehr funktionen)
 * load data with same keys (key, name) for flat data
 * test linkLabel alignment

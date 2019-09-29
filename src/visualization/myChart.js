@@ -163,6 +163,7 @@ function update(source, options, config){
     return d.data[options.nodeLabelField];
   });
 
+  /*
   // add nodeInfo
 
   const xEnd = 600; 
@@ -197,6 +198,7 @@ function update(source, options, config){
     .style("fill", "green");
 
   // end nodeInfo
+  */
 
   // Transition nodes to their new position.
   let nodeUpdate = node.merge(nodeEnter)

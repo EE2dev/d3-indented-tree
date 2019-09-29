@@ -673,30 +673,38 @@
       return d.data[options.nodeLabelField];
     });
 
+    /*
     // add nodeInfo
-
-    var xEnd = 600;
-
-    nodeEnter.append("path").style("class", "node-info connector").attr("d", function (d) {
-      // const nodePos = d3.select(this.parentNode).select("text").node().getBoundingClientRect();
-      var nodeBBox = d3.select(this.parentNode).node().getBBox();
-      var len = xEnd - (d.y + nodeBBox.width + 5);
-      return "M " + (nodeBBox.width + 5) + " 0 h " + len;
-    }).style("stroke-dasharray", 2).style("stroke", "green");
-
-    nodeEnter.append("rect").style("class", "node-info box").style("stroke", "green").attr("x", function (d) {
-      return xEnd - d.y - 40;
-    }).attr("y", -8).attr("width", 40).attr("height", 16);
-
-    nodeEnter.append("text").style("class", "node-info label").attr("text-anchor", "end").attr("x", function (d) {
-      return xEnd - d.y;
-    }).attr("dy", ".35em")
-    //.text(d => l.getLinkLabelFormatted(d))
-    .text(function (d) {
-      return d.data.population;
-    }).style("font-size", ".8em").style("fill", "green");
-
-    // end nodeInfo
+      const xEnd = 600; 
+      nodeEnter.append("path")
+      .style("class", "node-info connector")
+      .attr("d", function(d) {
+        // const nodePos = d3.select(this.parentNode).select("text").node().getBoundingClientRect();
+        const nodeBBox = d3.select(this.parentNode).node().getBBox();
+        const len = xEnd - (d.y + nodeBBox.width + 5);
+        return `M ${nodeBBox.width + 5} 0 h ${len}`;
+      })
+      .style("stroke-dasharray", 2)
+      .style("stroke", "green");
+    
+    nodeEnter.append("rect")
+      .style("class", "node-info box")
+      .style("stroke", "green")
+      .attr("x", (d) => xEnd - d.y - 40)
+      .attr("y", -8)
+      .attr("width", 40)
+      .attr("height", 16);
+      nodeEnter.append("text")
+      .style("class", "node-info label")
+      .attr("text-anchor", "end")
+      .attr("x", (d) => xEnd - d.y)
+      .attr("dy", ".35em")
+      //.text(d => l.getLinkLabelFormatted(d))
+      .text(d => d.data.population)
+      .style("font-size", ".8em")
+      .style("fill", "green");
+      // end nodeInfo
+    */
 
     // Transition nodes to their new position.
     var nodeUpdate = node.merge(nodeEnter).transition().duration(options.transitionDuration);
