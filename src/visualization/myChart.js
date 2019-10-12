@@ -130,17 +130,15 @@ function update(source, options, config){
   const n = nodesAPI;
   n.initialize(options);
 
-  let node = config.svg.selectAll("g.node")
+  const node = config.svg.selectAll("g.node")
     .data(nodesSort, function (d) {
       return d.id || (d.id = ++config.i);
     });
 
   // Enter any new nodes at the parent's previous position.
-  var nodeEnter = node.enter().append("g")
+  const nodeEnter = node.enter().append("g")
     .attr("class", "node")
-    .attr("transform", function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    })
+    .style("visibility", "hidden")
     .on("click", (d) => { return click (d, options, config); });
 
   nodeEnter.call(n.appendNode);
@@ -156,49 +154,49 @@ function update(source, options, config){
       } else {
         return d.data[options.nodeLabelField];
       }
-    })
-    .style("fill-opacity", 1e-6);
+    });
 
   nodeEnter.append("svg:title").text(function (d) {
     return d.data[options.nodeLabelField];
   });
 
-  /*
-  // add nodeInfo
+  // add nodeBar
+  const nodeBarEnter = nodeEnter.append("g")
+    .attr("class", "node-bar")
+    .attr("display", options.nodeBarOn ? "inline" : "none");
 
-  const xEnd = 600; 
+  n.computeNodeExtend();
 
-  nodeEnter.append("path")
-    .style("class", "node-info connector")
-    .attr("d", function(d) {
-      // const nodePos = d3.select(this.parentNode).select("text").node().getBoundingClientRect();
-      const nodeBBox = d3.select(this.parentNode).node().getBBox();
-      const len = xEnd - (d.y + nodeBBox.width + 5);
-      return `M ${nodeBBox.width + 5} 0 h ${len}`;
-    })
-    .style("stroke-dasharray", 2)
-    .style("stroke", "green");
+  nodeBarEnter.append("path")
+    .attr("class", "node-bar connector")
+    // .attr("d", n.getEnterNodeBarD);
+    .attr("d", n.getNodeBarD);
   
-  nodeEnter.append("rect")
-    .style("class", "node-info box")
-    .style("stroke", "green")
-    .attr("x", (d) => xEnd - d.y - 40)
+  nodeBarEnter.append("rect")
+    .attr("class", "node-bar box")
+    // .attr("x", n.getXNodeBarRect)
+    // .attr("x", (d) => xEnd - d.y - 40)
     .attr("y", -8)
     .attr("width", 40)
     .attr("height", 16);
 
-  nodeEnter.append("text")
-    .style("class", "node-info label")
-    .attr("text-anchor", "end")
-    .attr("x", (d) => xEnd - d.y)
+  nodeBarEnter.append("text")
+    .attr("class", "node-bar label")
+    .style("text-anchor", "end")
+    // .attr("x", n.getXNodeBarText)
+    //.attr("x", (d) => xEnd - d.y)
     .attr("dy", ".35em")
     //.text(d => l.getLinkLabelFormatted(d))
-    .text(d => d.data.population)
+    .text(d => d.data.size1)
     .style("font-size", ".8em")
     .style("fill", "green");
+  // end nodeBar
 
-  // end nodeInfo
-  */
+  nodeEnter.attr("transform", 
+    function () {
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
+    })
+    .style("visibility", "visible");
 
   // Transition nodes to their new position.
   let nodeUpdate = node.merge(nodeEnter)
@@ -211,9 +209,16 @@ function update(source, options, config){
     });
 
   nodeUpdate.call(n.updateNode);
-
-  nodeUpdate.select(".nodeLabel")
-    .style("fill-opacity", 1);
+  
+  nodeUpdate.selectAll("g.node-bar")
+    .attr("display", options.nodeBarOn ? "inline" : "none");
+  nodeUpdate.selectAll(".node-bar.connector")
+    //.attr("d", n.getUpdateNodeBarD);
+    .attr("d", n.getNodeBarD);
+  nodeUpdate.selectAll(".node-bar.box")
+    .attr("x", n.getXNodeBarRect);
+  nodeUpdate.selectAll(".node-bar.label")
+    .attr("x", n.getXNodeBarText);
 
   // Transition exiting nodes to the parent's new position (and remove the nodes)
   var nodeExit = node.exit().transition()

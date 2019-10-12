@@ -14,9 +14,17 @@ export default function (_dataSpec) {
   options.margin = {top: 20, right: 10, bottom: 20, left: 10};
   options.svgDimensions = {height: 800, width: 1400};
   options.transitionDuration = 750;
+  options.locale = undefined;
 
   options.defaultColor = "grey";
   
+  options.nodeBarOn = true;
+  options.nodeBarField = "value";
+  options.nodeBarColor; // function for setting the label color based on the value.
+  options.nodeBarUnit = "";
+  options.nodeBarFormatSpecifier = ",.0f"; 
+  options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
+
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
   options.nodeImageSetBackground = false;
@@ -57,12 +65,8 @@ export default function (_dataSpec) {
   options.linkLabelUnit = "";
   options.linkLabelOnTop = true;
   options.linkLabelAligned = true; // otherwise centered
-  // options.linkLabelFormat = d => d;
-
-  options.locale = undefined;
   options.linkLabelFormatSpecifier = ",.0f"; 
   options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
-
   options.linkLabelColor; // function for setting the label color based on the value.
 
   // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
@@ -156,6 +160,25 @@ export default function (_dataSpec) {
   }; 
 
   // 3. ADD getter-setter methods with updateable functions here
+  chartAPI.nodeBar = function(_ = options.nodeBarField, _options = {}) { 
+    if (!arguments.length) return options.nodeBarField;
+
+    if (typeof(_)  === "string")  {
+      options.nodeBarField = _; 
+      options.nodeBarOn = true;
+    } else if (typeof(_)  === "boolean") {
+      options.nodeBarOn = _;
+    }
+    if (options.nodeBarOn) {
+      if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
+      options.nodeBarColor = _options.color || options.nodeBarColor;
+      options.nodeBarUnit = _options.unit || options.nodeBarUnit;
+      options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
+    }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
   chartAPI.nodeImageFile = function(_callback, _options = {}) {
     if (!arguments.length) return options.nodeImageFileAppend;
     options.nodeImageFile = true;

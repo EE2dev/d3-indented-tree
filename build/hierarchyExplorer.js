@@ -48,6 +48,16 @@
     };
   }();
 
+  var toConsumableArray = function (arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  };
+
   ////////////////////////////////////////////////////
   // Processing data                                //
   //////////////////////////////////////////////////// 
@@ -458,6 +468,8 @@
 
   var nodesAPI = {};
   var options$1 = void 0;
+  var nodeExtendArray = void 0;
+  var xEnd = 600;
 
   nodesAPI.initialize = function (_options) {
     options$1 = _options;
@@ -514,6 +526,54 @@
 
   nodesAPI.updateNodeImage = function (transition) {
     transition.select(".nodeImage").attr("xlink:href", options$1.nodeImageFileAppend);
+  };
+
+  nodesAPI.computeNodeExtend = function () {
+    nodeExtendArray = [];
+    d3.selectAll(".node").each(function (d) {
+      var labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
+      var imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
+      var nodeExtend = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
+      d.nodeExtend = nodeExtend;
+      nodeExtendArray.push(nodeExtend + d.y + 5);
+    });
+    nodeExtendArray.maxExtend = Math.max.apply(Math, toConsumableArray(nodeExtendArray));
+    console.log("max: " + nodeExtendArray.maxExtend);
+    xEnd = nodeExtendArray.maxExtend + 200;
+  };
+
+  nodesAPI.getNodeBarD = function (d) {
+    return "M " + (d.nodeExtend + 5) + " 0 h " + (xEnd - (d.y + d.nodeExtend + 5));
+  };
+
+  /*
+  nodesAPI.getEnterNodeBarD = function (d) {
+    let node = d3.selectAll(".node").filter(d2 => d2.id === d.id);
+    let nodeBBox = node.select(".nodeLabel").node().getBBox();
+    if (nodeBBox.width === 0) {
+      nodeBBox = node.select(".nodeImage").node().getBBox();
+    }
+    const nodeExtend = nodeBBox.x + nodeBBox.width;
+    // TO DO add width of BBox of text in full size
+    const len = xEnd - (d.y + nodeExtend + 5);
+    // console.log("len: " + len);
+    d.nodeExtend = nodeExtend;
+    return `M ${nodeExtend + 5} 0 h ${len}`;
+  };
+
+  nodesAPI.getUpdateNodeBarD = function (d) {
+    const len = xEnd - (d.y + d.nodeExtend + 5);
+    console.log("len: " + len);
+    return `M ${d.nodeExtend + 5} 0 h ${len}`;
+  };
+  */
+
+  nodesAPI.getXNodeBarRect = function (d) {
+    return xEnd - d.y - 40;
+  };
+
+  nodesAPI.getXNodeBarText = function (d) {
+    return xEnd - d.y - 5;
   };
 
   ////////////////////////////////////////////////////
@@ -653,9 +713,7 @@
     });
 
     // Enter any new nodes at the parent's previous position.
-    var nodeEnter = node.enter().append("g").attr("class", "node").attr("transform", function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    }).on("click", function (d) {
+    var nodeEnter = node.enter().append("g").attr("class", "node").style("visibility", "hidden").on("click", function (d) {
       return click(d, options, config);
     });
 
@@ -667,44 +725,39 @@
       } else {
         return d.data[options.nodeLabelField];
       }
-    }).style("fill-opacity", 1e-6);
+    });
 
     nodeEnter.append("svg:title").text(function (d) {
       return d.data[options.nodeLabelField];
     });
 
-    /*
-    // add nodeInfo
-      const xEnd = 600; 
-      nodeEnter.append("path")
-      .style("class", "node-info connector")
-      .attr("d", function(d) {
-        // const nodePos = d3.select(this.parentNode).select("text").node().getBoundingClientRect();
-        const nodeBBox = d3.select(this.parentNode).node().getBBox();
-        const len = xEnd - (d.y + nodeBBox.width + 5);
-        return `M ${nodeBBox.width + 5} 0 h ${len}`;
-      })
-      .style("stroke-dasharray", 2)
-      .style("stroke", "green");
-    
-    nodeEnter.append("rect")
-      .style("class", "node-info box")
-      .style("stroke", "green")
-      .attr("x", (d) => xEnd - d.y - 40)
-      .attr("y", -8)
-      .attr("width", 40)
-      .attr("height", 16);
-      nodeEnter.append("text")
-      .style("class", "node-info label")
-      .attr("text-anchor", "end")
-      .attr("x", (d) => xEnd - d.y)
-      .attr("dy", ".35em")
-      //.text(d => l.getLinkLabelFormatted(d))
-      .text(d => d.data.population)
-      .style("font-size", ".8em")
-      .style("fill", "green");
-      // end nodeInfo
-    */
+    // add nodeBar
+    var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+
+    n.computeNodeExtend();
+
+    nodeBarEnter.append("path").attr("class", "node-bar connector")
+    // .attr("d", n.getEnterNodeBarD);
+    .attr("d", n.getNodeBarD);
+
+    nodeBarEnter.append("rect").attr("class", "node-bar box")
+    // .attr("x", n.getXNodeBarRect)
+    // .attr("x", (d) => xEnd - d.y - 40)
+    .attr("y", -8).attr("width", 40).attr("height", 16);
+
+    nodeBarEnter.append("text").attr("class", "node-bar label").style("text-anchor", "end")
+    // .attr("x", n.getXNodeBarText)
+    //.attr("x", (d) => xEnd - d.y)
+    .attr("dy", ".35em")
+    //.text(d => l.getLinkLabelFormatted(d))
+    .text(function (d) {
+      return d.data.size1;
+    }).style("font-size", ".8em").style("fill", "green");
+    // end nodeBar
+
+    nodeEnter.attr("transform", function () {
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
+    }).style("visibility", "visible");
 
     // Transition nodes to their new position.
     var nodeUpdate = node.merge(nodeEnter).transition().duration(options.transitionDuration);
@@ -715,7 +768,12 @@
 
     nodeUpdate.call(n.updateNode);
 
-    nodeUpdate.select(".nodeLabel").style("fill-opacity", 1);
+    nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+    nodeUpdate.selectAll(".node-bar.connector")
+    //.attr("d", n.getUpdateNodeBarD);
+    .attr("d", n.getNodeBarD);
+    nodeUpdate.selectAll(".node-bar.box").attr("x", n.getXNodeBarRect);
+    nodeUpdate.selectAll(".node-bar.label").attr("x", n.getXNodeBarText);
 
     // Transition exiting nodes to the parent's new position (and remove the nodes)
     var nodeExit = node.exit().transition().duration(options.transitionDuration);
@@ -819,8 +877,15 @@
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.svgDimensions = { height: 800, width: 1400 };
     options.transitionDuration = 750;
+    options.locale = undefined;
 
     options.defaultColor = "grey";
+
+    options.nodeBarOn = true;
+    options.nodeBarField = "value";
+    options.nodeBarUnit = "";
+    options.nodeBarFormatSpecifier = ",.0f";
+    options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -863,9 +928,6 @@
     options.linkLabelUnit = "";
     options.linkLabelOnTop = true;
     options.linkLabelAligned = true; // otherwise centered
-    // options.linkLabelFormat = d => d;
-
-    options.locale = undefined;
     options.linkLabelFormatSpecifier = ",.0f";
     options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
 
@@ -962,6 +1024,31 @@
     };
 
     // 3. ADD getter-setter methods with updateable functions here
+    chartAPI.nodeBar = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeBarField;
+
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (!arguments.length) return options.nodeBarField;
+
+      if (typeof _ === "string") {
+        options.nodeBarField = _;
+        options.nodeBarOn = true;
+      } else if (typeof _ === "boolean") {
+        options.nodeBarOn = _;
+      }
+      if (options.nodeBarOn) {
+        if (_options.locale) {
+          chartAPI.formatDefaultLocale(_options.locale);
+        }
+        options.nodeBarColor = _options.color || options.nodeBarColor;
+        options.nodeBarUnit = _options.unit || options.nodeBarUnit;
+        options.nodeBarFormat = _options.format ? d3.format(_options.format) : options.nodeBarFormat;
+      }
+      if (typeof options.updateDefault === "function") options.updateDefault();
+      return chartAPI;
+    };
+
     chartAPI.nodeImageFile = function (_callback) {
       var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 

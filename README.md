@@ -291,9 +291,7 @@ The object (named *dataSpec* above) which is passed to the function ```hierarchy
 * `delimiter`: <i>string</i> containing the delimiter used in the csv data.
 * `convertTypes`: <i>function</i> that converts the data to appropriate types which is relevant for [`myChart.nodeSort()`](#node_nodeSort). If a conversion function is specified, the specified function is invoked for each row, being passed an object representing the current row (d), the index (i) starting at zero for the first non-header row, and the array of column names. 
 [Here](https://github.com/d3/d3-dsv#dsv_parse) is more documentation about this callback function.
-Alternatively, the <i>string</i> `"none"` can be assigned to `convertTypes` to prevent conversions, then all columns are parsed as <i>string</i>. 
-
- Default is [d3.autoType](https://github.com/d3/d3-dsv#autoType))`myChart.nodeSort()`. 
+Alternatively, the <i>string</i> `"none"` can be assigned to `convertTypes` to prevent conversions, then all columns are stored as <i>string</i>. The default is [d3.autoType](https://github.com/d3/d3-dsv#autoType). 
 
 ### 3.1 Links
 
