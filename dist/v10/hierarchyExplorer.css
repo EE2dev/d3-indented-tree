@@ -36,6 +36,14 @@
       fill: black;
     }
 
+    .node .node-bar {
+      stroke: grey;
+    }
+
+    .node .node-bar.connector {
+      stroke-dasharray: 2;
+    }
+
     .link {
       fill: none;
       stroke-width: 1px;

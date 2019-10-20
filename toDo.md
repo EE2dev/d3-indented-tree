@@ -62,14 +62,17 @@ https://gitlab.com/snippets/1703535
 [ok] umstellung bei blocks auf .min.js
 [ok] nodeInfo: nodeSort3 --> different nodeExtend if no nodeLabel
 
-
 * nodeInfo
   - determine size based on largest node BBox
   - determine size of the nodeBar based on a scale
+  - compute length based on scale range left and right
+  - For nodeBar and LinkLabel: if number size < rect ?
+    --> do dashed array just to the beginning of the nodeBarLabel
 
 * allow negativ values for linkWidth range for the tree to go left 
 
 * linkLabel background: not stroke but rectangle with background color and 20% tranparency, rounded corners 
+- concept for transitions of linklabel effect on linkLabelBackground
 
 * color themes
 * image referencing API
@@ -89,9 +92,11 @@ https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world
     
 * Gradient for path.right: yes no https://observablehq.com/@d3/sankey-diagram
 
+* scales for linkLabel and nodeBar also diverging (Domain: [min, 0, max])
 * change css camelCase to hyphen
 [info] antialiasing: https://stackoverflow.com/questions/23376308/avoiding-lines-between-adjecent-svg-rectangles/23376793#23376793
 
+* when invoking nodeBar, currently path is shown much earlier then bar + label which comes from the left
 * add own sort function
 * linkLabel align for longest and shortest
 * test linkLabel with just text

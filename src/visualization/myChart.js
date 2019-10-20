@@ -24,7 +24,7 @@ export function myChart(selection, data, options){
     .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
  
   createTree(options, config, data);
-  createScale(options, config);
+  createScales(options, config);
   createUpdateFunctions(options, config, data);
   // root.children.forEach(collapse);
   update(config.root, options, config);
@@ -52,7 +52,7 @@ function createTree(options, config, data) {
   } 
 }
 
-function createScale(options, config) {
+function createScales(options, config) {
   let nodes = config.root.descendants();
   if (!options.linkStrengthStatic) {    
     options.linkStrengthScale
@@ -64,6 +64,11 @@ function createScale(options, config) {
       .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]))
       .range(options.linkWidthRange);
   }
+  if (options.nodeBarOn) {    
+    options.nodeBarScale
+      .domain(d3.extent(nodes, d => +d.data[options.nodeBarField]))
+      .range(options.nodeBarRange);
+  }
 }
 
 function createUpdateFunctions(options, config, data){
@@ -71,13 +76,13 @@ function createUpdateFunctions(options, config, data){
     if (options.linkWidthStatic) {  
       config.tree.nodeSize([0, options.linkWidthValue]);
     } else {
-      createScale(options, config);
+      createScales(options, config);
     }
     update(config.root, options, config);
   };
 
-  options.updateLinkStrength = function() {
-    createScale(options, config);
+  options.updateScales = function() {
+    createScales(options, config);
     update(config.root, options, config);
   };
 
@@ -161,35 +166,30 @@ function update(source, options, config){
   });
 
   // add nodeBar
+  if (options.nodeBarOn) { n.computeNodeExtend(); }
+
   const nodeBarEnter = nodeEnter.append("g")
     .attr("class", "node-bar")
     .attr("display", options.nodeBarOn ? "inline" : "none");
 
-  n.computeNodeExtend();
-
   nodeBarEnter.append("path")
     .attr("class", "node-bar connector")
-    // .attr("d", n.getEnterNodeBarD);
-    .attr("d", n.getNodeBarD);
+    .attr("d", "M 0 0 h 0");
   
   nodeBarEnter.append("rect")
     .attr("class", "node-bar box")
     // .attr("x", n.getXNodeBarRect)
     // .attr("x", (d) => xEnd - d.y - 40)
     .attr("y", -8)
-    .attr("width", 40)
     .attr("height", 16);
 
   nodeBarEnter.append("text")
     .attr("class", "node-bar label")
     .style("text-anchor", "end")
-    // .attr("x", n.getXNodeBarText)
-    //.attr("x", (d) => xEnd - d.y)
     .attr("dy", ".35em")
-    //.text(d => l.getLinkLabelFormatted(d))
-    .text(d => d.data.size1)
-    .style("font-size", ".8em")
-    .style("fill", "green");
+    .style("stroke", "none")
+    .style("font-size", ".8em");
+  //.style("fill", "green");
   // end nodeBar
 
   nodeEnter.attr("transform", 
@@ -212,13 +212,20 @@ function update(source, options, config){
   
   nodeUpdate.selectAll("g.node-bar")
     .attr("display", options.nodeBarOn ? "inline" : "none");
-  nodeUpdate.selectAll(".node-bar.connector")
-    //.attr("d", n.getUpdateNodeBarD);
-    .attr("d", n.getNodeBarD);
-  nodeUpdate.selectAll(".node-bar.box")
-    .attr("x", n.getXNodeBarRect);
-  nodeUpdate.selectAll(".node-bar.label")
-    .attr("x", n.getXNodeBarText);
+
+  if (options.nodeBarOn) {
+    nodeUpdate.selectAll(".node-bar.connector")
+      .attr("d", n.getNodeBarD);
+    nodeUpdate.selectAll(".node-bar.box")
+      .style("fill", n.getNodeBarRectFill)
+      .style("stroke", n.getNodeBarRectStroke)
+      .attr("x", n.getXNodeBarRect)
+      .attr("width", n.getWidthNodeBarRect);
+    nodeUpdate.selectAll(".node-bar.label")
+      .style("fill", n.getNodeBarTextFill)
+      .call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
+      .attr("x", n.getXNodeBarText);
+  }
 
   // Transition exiting nodes to the parent's new position (and remove the nodes)
   var nodeExit = node.exit().transition()

@@ -36,8 +36,8 @@ export function readData(myData, selection, options, createChart) {
     if (myData.isJSON) {
       hierarchy = d3.hierarchy(myData.data);
     } else {
-      // let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert, myData.convertTypesFunction);
-      let data = readDataFromDOM(myData.delimiter, myData.data, false, myData.convertTypesFunction);
+      const convert = myData.flatData ? false : myData.autoConvert; // for flat data the autoconvert is applied with createLinkedData()
+      let data = readDataFromDOM(myData.delimiter, myData.data, convert, myData.convertTypesFunction);
       if (myData.flatData) {
         data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
           , myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1

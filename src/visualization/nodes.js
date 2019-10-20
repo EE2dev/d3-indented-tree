@@ -4,9 +4,12 @@ export let nodesAPI = {};
 let options;
 let nodeExtendArray;
 let xEnd = 600;
+let oldLabelField , newLabelField;
 
 nodesAPI.initialize = function(_options) { 
   options = _options; 
+  oldLabelField = newLabelField;
+  newLabelField = options.nodeBarOn ? options.nodeBarField : undefined;
 };
 
 nodesAPI.appendNode = function (selection) {
@@ -89,48 +92,45 @@ nodesAPI.updateNodeImage = function (transition) {
 nodesAPI.computeNodeExtend = function() {
   nodeExtendArray = [];
   d3.selectAll(".node").each(function(d) {
-    let labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
-    let imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
-    let nodeExtend = (labelBBox.width !== 0) ? 
+    const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
+    const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
+    const nodeExtend = (labelBBox.width !== 0) ? 
       labelBBox.x + labelBBox.width
       : imageBBox.x + imageBBox.width;
     d.nodeExtend = nodeExtend;
     nodeExtendArray.push(nodeExtend + d.y + 5);
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
-  console.log("max: " + nodeExtendArray.maxExtend);
-  xEnd = nodeExtendArray.maxExtend + 200;
+  xEnd = nodeExtendArray.maxExtend + 50 + options.nodeBarRange[1];
 };
 
-nodesAPI.getNodeBarD = d =>
-  `M ${d.nodeExtend + 5} 0 h ${xEnd - (d.y + d.nodeExtend + 5)}`;
-
-/*
-nodesAPI.getEnterNodeBarD = function (d) {
-  let node = d3.selectAll(".node").filter(d2 => d2.id === d.id);
-  let nodeBBox = node.select(".nodeLabel").node().getBBox();
-  if (nodeBBox.width === 0) {
-    nodeBBox = node.select(".nodeImage").node().getBBox();
+nodesAPI.getNodeBarLabelTween = function(d) { 
+  const selection = d3.select(this);
+  if (!options.nodeBarOn) {
+    return function() { selection.text(""); };
+  } 
+  const numberStart = oldLabelField ? d.data[oldLabelField] : d.data[newLabelField];
+  const numberEnd = d.data[newLabelField];
+  if (isNaN(numberStart) || isNaN(numberEnd)) {
+    return function() { selection.text(numberEnd); };
   }
-  const nodeExtend = nodeBBox.x + nodeBBox.width;
-  // TO DO add width of BBox of text in full size
-  const len = xEnd - (d.y + nodeExtend + 5);
-  // console.log("len: " + len);
-  d.nodeExtend = nodeExtend;
-  return `M ${nodeExtend + 5} 0 h ${len}`;
+  const i = d3.interpolateNumber(numberStart, numberEnd);
+  return function(t) { selection.text(options.nodeBarFormat(i(t)) + options.nodeBarUnit); };
 };
 
-nodesAPI.getUpdateNodeBarD = function (d) {
-  const len = xEnd - (d.y + d.nodeExtend + 5);
-  console.log("len: " + len);
-  return `M ${d.nodeExtend + 5} 0 h ${len}`;
-};
-*/
+nodesAPI.getNodeBarD = d => `M ${d.nodeExtend + 5} 0 h ${xEnd - (d.y + d.nodeExtend + 5)}`;
+nodesAPI.getXNodeBarRect = d => xEnd - d.y - options.nodeBarScale(d.data[options.nodeBarField]);
+nodesAPI.getWidthNodeBarRect = d => options.nodeBarScale(d.data[options.nodeBarField]);
+nodesAPI.getXNodeBarText = d => xEnd - d.y - 5;
 
-nodesAPI.getXNodeBarRect = function (d) {
-  return xEnd - d.y - 40;
+nodesAPI.getNodeBarTextFill = function(d) {
+  return options.nodeBarTextFill ? options.nodeBarTextFill(d) : d3.select(this).style("fill");
 };
 
-nodesAPI.getXNodeBarText = function (d) {
-  return xEnd - d.y - 5;
+nodesAPI.getNodeBarRectFill = function(d) {
+  return options.nodeBarRectFill ? options.nodeBarRectFill(d) : d3.select(this).style("fill");
+};
+
+nodesAPI.getNodeBarRectStroke = function(d) {
+  return options.nodeBarRectStroke ? options.nodeBarRectStroke(d) : d3.select(this).style("stroke");
 };

@@ -18,12 +18,16 @@ export default function (_dataSpec) {
 
   options.defaultColor = "grey";
   
-  options.nodeBarOn = true;
+  options.nodeBarOn = false;
   options.nodeBarField = "value";
-  options.nodeBarColor; // function for setting the label color based on the value.
+  options.nodeBarTextFill; // function for setting the label color based on the value.
+  options.nodeBarRectFill; // function for setting the fill color of the rectangle based on the value.
+  options.nodeBarRectStroke; // function for setting the stroke color of the rectangle based on the value.
   options.nodeBarUnit = "";
   options.nodeBarFormatSpecifier = ",.0f"; 
   options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
+  options.nodeBarScale = d3.scaleLinear();
+  options.nodeBarRange = [50, 200];
 
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -171,11 +175,15 @@ export default function (_dataSpec) {
     }
     if (options.nodeBarOn) {
       if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
-      options.nodeBarColor = _options.color || options.nodeBarColor;
+      options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
+      options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
+      options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
       options.nodeBarUnit = _options.unit || options.nodeBarUnit;
       options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
+      options.nodeBarScale  = _options.scale || options.nodeBarScale;
+      options.nodeBarRange = _options.range || options.nodeBarRange;
     }
-    if (typeof options.updateDefault === "function") options.updateDefault();
+    if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;
   };
 
@@ -271,7 +279,7 @@ export default function (_dataSpec) {
       options.linkStrengthRange = _options.range || options.linkStrengthRange;
     }
     
-    if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
+    if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;
   };
 

@@ -12,7 +12,7 @@
   <aside id="data">
 level1;level2;level3;size1;size2;size3;color
 Eve;Cain;;1;2;4;rgb(100 23 80)
-Eve;Seth;;3;2;4;rgb(100 23 80)
+Eve;Seth;;-453;2;4;rgb(100 23 80)
 Eve;Seth;Enos;3;2;4;rgb(100 23 80)
 Eve;Seth;Noam;3;2;4;rgb(100 23 80)
 Eve;Abel;;32;2;4;rgb(100 23 80)
@@ -26,22 +26,12 @@ Eve;Azura;;5;2;4;rgb(100 23 80)
       source: "aside#data",
       hierarchyLevels: ["$", "level1", "level2", "level3"],
       delimiter: ";",
-      convertTypes: d => {
-          return {
-            level1: d.level1,
-            level2: d.level2,
-            level3: d.level3,
-            size1: +d.size1,
-            size2: +d.size2,
-            size3: +d.size3,
-            color: d.color,
-          };
-      },
     };
     const myChart = hierarchyExplorer.chart(dataSpec)
       .debugOn(true)
       .linkLabel("size1")
       .nodeSort("size1")
+      .nodeBar("size1")
     ;
     showChart(); // for preprocessing data see below
     
@@ -54,50 +44,11 @@ Eve;Azura;;5;2;4;rgb(100 23 80)
     function showChart(_file, preprocessed) {
       const selection = d3.select("body")
         .append("div")
-          .attr("class", "chart");
-      if (preprocessed) {
-        selection.datum(_file);
-      }
+        .attr("class", "chart");
       selection.call(myChart);
     }         
   
-    /*
-    ////////////////////////////////////////////////////////////////
-    //  If data needs to be processed before passing it on        //
-    //  substitute showChart() with readData()                    //
-    ////////////////////////////////////////////////////////////////
-
-    readData(); // no parameter when data is embedded in <pre> tag, otherwise readData(file);
-    
-    function readData(csvFile) {
-      if (typeof csvFile !== 'undefined') {
-        d3.csv(csvFile, processData, function(error, file) {
-          showChart(file, true);
-        });
-      } 
-      else {
-        file = d3.csvParse(d3.select("aside#data").text()); 
-        file.forEach( function (row) {
-          processData(row);
-        });        
-        showChart(file, true);
-      }
-    } 
-    
-    ////////////////////////////////////////////////////////////////
-    //  This function converts each data element to a number.     //
-    //  Update this function to process data accordingly          //
-    ////////////////////////////////////////////////////////////////
-     
-    function processData(d) {
-      for (var perm in d) {
-        if (Object.prototype.hasOwnProperty.call(d, perm)) {
-          d[perm] = +d[perm];
-        }
-      }    
-      return d;
-    }  
-    */
+   
   </script>
 </body>
 </html>  

@@ -48,6 +48,16 @@
     };
   }();
 
+  var toConsumableArray = function (arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  };
+
   ////////////////////////////////////////////////////
   // Processing data                                //
   //////////////////////////////////////////////////// 
@@ -92,8 +102,8 @@
       if (myData.isJSON) {
         hierarchy = d3.hierarchy(myData.data);
       } else {
-        // let data = readDataFromDOM(myData.delimiter, myData.data, myData.autoConvert, myData.convertTypesFunction);
-        var data = readDataFromDOM(myData.delimiter, myData.data, false, myData.convertTypesFunction);
+        var convert = myData.flatData ? false : myData.autoConvert; // for flat data the autoconvert is applied with createLinkedData()
+        var data = readDataFromDOM(myData.delimiter, myData.data, convert, myData.convertTypesFunction);
         if (myData.flatData) {
           data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
         }
@@ -458,9 +468,15 @@
 
   var nodesAPI = {};
   var options$1 = void 0;
+  var nodeExtendArray = void 0;
+  var xEnd = 600;
+  var oldLabelField$1 = void 0,
+      newLabelField$1 = void 0;
 
   nodesAPI.initialize = function (_options) {
     options$1 = _options;
+    oldLabelField$1 = newLabelField$1;
+    newLabelField$1 = options$1.nodeBarOn ? options$1.nodeBarField : undefined;
   };
 
   nodesAPI.appendNode = function (selection) {
@@ -516,6 +532,64 @@
     transition.select(".nodeImage").attr("xlink:href", options$1.nodeImageFileAppend);
   };
 
+  nodesAPI.computeNodeExtend = function () {
+    nodeExtendArray = [];
+    d3.selectAll(".node").each(function (d) {
+      var labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
+      var imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
+      var nodeExtend = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
+      d.nodeExtend = nodeExtend;
+      nodeExtendArray.push(nodeExtend + d.y + 5);
+    });
+    nodeExtendArray.maxExtend = Math.max.apply(Math, toConsumableArray(nodeExtendArray));
+    xEnd = nodeExtendArray.maxExtend + 50 + options$1.nodeBarRange[1];
+  };
+
+  nodesAPI.getNodeBarLabelTween = function (d) {
+    var selection = d3.select(this);
+    if (!options$1.nodeBarOn) {
+      return function () {
+        selection.text("");
+      };
+    }
+    var numberStart = oldLabelField$1 ? d.data[oldLabelField$1] : d.data[newLabelField$1];
+    var numberEnd = d.data[newLabelField$1];
+    if (isNaN(numberStart) || isNaN(numberEnd)) {
+      return function () {
+        selection.text(numberEnd);
+      };
+    }
+    var i = d3.interpolateNumber(numberStart, numberEnd);
+    return function (t) {
+      selection.text(options$1.nodeBarFormat(i(t)) + options$1.nodeBarUnit);
+    };
+  };
+
+  nodesAPI.getNodeBarD = function (d) {
+    return "M " + (d.nodeExtend + 5) + " 0 h " + (xEnd - (d.y + d.nodeExtend + 5));
+  };
+  nodesAPI.getXNodeBarRect = function (d) {
+    return xEnd - d.y - options$1.nodeBarScale(d.data[options$1.nodeBarField]);
+  };
+  nodesAPI.getWidthNodeBarRect = function (d) {
+    return options$1.nodeBarScale(d.data[options$1.nodeBarField]);
+  };
+  nodesAPI.getXNodeBarText = function (d) {
+    return xEnd - d.y - 5;
+  };
+
+  nodesAPI.getNodeBarTextFill = function (d) {
+    return options$1.nodeBarTextFill ? options$1.nodeBarTextFill(d) : d3.select(this).style("fill");
+  };
+
+  nodesAPI.getNodeBarRectFill = function (d) {
+    return options$1.nodeBarRectFill ? options$1.nodeBarRectFill(d) : d3.select(this).style("fill");
+  };
+
+  nodesAPI.getNodeBarRectStroke = function (d) {
+    return options$1.nodeBarRectStroke ? options$1.nodeBarRectStroke(d) : d3.select(this).style("stroke");
+  };
+
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
   //////////////////////////////////////////////////// 
@@ -534,7 +608,7 @@
     config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
     createTree(options, config, data);
-    createScale(options, config);
+    createScales(options, config);
     createUpdateFunctions(options, config, data);
     // root.children.forEach(collapse);
     update(config.root, options, config);
@@ -570,7 +644,7 @@
     }
   }
 
-  function createScale(options, config) {
+  function createScales(options, config) {
     var nodes = config.root.descendants();
     if (!options.linkStrengthStatic) {
       options.linkStrengthScale.domain(d3.extent(nodes, function (d) {
@@ -582,6 +656,11 @@
         return +d.data[options.linkWidthField];
       })).range(options.linkWidthRange);
     }
+    if (options.nodeBarOn) {
+      options.nodeBarScale.domain(d3.extent(nodes, function (d) {
+        return +d.data[options.nodeBarField];
+      })).range(options.nodeBarRange);
+    }
   }
 
   function createUpdateFunctions(options, config, data) {
@@ -589,13 +668,13 @@
       if (options.linkWidthStatic) {
         config.tree.nodeSize([0, options.linkWidthValue]);
       } else {
-        createScale(options, config);
+        createScales(options, config);
       }
       update(config.root, options, config);
     };
 
-    options.updateLinkStrength = function () {
-      createScale(options, config);
+    options.updateScales = function () {
+      createScales(options, config);
       update(config.root, options, config);
     };
 
@@ -653,9 +732,7 @@
     });
 
     // Enter any new nodes at the parent's previous position.
-    var nodeEnter = node.enter().append("g").attr("class", "node").attr("transform", function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    }).on("click", function (d) {
+    var nodeEnter = node.enter().append("g").attr("class", "node").style("visibility", "hidden").on("click", function (d) {
       return click(d, options, config);
     });
 
@@ -667,44 +744,33 @@
       } else {
         return d.data[options.nodeLabelField];
       }
-    }).style("fill-opacity", 1e-6);
+    });
 
     nodeEnter.append("svg:title").text(function (d) {
       return d.data[options.nodeLabelField];
     });
 
-    /*
-    // add nodeInfo
-      const xEnd = 600; 
-      nodeEnter.append("path")
-      .style("class", "node-info connector")
-      .attr("d", function(d) {
-        // const nodePos = d3.select(this.parentNode).select("text").node().getBoundingClientRect();
-        const nodeBBox = d3.select(this.parentNode).node().getBBox();
-        const len = xEnd - (d.y + nodeBBox.width + 5);
-        return `M ${nodeBBox.width + 5} 0 h ${len}`;
-      })
-      .style("stroke-dasharray", 2)
-      .style("stroke", "green");
-    
-    nodeEnter.append("rect")
-      .style("class", "node-info box")
-      .style("stroke", "green")
-      .attr("x", (d) => xEnd - d.y - 40)
-      .attr("y", -8)
-      .attr("width", 40)
-      .attr("height", 16);
-      nodeEnter.append("text")
-      .style("class", "node-info label")
-      .attr("text-anchor", "end")
-      .attr("x", (d) => xEnd - d.y)
-      .attr("dy", ".35em")
-      //.text(d => l.getLinkLabelFormatted(d))
-      .text(d => d.data.population)
-      .style("font-size", ".8em")
-      .style("fill", "green");
-      // end nodeInfo
-    */
+    // add nodeBar
+    if (options.nodeBarOn) {
+      n.computeNodeExtend();
+    }
+
+    var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+
+    nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
+
+    nodeBarEnter.append("rect").attr("class", "node-bar box")
+    // .attr("x", n.getXNodeBarRect)
+    // .attr("x", (d) => xEnd - d.y - 40)
+    .attr("y", -8).attr("height", 16);
+
+    nodeBarEnter.append("text").attr("class", "node-bar label").style("text-anchor", "end").attr("dy", ".35em").style("stroke", "none").style("font-size", ".8em");
+    //.style("fill", "green");
+    // end nodeBar
+
+    nodeEnter.attr("transform", function () {
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
+    }).style("visibility", "visible");
 
     // Transition nodes to their new position.
     var nodeUpdate = node.merge(nodeEnter).transition().duration(options.transitionDuration);
@@ -715,7 +781,15 @@
 
     nodeUpdate.call(n.updateNode);
 
-    nodeUpdate.select(".nodeLabel").style("fill-opacity", 1);
+    nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+
+    if (options.nodeBarOn) {
+      nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
+      nodeUpdate.selectAll(".node-bar.box").style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
+      nodeUpdate.selectAll(".node-bar.label").style("fill", n.getNodeBarTextFill).call(function (sel) {
+        return sel.tween("nodeBarLabel", n.getNodeBarLabelTween);
+      }).attr("x", n.getXNodeBarText);
+    }
 
     // Transition exiting nodes to the parent's new position (and remove the nodes)
     var nodeExit = node.exit().transition().duration(options.transitionDuration);
@@ -819,8 +893,17 @@
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.svgDimensions = { height: 800, width: 1400 };
     options.transitionDuration = 750;
+    options.locale = undefined;
 
     options.defaultColor = "grey";
+
+    options.nodeBarOn = false;
+    options.nodeBarField = "value";
+    options.nodeBarUnit = "";
+    options.nodeBarFormatSpecifier = ",.0f";
+    options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
+    options.nodeBarScale = d3.scaleLinear();
+    options.nodeBarRange = [50, 200];
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -863,9 +946,6 @@
     options.linkLabelUnit = "";
     options.linkLabelOnTop = true;
     options.linkLabelAligned = true; // otherwise centered
-    // options.linkLabelFormat = d => d;
-
-    options.locale = undefined;
     options.linkLabelFormatSpecifier = ",.0f";
     options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
 
@@ -962,6 +1042,35 @@
     };
 
     // 3. ADD getter-setter methods with updateable functions here
+    chartAPI.nodeBar = function () {
+      var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeBarField;
+
+      var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (!arguments.length) return options.nodeBarField;
+
+      if (typeof _ === "string") {
+        options.nodeBarField = _;
+        options.nodeBarOn = true;
+      } else if (typeof _ === "boolean") {
+        options.nodeBarOn = _;
+      }
+      if (options.nodeBarOn) {
+        if (_options.locale) {
+          chartAPI.formatDefaultLocale(_options.locale);
+        }
+        options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
+        options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
+        options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
+        options.nodeBarUnit = _options.unit || options.nodeBarUnit;
+        options.nodeBarFormat = _options.format ? d3.format(_options.format) : options.nodeBarFormat;
+        options.nodeBarScale = _options.scale || options.nodeBarScale;
+        options.nodeBarRange = _options.range || options.nodeBarRange;
+      }
+      if (typeof options.updateScales === "function") options.updateScales();
+      return chartAPI;
+    };
+
     chartAPI.nodeImageFile = function (_callback) {
       var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -1072,7 +1181,7 @@
         options.linkStrengthRange = _options.range || options.linkStrengthRange;
       }
 
-      if (typeof options.updateLinkStrength === "function") options.updateLinkStrength();
+      if (typeof options.updateScales === "function") options.updateScales();
       return chartAPI;
     };
 
