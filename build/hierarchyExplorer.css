@@ -44,6 +44,19 @@
       stroke-dasharray: 2;
     }
 
+    .node .node-bar-positive {
+      fill: steelblue;
+    }
+
+    .node .node-bar-negative {
+      fill: darkorange;
+    }
+
+    .node .bar-label {
+      stroke: none;
+      font: 0.8em sans-serif;
+    }
+
     .link {
       fill: none;
       stroke-width: 1px;

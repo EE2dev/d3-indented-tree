@@ -64,10 +64,25 @@ function createScales(options, config) {
       .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]))
       .range(options.linkWidthRange);
   }
-  if (options.nodeBarOn) {    
+  if (options.nodeBarOn) { 
+    let dom;
+    if (!options.nodeBarDomain) { 
+      const extent = d3.extent(nodes, d => +d.data[options.nodeBarField]);
+      const maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1])); 
+      options.nodeBarExtentPosNeg = (extent[0] * extent[1] >= 0); 
+      if (extent[0] >= 0 && extent[1] >= 0) {
+        dom = [0, maxExtent];
+      } else if (extent[0] < 0 && extent[1] < 0) {
+        dom = [extent[0], 0];
+      } else {
+        dom = [-maxExtent, maxExtent];
+      }
+    }
+    else { dom = options.nodeBarDomain;}
     options.nodeBarScale
-      .domain(d3.extent(nodes, d => +d.data[options.nodeBarField]))
-      .range(options.nodeBarRange);
+      .domain(dom)
+      .range(options.nodeBarRange)
+      .clamp(true);
   }
 }
 
@@ -184,12 +199,8 @@ function update(source, options, config){
     .attr("height", 16);
 
   nodeBarEnter.append("text")
-    .attr("class", "node-bar label")
-    .style("text-anchor", "end")
-    .attr("dy", ".35em")
-    .style("stroke", "none")
-    .style("font-size", ".8em");
-  //.style("fill", "green");
+    .attr("class", "node-bar bar-label")
+    .attr("dy", ".35em") ;
   // end nodeBar
 
   nodeEnter.attr("transform", 
@@ -217,11 +228,15 @@ function update(source, options, config){
     nodeUpdate.selectAll(".node-bar.connector")
       .attr("d", n.getNodeBarD);
     nodeUpdate.selectAll(".node-bar.box")
+      .attr("class", n.setNodeBarDefaultClass)
+      //.classed("node-bar-positive", d => d.data[options.nodeBarField] >= 0)
+      //.classed("node-bar-negative", d => d.data[options.nodeBarField] < 0)
       .style("fill", n.getNodeBarRectFill)
       .style("stroke", n.getNodeBarRectStroke)
       .attr("x", n.getXNodeBarRect)
       .attr("width", n.getWidthNodeBarRect);
-    nodeUpdate.selectAll(".node-bar.label")
+    nodeUpdate.selectAll(".node-bar.bar-label")
+      .style("text-anchor", n.getNodeBarTextAnchor)
       .style("fill", n.getNodeBarTextFill)
       .call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
       .attr("x", n.getXNodeBarText);

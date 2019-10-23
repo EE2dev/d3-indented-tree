@@ -19,7 +19,9 @@ export default function (_dataSpec) {
   options.defaultColor = "grey";
   
   options.nodeBarOn = false;
-  options.nodeBarField = "value";
+  options.nodeBarField = "value"; // for the width of the rect
+  options.nodeBarLabel = options.nodeBarField; // for the text displayed
+  options.nodeBarLabelInside = false; // display the label inside the bar?
   options.nodeBarTextFill; // function for setting the label color based on the value.
   options.nodeBarRectFill; // function for setting the fill color of the rectangle based on the value.
   options.nodeBarRectStroke; // function for setting the stroke color of the rectangle based on the value.
@@ -27,7 +29,9 @@ export default function (_dataSpec) {
   options.nodeBarFormatSpecifier = ",.0f"; 
   options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
   options.nodeBarScale = d3.scaleLinear();
-  options.nodeBarRange = [50, 200];
+  options.nodeBarDomain; // domain of the scale
+  options.nodeBarRange = [0, 200];
+  options.nodeBarExtentPosNeg; // true if extent of nodeBarField has negative and positive values
 
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -175,6 +179,8 @@ export default function (_dataSpec) {
     }
     if (options.nodeBarOn) {
       if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
+      options.nodeBarLabel = _options.label || options.nodeBarField;
+      options.nodeBarLabelInside = (typeof (_options.labelInside) !== "undefined") ? _options.labelInside : options.nodeBarLabelInside;
       options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
       options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
       options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
@@ -182,6 +188,7 @@ export default function (_dataSpec) {
       options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
       options.nodeBarScale  = _options.scale || options.nodeBarScale;
       options.nodeBarRange = _options.range || options.nodeBarRange;
+      options.nodeBarDomain = _options.domain || options.nodeBarDomain;
     }
     if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;

@@ -4,12 +4,13 @@ export let nodesAPI = {};
 let options;
 let nodeExtendArray;
 let xEnd = 600;
+const connectorLengthMin = 50;
 let oldLabelField , newLabelField;
 
 nodesAPI.initialize = function(_options) { 
   options = _options; 
   oldLabelField = newLabelField;
-  newLabelField = options.nodeBarOn ? options.nodeBarField : undefined;
+  newLabelField = options.nodeBarOn ? options.nodeBarLabel : undefined;
 };
 
 nodesAPI.appendNode = function (selection) {
@@ -94,14 +95,32 @@ nodesAPI.computeNodeExtend = function() {
   d3.selectAll(".node").each(function(d) {
     const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
     const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
-    const nodeExtend = (labelBBox.width !== 0) ? 
+    const nodeEnd = (labelBBox.width !== 0) ? 
       labelBBox.x + labelBBox.width
       : imageBBox.x + imageBBox.width;
-    d.nodeExtend = nodeExtend;
-    nodeExtendArray.push(nodeExtend + d.y + 5);
+    d.nodeBar = {};
+    d.nodeBar.nodeEnd = nodeEnd;
+    nodeExtendArray.push(d.y + nodeEnd  + 5);
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
-  xEnd = nodeExtendArray.maxExtend + 50 + options.nodeBarRange[1];
+  xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options.nodeBarRange[1];
+
+  d3.selectAll(".node").each(function(d) {
+    d.nodeBar.connectorLength = xEnd - d.y - options.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
+    d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength;
+    d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength + options.nodeBarScale(0);
+    d.nodeBar.posStart = d.nodeBar.negEnd;
+
+    if (options.nodeBarLabelInside) {
+      d.nodeBar.textX = d.data[options.nodeBarField] < 0 ? 
+        d.nodeBar.negEnd - 5 : 
+        d.nodeBar.posStart + 5;
+    } else {
+      d.nodeBar.textX = d.data[options.nodeBarField] < 0 ? 
+        d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5 : 
+        d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) + 5;
+    }
+  });
 };
 
 nodesAPI.getNodeBarLabelTween = function(d) { 
@@ -118,10 +137,13 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   return function(t) { selection.text(options.nodeBarFormat(i(t)) + options.nodeBarUnit); };
 };
 
-nodesAPI.getNodeBarD = d => `M ${d.nodeExtend + 5} 0 h ${xEnd - (d.y + d.nodeExtend + 5)}`;
-nodesAPI.getXNodeBarRect = d => xEnd - d.y - options.nodeBarScale(d.data[options.nodeBarField]);
-nodesAPI.getWidthNodeBarRect = d => options.nodeBarScale(d.data[options.nodeBarField]);
-nodesAPI.getXNodeBarText = d => xEnd - d.y - 5;
+// nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${xEnd - (d.y + d.nodeBar.nodeEnd + 5)}`;
+nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${d.nodeBar.connectorLength}`;
+// nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
+nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
+nodesAPI.getWidthNodeBarRect = d => Math.abs(options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0));
+// nodesAPI.getXNodeBarText = d => xEnd - d.y - 5;
+nodesAPI.getXNodeBarText = d => d.nodeBar.textX;
 
 nodesAPI.getNodeBarTextFill = function(d) {
   return options.nodeBarTextFill ? options.nodeBarTextFill(d) : d3.select(this).style("fill");
@@ -133,4 +155,14 @@ nodesAPI.getNodeBarRectFill = function(d) {
 
 nodesAPI.getNodeBarRectStroke = function(d) {
   return options.nodeBarRectStroke ? options.nodeBarRectStroke(d) : d3.select(this).style("stroke");
+};
+
+nodesAPI.getNodeBarTextAnchor = function(d) {
+  return d.data[options.nodeBarField] < 0 ? "end" : "start";
+};
+
+nodesAPI.setNodeBarDefaultClass = function(d) {
+  let c = d3.select(this).attr("class");
+  c += (d.data[options.nodeBarField] >= 0) ? " node-bar-positive" : " node-bar-negative";
+  return c;
 };
