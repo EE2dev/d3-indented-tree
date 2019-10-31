@@ -225,12 +225,8 @@ function update(source, options, config){
     .attr("display", options.nodeBarOn ? "inline" : "none");
 
   if (options.nodeBarOn) {
-    nodeUpdate.selectAll(".node-bar.connector")
-      .attr("d", n.getNodeBarD);
     nodeUpdate.selectAll(".node-bar.box")
       .attr("class", n.setNodeBarDefaultClass)
-      //.classed("node-bar-positive", d => d.data[options.nodeBarField] >= 0)
-      //.classed("node-bar-negative", d => d.data[options.nodeBarField] < 0)
       .style("fill", n.getNodeBarRectFill)
       .style("stroke", n.getNodeBarRectStroke)
       .attr("x", n.getXNodeBarRect)
@@ -240,6 +236,8 @@ function update(source, options, config){
       .style("fill", n.getNodeBarTextFill)
       .call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
       .attr("x", n.getXNodeBarText);
+    nodeUpdate.selectAll(".node-bar.connector")
+      .attr("d", n.getNodeBarD);
   }
 
   // Transition exiting nodes to the parent's new position (and remove the nodes)

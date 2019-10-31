@@ -68,6 +68,7 @@ https://gitlab.com/snippets/1703535
   - compute length based on scale range left and right
   - connectorLength new
   - For nodeBar and LinkLabel: if number size < rect ?
+  - rootBar: false
   - allow for negative values to have bars to the left by default.
     (if range[a,b] then create scale for [-b, -a] for negative values)
     divergingScale: true

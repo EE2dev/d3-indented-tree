@@ -469,7 +469,7 @@
   var nodesAPI = {};
   var options$1 = void 0;
   var nodeExtendArray = void 0;
-  var xEnd = 600;
+  var xEnd = void 0;
   var connectorLengthMin = 50;
   var oldLabelField$1 = void 0,
       newLabelField$1 = void 0;
@@ -547,17 +547,48 @@
     xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options$1.nodeBarRange[1];
 
     d3.selectAll(".node").each(function (d) {
+      d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField$1]);
+      // console.log(d.data[newLabelField] + ": " + d.nodeBar.LabelWidth);
       d.nodeBar.connectorLength = xEnd - d.y - options$1.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
       d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength;
       d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength + options$1.nodeBarScale(0);
       d.nodeBar.posStart = d.nodeBar.negEnd;
 
       if (options$1.nodeBarLabelInside) {
-        d.nodeBar.textX = d.data[options$1.nodeBarField] < 0 ? d.nodeBar.negEnd - 5 : d.nodeBar.posStart + 5;
+        if (d.data[options$1.nodeBarField] < 0) {
+          d.nodeBar.textX = d.nodeBar.negEnd - 5;
+          // const labelX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5 - d.nodeBar.LabelWidth;
+          // comparison if the label is left of bar because bar is too short
+          d.nodeBar.cLength = d.nodeBar.LabelWidth + 5 > options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0) ?
+          // d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5
+          //  - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5)
+          d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5) : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - (d.nodeBar.nodeEnd + 5 + 5);
+          /*
+          d.nodeBar.cLength = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) 
+            - (d.nodeBar.nodeEnd + 5 + 5);
+            */
+        } else {
+          d.nodeBar.textX = d.nodeBar.posStart + 5;
+          d.nodeBar.cLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+        }
       } else {
-        d.nodeBar.textX = d.data[options$1.nodeBarField] < 0 ? d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5 : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
+        if (d.data[options$1.nodeBarField] < 0) {
+          d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5;
+          d.nodeBar.cLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
+        } else {
+          d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
+          d.nodeBar.cLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+        }
       }
     });
+  };
+
+  var getBarLabelWidth = function getBarLabelWidth(text) {
+    var sel = d3.select("g.node").append("text").style("visibility", "hidden").attr("class", "bar-label temp").text(text);
+
+    var w = sel.node().getBBox().width;
+    sel.remove();
+    return w;
   };
 
   nodesAPI.getNodeBarLabelTween = function (d) {
@@ -580,9 +611,9 @@
     };
   };
 
-  // nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${xEnd - (d.y + d.nodeBar.nodeEnd + 5)}`;
+  // nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${d.nodeBar.cLength}`;
   nodesAPI.getNodeBarD = function (d) {
-    return "M " + (d.nodeBar.nodeEnd + 5) + " 0 h " + d.nodeBar.connectorLength;
+    return "M " + (d.nodeBar.cLength + d.nodeBar.nodeEnd + 5) + " 0 h " + -d.nodeBar.cLength;
   };
   // nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
   nodesAPI.getXNodeBarRect = function (d) {
@@ -826,14 +857,11 @@
     nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
     if (options.nodeBarOn) {
-      nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
-      nodeUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass)
-      //.classed("node-bar-positive", d => d.data[options.nodeBarField] >= 0)
-      //.classed("node-bar-negative", d => d.data[options.nodeBarField] < 0)
-      .style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
+      nodeUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass).style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
       nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill).call(function (sel) {
         return sel.tween("nodeBarLabel", n.getNodeBarLabelTween);
       }).attr("x", n.getXNodeBarText);
+      nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
     }
 
     // Transition exiting nodes to the parent's new position (and remove the nodes)

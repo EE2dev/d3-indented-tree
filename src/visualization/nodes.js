@@ -3,7 +3,7 @@ import * as d3 from "d3";
 export let nodesAPI = {};
 let options;
 let nodeExtendArray;
-let xEnd = 600;
+let xEnd;
 const connectorLengthMin = 50;
 let oldLabelField , newLabelField;
 
@@ -106,21 +106,54 @@ nodesAPI.computeNodeExtend = function() {
   xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options.nodeBarRange[1];
 
   d3.selectAll(".node").each(function(d) {
+    d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField]);
+    // console.log(d.data[newLabelField] + ": " + d.nodeBar.LabelWidth);
     d.nodeBar.connectorLength = xEnd - d.y - options.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
     d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength;
     d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength + options.nodeBarScale(0);
     d.nodeBar.posStart = d.nodeBar.negEnd;
 
     if (options.nodeBarLabelInside) {
-      d.nodeBar.textX = d.data[options.nodeBarField] < 0 ? 
-        d.nodeBar.negEnd - 5 : 
-        d.nodeBar.posStart + 5;
+      if (d.data[options.nodeBarField] < 0) { 
+        d.nodeBar.textX = d.nodeBar.negEnd - 5;
+        // const labelX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5 - d.nodeBar.LabelWidth;
+        // comparison if the label is left of bar because bar is too short
+        d.nodeBar.cLength = (d.nodeBar.LabelWidth + 5 > options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0)) ?
+          // d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5
+          //  - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5)
+          d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5)
+          : d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) 
+            - (d.nodeBar.nodeEnd + 5 + 5);
+        /*
+        d.nodeBar.cLength = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) 
+          - (d.nodeBar.nodeEnd + 5 + 5);
+          */
+      } else {
+        d.nodeBar.textX = d.nodeBar.posStart + 5;
+        d.nodeBar.cLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+      }
     } else {
-      d.nodeBar.textX = d.data[options.nodeBarField] < 0 ? 
-        d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5 : 
-        d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) + 5;
+      if (d.data[options.nodeBarField] < 0) {
+        d.nodeBar.textX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5;
+        d.nodeBar.cLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
+      } else {
+        d.nodeBar.textX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) + 5;
+        d.nodeBar.cLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+      }
     }
   });
+};
+
+const getBarLabelWidth = function(text) {
+  const sel = d3.select("g.node")
+    .append("text")
+    .style("visibility", "hidden")
+    .attr("class", "bar-label temp")
+    .text(text);
+
+  const w = sel.node().getBBox().width;
+  sel.remove();
+  return w;
 };
 
 nodesAPI.getNodeBarLabelTween = function(d) { 
@@ -137,8 +170,8 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   return function(t) { selection.text(options.nodeBarFormat(i(t)) + options.nodeBarUnit); };
 };
 
-// nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${xEnd - (d.y + d.nodeBar.nodeEnd + 5)}`;
-nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${d.nodeBar.connectorLength}`;
+// nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${d.nodeBar.cLength}`;
+nodesAPI.getNodeBarD = d => `M ${d.nodeBar.cLength + d.nodeBar.nodeEnd + 5} 0 h ${-d.nodeBar.cLength}`;
 // nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
 nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
 nodesAPI.getWidthNodeBarRect = d => Math.abs(options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0));
