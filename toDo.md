@@ -62,22 +62,23 @@ https://gitlab.com/snippets/1703535
 [ok] umstellung bei blocks auf .min.js
 [ok] nodeInfo: nodeSort3 --> different nodeExtend if no nodeLabel
 
-* nodeInfo
-  - determine size based on largest node BBox
-  - determine size of the nodeBar based on a scale
-  - compute length based on scale range left and right
-  - connectorLength new
+* nodeInfo (=nodeBar)
+  [ok] determine size based on largest node BBox
+  [ok] determine size of the nodeBar based on a scale
+  [ok] compute length based on scale range left and right
+  [ok] connectorLength new
   - For nodeBar and LinkLabel: if number size < rect ?
   - rootBar: false
-  - allow for negative values to have bars to the left by default.
-    (if range[a,b] then create scale for [-b, -a] for negative values)
+  - default visualization with bar for root
+  [ok] allow for negative values to have bars to the left by default.
+  [ok]  (if range[a,b] then create scale for [-b, -a] for negative values)
     divergingScale: true
   - animation for changes from pos to negativ: 
     two chained transition split in half to go to 0.
     text animated accordingly
     --> do dashed array just to the beginning of the nodeBarLabel
-  - domain can be set in api 
-  - default visualization with bar for root
+  [ok] domain can be set in api 
+
 
 * allow negativ values for linkWidth range for the tree to go left 
 

@@ -548,36 +548,27 @@
 
     d3.selectAll(".node").each(function (d) {
       d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField$1]);
-      // console.log(d.data[newLabelField] + ": " + d.nodeBar.LabelWidth);
-      d.nodeBar.connectorLength = xEnd - d.y - options$1.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
-      d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength;
-      d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLength + options$1.nodeBarScale(0);
+      d.nodeBar.connectorLengthToNegStart = xEnd - d.y - options$1.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
+      d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart;
+      d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart + options$1.nodeBarScale(0);
       d.nodeBar.posStart = d.nodeBar.negEnd;
 
       if (options$1.nodeBarLabelInside) {
         if (d.data[options$1.nodeBarField] < 0) {
           d.nodeBar.textX = d.nodeBar.negEnd - 5;
-          // const labelX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5 - d.nodeBar.LabelWidth;
           // comparison if the label is left of bar because bar is too short
-          d.nodeBar.cLength = d.nodeBar.LabelWidth + 5 > options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0) ?
-          // d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5
-          //  - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5)
-          d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5) : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - (d.nodeBar.nodeEnd + 5 + 5);
-          /*
-          d.nodeBar.cLength = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) 
-            - (d.nodeBar.nodeEnd + 5 + 5);
-            */
+          d.nodeBar.connectorLength = d.nodeBar.LabelWidth + 5 > options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0) ? d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5) : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - (d.nodeBar.nodeEnd + 5 + 5);
         } else {
           d.nodeBar.textX = d.nodeBar.posStart + 5;
-          d.nodeBar.cLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+          d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
         }
       } else {
         if (d.data[options$1.nodeBarField] < 0) {
           d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5;
-          d.nodeBar.cLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
+          d.nodeBar.connectorLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
         } else {
           d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
-          d.nodeBar.cLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+          d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
         }
       }
     });
@@ -611,18 +602,15 @@
     };
   };
 
-  // nodesAPI.getNodeBarD = d => `M ${d.nodeBar.nodeEnd + 5} 0 h ${d.nodeBar.cLength}`;
   nodesAPI.getNodeBarD = function (d) {
-    return "M " + (d.nodeBar.cLength + d.nodeBar.nodeEnd + 5) + " 0 h " + -d.nodeBar.cLength;
+    return "M " + (d.nodeBar.connectorLength + d.nodeBar.nodeEnd + 5) + " 0 h " + -d.nodeBar.connectorLength;
   };
-  // nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
   nodesAPI.getXNodeBarRect = function (d) {
     return d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField]));
   };
   nodesAPI.getWidthNodeBarRect = function (d) {
     return Math.abs(options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0));
   };
-  // nodesAPI.getXNodeBarText = d => xEnd - d.y - 5;
   nodesAPI.getXNodeBarText = function (d) {
     return d.nodeBar.textX;
   };
@@ -829,7 +817,9 @@
       n.computeNodeExtend();
     }
 
-    var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+    var nodeBarEnter = nodeEnter.filter(function (d, i) {
+      return options.nodeBarRoot ? true : i > 0;
+    }).append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
     nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
 
@@ -979,6 +969,7 @@
     options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
     options.nodeBarScale = d3.scaleLinear();
     options.nodeBarRange = [0, 200];
+    options.nodeBarRoot = false; // display bar for root node?
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -1144,6 +1135,7 @@
         options.nodeBarScale = _options.scale || options.nodeBarScale;
         options.nodeBarRange = _options.range || options.nodeBarRange;
         options.nodeBarDomain = _options.domain || options.nodeBarDomain;
+        options.nodeBarRoot = typeof _options.rootBar !== "undefined" ? _options.rootBar : options.nodeBarRoot;
       }
       if (typeof options.updateScales === "function") options.updateScales();
       return chartAPI;

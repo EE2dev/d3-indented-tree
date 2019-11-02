@@ -288,6 +288,7 @@ Oceania,,38
 The object (named *dataSpec* above) which is passed to the function ```hierarchyExplorer.chart()``` can have the following properties:
 * `source`: <i>string</i> containing the path/URL to the data or the selector referencing the DOM element containing the data.
 * `hierarchyLevels`: <i>array</i> containing columns of each level in its top-down traversal order when the refered data is in the csv relational format.
+* `separator`: <i>string</i> In case the data comes in the csv relational format, the separator is used internally to concatenate columns. The default is "$". If the data contains a "$", the separator has to be changed to another string/character not contained in the data.  
 * `delimiter`: <i>string</i> containing the delimiter used in the csv data.
 * `convertTypes`: <i>function</i> that converts the data to appropriate types which is relevant for [`myChart.nodeSort()`](#node_nodeSort). If a conversion function is specified, the specified function is invoked for each row, being passed an object representing the current row (d), the index (i) starting at zero for the first non-header row, and the array of column names. 
 [Here](https://github.com/d3/d3-dsv#dsv_parse) is more documentation about this callback function.
@@ -377,6 +378,32 @@ Transitions to the new number label on top of the links.
     * with no argument the function returns the name of the numeric field for the link labels.
 
 ### 3.2 Nodes
+
+<a name="node_nodeBar" href="#node_nodeBar">#</a> <i>myChart</i>.<b>nodeBar</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Transitions the bar for each node to the new value. 
+1. argument:
+    * to set the node bar dynamically, provide the name of a field as a *string*. The values of the field must be *numeric*. 
+    * to switch the node bars on or off provide a <i>boolean</i>. 
+    
+2. argument (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `unit` specifies a suffix *string* for the node bar label (default is `""`).
+        * `format` refers to the format *string* of the node bar label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
+        * `locale` is an *object* overriding the default locale format with the specified locale format.
+        The locale is affecting the display of the link label if the `format` property is specified. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
+        * `label` specifies the *string* field name for the node bar label (default is the field which is specified as the first argument and used for drawing the bars).
+        * `labelInside` specifies a *boolean* property denoting whether to place the label inside the bars (`labelInside: true`) or next to the bar (default is `false`).
+        * `textFill` is a *function* that sets the color of the node bar label. This callback function is called for each node by passing an object with its fields to it. (default is its (=`.node .nodeLabel`) static CSS property which is `black`). 
+        * `rectFill` is a *function* that sets the fill color of the node bar. This callback function is called for each node by passing an object with its fields to it. (default is its ( for values >= 0: `.node .node-bar-positive`, for values <0: `.node .node-bar-negative`) static CSS property which is `steelblue`, and `darkorange`, respectively). 
+        * `rectStroke` is a *function* that sets the stroke color of the node bar. This callback function is called for each node by passing an object with its fields to it. (default is its (=`.node .node-bar`) static CSS property which is `grey`). 
+        * `scale` is a *function* defining the scale used to map the values to the node bar width (default is `d3.scaleLinear()`).
+        * `range` is an *array* refering to the range of the scale (default is `[0, 200]`). In case there are positive and negative values, the range is used separately but scaled correspondingly for positive and negative values to compute the width of their node bars.
+        * `domain` is an *array* refering to the domain of the scale (default is calculated based on the extent of the corresponding field values).
+        * `rootBar` specifies a *boolean* property denoting whether a node bar is displayed for the root node bar. (default is `false`).
+
+* No argument:
+    * with no argument the function returns the name of the numeric field for the node bars.
 
 <a name="node_nodeImageFile" href="#node_nodeImageFile">#</a> <i>myChart</i>.<b>nodeImageFile</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
