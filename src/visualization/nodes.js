@@ -124,7 +124,7 @@ nodesAPI.computeNodeExtend = function() {
         d.nodeBar.textX = d.nodeBar.posStart + 5;
         d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
       }
-    } else {
+    } else { // labelInside === false
       if (d.data[options.nodeBarField] < 0) {
         d.nodeBar.textX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5;
         d.nodeBar.connectorLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
@@ -148,6 +148,8 @@ const getBarLabelWidth = function(text) {
   return w;
 };
 
+// transitions the node bar label through interpolattion and adjusts the class of the node bar
+//  when the sign of the node bar label changes
 nodesAPI.getNodeBarLabelTween = function(d) { 
   const selection = d3.select(this);
   if (!options.nodeBarOn) {
@@ -159,7 +161,14 @@ nodesAPI.getNodeBarLabelTween = function(d) {
     return function() { selection.text(numberEnd); };
   }
   const i = d3.interpolateNumber(numberStart, numberEnd);
-  return function(t) { selection.text(options.nodeBarFormat(i(t)) + options.nodeBarUnit); };
+  const correspondingBar = d3.selectAll(".node-bar.box").filter((d2) => d2.id === d.id);
+  return function(t) { 
+    const num = i(t);
+    if (numberStart * num < 0) {
+      correspondingBar.attr("class", () => num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative");
+    }
+    selection.text(options.nodeBarFormat(num) + options.nodeBarUnit); 
+  };
 };
 
 nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.nodeEnd + 5} 0 h ${-d.nodeBar.connectorLength}`;
@@ -184,7 +193,6 @@ nodesAPI.getNodeBarTextAnchor = function(d) {
 };
 
 nodesAPI.setNodeBarDefaultClass = function(d) {
-  let c = d3.select(this).attr("class");
-  c += (d.data[options.nodeBarField] >= 0) ? " node-bar-positive" : " node-bar-negative";
-  return c;
+  return d.data[options.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
 };
+

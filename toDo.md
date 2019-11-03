@@ -67,20 +67,24 @@ https://gitlab.com/snippets/1703535
   [ok] determine size of the nodeBar based on a scale
   [ok] compute length based on scale range left and right
   [ok] connectorLength new
-  - For nodeBar and LinkLabel: if number size < rect ?
-  - rootBar: false
-  - default visualization with bar for root
+  [ok] For nodeBar: if number size < rect ?
+  [ok] rootBar: false
+  [ok] default visualization with no bar for root
   [ok] allow for negative values to have bars to the left by default.
   [ok]  (if range[a,b] then create scale for [-b, -a] for negative values)
-    divergingScale: true
-  - animation for changes from pos to negativ: 
-    two chained transition split in half to go to 0.
-    text animated accordingly
-    --> do dashed array just to the beginning of the nodeBarLabel
+  [none]  divergingScale: true
+  [ok] animation for changes from pos to negativ: 
+  [none]  two chained transition split in half to go to 0.
+  [ok] text animated accordingly
+  [ok] do dashed array just to the beginning of the nodeBarLabel
   [ok] domain can be set in api 
 
+Draw background for TextLabel
 
 * allow negativ values for linkWidth range for the tree to go left 
+* reimplement range linkWidth such that node starts after range
+ - For LinkLabel: if number size < rect ? --> move label left/ right of link down
+ - updateScale for linkWidth, linkStrength
 
 * linkLabel background: not stroke but rectangle with background color and 20% tranparency, rounded corners 
 - concept for transitions of linklabel effect on linkLabelBackground

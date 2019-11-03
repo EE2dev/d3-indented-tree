@@ -64,7 +64,7 @@ function createScales(options, config) {
       .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]))
       .range(options.linkWidthRange);
   }
-  if (options.nodeBarOn) { 
+  if (options.nodeBarOn && options.nodeBarUpdateScale) { 
     let dom;
     if (!options.nodeBarDomain) { 
       const extent = d3.extent(nodes, d => +d.data[options.nodeBarField]);
@@ -76,6 +76,7 @@ function createScales(options, config) {
         dom = [extent[0], 0];
       } else {
         dom = [-maxExtent, maxExtent];
+        options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] * 2];
       }
     }
     else { dom = options.nodeBarDomain;}
@@ -194,9 +195,8 @@ function update(source, options, config){
     .attr("d", "M 0 0 h 0");
   
   nodeBarEnter.append("rect")
-    .attr("class", "node-bar box")
-    // .attr("x", n.getXNodeBarRect)
-    // .attr("x", (d) => xEnd - d.y - 40)
+    //.attr("class", "node-bar box")
+    .attr("class", n.setNodeBarDefaultClass)
     .attr("y", -8)
     .attr("height", 16);
 
@@ -228,7 +228,6 @@ function update(source, options, config){
 
   if (options.nodeBarOn) {
     nodeUpdate.selectAll(".node-bar.box")
-      .attr("class", n.setNodeBarDefaultClass)
       .style("fill", n.getNodeBarRectFill)
       .style("stroke", n.getNodeBarRectStroke)
       .attr("x", n.getXNodeBarRect)

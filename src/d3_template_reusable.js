@@ -33,6 +33,7 @@ export default function (_dataSpec) {
   options.nodeBarRange = [0, 200];
   options.nodeBarExtentPosNeg; // true if extent of nodeBarField has negative and positive values
   options.nodeBarRoot = false; // display bar for root node?
+  options.nodeBarUpdateScale = true; // update scale or use current scale
 
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -191,6 +192,8 @@ export default function (_dataSpec) {
       options.nodeBarRange = _options.range || options.nodeBarRange;
       options.nodeBarDomain = _options.domain || options.nodeBarDomain;
       options.nodeBarRoot = (typeof (_options.rootBar) !== "undefined") ? _options.rootBar : options.nodeBarRoot;
+      options.nodeBarUpdateScale = (typeof (_options.updateScale) !== "undefined") ? _options.updateScale : options.nodeBarUpdateScale;
+      
     }
     if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;

@@ -563,6 +563,7 @@
           d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
         }
       } else {
+        // labelInside === false
         if (d.data[options$1.nodeBarField] < 0) {
           d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5;
           d.nodeBar.connectorLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
@@ -582,6 +583,8 @@
     return w;
   };
 
+  // transitions the node bar label through interpolattion and adjusts the class of the node bar
+  //  when the sign of the node bar label changes
   nodesAPI.getNodeBarLabelTween = function (d) {
     var selection = d3.select(this);
     if (!options$1.nodeBarOn) {
@@ -597,8 +600,17 @@
       };
     }
     var i = d3.interpolateNumber(numberStart, numberEnd);
+    var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
+      return d2.id === d.id;
+    });
     return function (t) {
-      selection.text(options$1.nodeBarFormat(i(t)) + options$1.nodeBarUnit);
+      var num = i(t);
+      if (numberStart * num < 0) {
+        correspondingBar.attr("class", function () {
+          return num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+        });
+      }
+      selection.text(options$1.nodeBarFormat(num) + options$1.nodeBarUnit);
     };
   };
 
@@ -632,9 +644,7 @@
   };
 
   nodesAPI.setNodeBarDefaultClass = function (d) {
-    var c = d3.select(this).attr("class");
-    c += d.data[options$1.nodeBarField] >= 0 ? " node-bar-positive" : " node-bar-negative";
-    return c;
+    return d.data[options$1.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
   };
 
   ////////////////////////////////////////////////////
@@ -703,7 +713,7 @@
         return +d.data[options.linkWidthField];
       })).range(options.linkWidthRange);
     }
-    if (options.nodeBarOn) {
+    if (options.nodeBarOn && options.nodeBarUpdateScale) {
       var dom = void 0;
       if (!options.nodeBarDomain) {
         var extent = d3.extent(nodes, function (d) {
@@ -717,6 +727,7 @@
           dom = [extent[0], 0];
         } else {
           dom = [-maxExtent, maxExtent];
+          options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] * 2];
         }
       } else {
         dom = options.nodeBarDomain;
@@ -823,10 +834,9 @@
 
     nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
 
-    nodeBarEnter.append("rect").attr("class", "node-bar box")
-    // .attr("x", n.getXNodeBarRect)
-    // .attr("x", (d) => xEnd - d.y - 40)
-    .attr("y", -8).attr("height", 16);
+    nodeBarEnter.append("rect")
+    //.attr("class", "node-bar box")
+    .attr("class", n.setNodeBarDefaultClass).attr("y", -8).attr("height", 16);
 
     nodeBarEnter.append("text").attr("class", "node-bar bar-label").attr("dy", ".35em");
     // end nodeBar
@@ -847,7 +857,7 @@
     nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
     if (options.nodeBarOn) {
-      nodeUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass).style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
+      nodeUpdate.selectAll(".node-bar.box").style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
       nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill).call(function (sel) {
         return sel.tween("nodeBarLabel", n.getNodeBarLabelTween);
       }).attr("x", n.getXNodeBarText);
@@ -970,6 +980,7 @@
     options.nodeBarScale = d3.scaleLinear();
     options.nodeBarRange = [0, 200];
     options.nodeBarRoot = false; // display bar for root node?
+    options.nodeBarUpdateScale = true; // update scale or use current scale
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -1136,6 +1147,7 @@
         options.nodeBarRange = _options.range || options.nodeBarRange;
         options.nodeBarDomain = _options.domain || options.nodeBarDomain;
         options.nodeBarRoot = typeof _options.rootBar !== "undefined" ? _options.rootBar : options.nodeBarRoot;
+        options.nodeBarUpdateScale = typeof _options.updateScale !== "undefined" ? _options.updateScale : options.nodeBarUpdateScale;
       }
       if (typeof options.updateScales === "function") options.updateScales();
       return chartAPI;

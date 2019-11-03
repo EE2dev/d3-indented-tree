@@ -469,14 +469,15 @@
   var nodesAPI = {};
   var options$1 = void 0;
   var nodeExtendArray = void 0;
-  var xEnd = 600;
+  var xEnd = void 0;
+  var connectorLengthMin = 50;
   var oldLabelField$1 = void 0,
       newLabelField$1 = void 0;
 
   nodesAPI.initialize = function (_options) {
     options$1 = _options;
     oldLabelField$1 = newLabelField$1;
-    newLabelField$1 = options$1.nodeBarOn ? options$1.nodeBarField : undefined;
+    newLabelField$1 = options$1.nodeBarOn ? options$1.nodeBarLabel : undefined;
   };
 
   nodesAPI.appendNode = function (selection) {
@@ -537,14 +538,53 @@
     d3.selectAll(".node").each(function (d) {
       var labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
       var imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
-      var nodeExtend = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
-      d.nodeExtend = nodeExtend;
-      nodeExtendArray.push(nodeExtend + d.y + 5);
+      var nodeEnd = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
+      d.nodeBar = {};
+      d.nodeBar.nodeEnd = nodeEnd;
+      nodeExtendArray.push(d.y + nodeEnd + 5);
     });
     nodeExtendArray.maxExtend = Math.max.apply(Math, toConsumableArray(nodeExtendArray));
-    xEnd = nodeExtendArray.maxExtend + 50 + options$1.nodeBarRange[1];
+    xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options$1.nodeBarRange[1];
+
+    d3.selectAll(".node").each(function (d) {
+      d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField$1]);
+      d.nodeBar.connectorLengthToNegStart = xEnd - d.y - options$1.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
+      d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart;
+      d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart + options$1.nodeBarScale(0);
+      d.nodeBar.posStart = d.nodeBar.negEnd;
+
+      if (options$1.nodeBarLabelInside) {
+        if (d.data[options$1.nodeBarField] < 0) {
+          d.nodeBar.textX = d.nodeBar.negEnd - 5;
+          // comparison if the label is left of bar because bar is too short
+          d.nodeBar.connectorLength = d.nodeBar.LabelWidth + 5 > options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0) ? d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5) : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - (d.nodeBar.nodeEnd + 5 + 5);
+        } else {
+          d.nodeBar.textX = d.nodeBar.posStart + 5;
+          d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+        }
+      } else {
+        // labelInside === false
+        if (d.data[options$1.nodeBarField] < 0) {
+          d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5;
+          d.nodeBar.connectorLength = d.nodeBar.textX - (d.nodeBar.nodeEnd + 5 + d.nodeBar.LabelWidth + 5);
+        } else {
+          d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
+          d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
+        }
+      }
+    });
   };
 
+  var getBarLabelWidth = function getBarLabelWidth(text) {
+    var sel = d3.select("g.node").append("text").style("visibility", "hidden").attr("class", "bar-label temp").text(text);
+
+    var w = sel.node().getBBox().width;
+    sel.remove();
+    return w;
+  };
+
+  // transitions the node bar label through interpolattion and adjusts the class of the node bar
+  //  when the sign of the node bar label changes
   nodesAPI.getNodeBarLabelTween = function (d) {
     var selection = d3.select(this);
     if (!options$1.nodeBarOn) {
@@ -560,22 +600,31 @@
       };
     }
     var i = d3.interpolateNumber(numberStart, numberEnd);
+    var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
+      return d2.id === d.id;
+    });
     return function (t) {
-      selection.text(options$1.nodeBarFormat(i(t)) + options$1.nodeBarUnit);
+      var num = i(t);
+      if (numberStart * num < 0) {
+        correspondingBar.attr("class", function () {
+          return num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+        });
+      }
+      selection.text(options$1.nodeBarFormat(num) + options$1.nodeBarUnit);
     };
   };
 
   nodesAPI.getNodeBarD = function (d) {
-    return "M " + (d.nodeExtend + 5) + " 0 h " + (xEnd - (d.y + d.nodeExtend + 5));
+    return "M " + (d.nodeBar.connectorLength + d.nodeBar.nodeEnd + 5) + " 0 h " + -d.nodeBar.connectorLength;
   };
   nodesAPI.getXNodeBarRect = function (d) {
-    return xEnd - d.y - options$1.nodeBarScale(d.data[options$1.nodeBarField]);
+    return d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField]));
   };
   nodesAPI.getWidthNodeBarRect = function (d) {
-    return options$1.nodeBarScale(d.data[options$1.nodeBarField]);
+    return Math.abs(options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0));
   };
   nodesAPI.getXNodeBarText = function (d) {
-    return xEnd - d.y - 5;
+    return d.nodeBar.textX;
   };
 
   nodesAPI.getNodeBarTextFill = function (d) {
@@ -588,6 +637,14 @@
 
   nodesAPI.getNodeBarRectStroke = function (d) {
     return options$1.nodeBarRectStroke ? options$1.nodeBarRectStroke(d) : d3.select(this).style("stroke");
+  };
+
+  nodesAPI.getNodeBarTextAnchor = function (d) {
+    return d.data[options$1.nodeBarField] < 0 ? "end" : "start";
+  };
+
+  nodesAPI.setNodeBarDefaultClass = function (d) {
+    return d.data[options$1.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
   };
 
   ////////////////////////////////////////////////////
@@ -656,10 +713,26 @@
         return +d.data[options.linkWidthField];
       })).range(options.linkWidthRange);
     }
-    if (options.nodeBarOn) {
-      options.nodeBarScale.domain(d3.extent(nodes, function (d) {
-        return +d.data[options.nodeBarField];
-      })).range(options.nodeBarRange);
+    if (options.nodeBarOn && options.nodeBarUpdateScale) {
+      var dom = void 0;
+      if (!options.nodeBarDomain) {
+        var extent = d3.extent(nodes, function (d) {
+          return +d.data[options.nodeBarField];
+        });
+        var maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1]));
+        options.nodeBarExtentPosNeg = extent[0] * extent[1] >= 0;
+        if (extent[0] >= 0 && extent[1] >= 0) {
+          dom = [0, maxExtent];
+        } else if (extent[0] < 0 && extent[1] < 0) {
+          dom = [extent[0], 0];
+        } else {
+          dom = [-maxExtent, maxExtent];
+          options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] * 2];
+        }
+      } else {
+        dom = options.nodeBarDomain;
+      }
+      options.nodeBarScale.domain(dom).range(options.nodeBarRange).clamp(true);
     }
   }
 
@@ -755,17 +828,17 @@
       n.computeNodeExtend();
     }
 
-    var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+    var nodeBarEnter = nodeEnter.filter(function (d, i) {
+      return options.nodeBarRoot ? true : i > 0;
+    }).append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
     nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
 
-    nodeBarEnter.append("rect").attr("class", "node-bar box")
-    // .attr("x", n.getXNodeBarRect)
-    // .attr("x", (d) => xEnd - d.y - 40)
-    .attr("y", -8).attr("height", 16);
+    nodeBarEnter.append("rect")
+    //.attr("class", "node-bar box")
+    .attr("class", n.setNodeBarDefaultClass).attr("y", -8).attr("height", 16);
 
-    nodeBarEnter.append("text").attr("class", "node-bar label").style("text-anchor", "end").attr("dy", ".35em").style("stroke", "none").style("font-size", ".8em");
-    //.style("fill", "green");
+    nodeBarEnter.append("text").attr("class", "node-bar bar-label").attr("dy", ".35em");
     // end nodeBar
 
     nodeEnter.attr("transform", function () {
@@ -784,11 +857,11 @@
     nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
     if (options.nodeBarOn) {
-      nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
       nodeUpdate.selectAll(".node-bar.box").style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
-      nodeUpdate.selectAll(".node-bar.label").style("fill", n.getNodeBarTextFill).call(function (sel) {
+      nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill).call(function (sel) {
         return sel.tween("nodeBarLabel", n.getNodeBarLabelTween);
       }).attr("x", n.getXNodeBarText);
+      nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
     }
 
     // Transition exiting nodes to the parent's new position (and remove the nodes)
@@ -898,12 +971,16 @@
     options.defaultColor = "grey";
 
     options.nodeBarOn = false;
-    options.nodeBarField = "value";
+    options.nodeBarField = "value"; // for the width of the rect
+    options.nodeBarLabel = options.nodeBarField; // for the text displayed
+    options.nodeBarLabelInside = false; // display the label inside the bar?
     options.nodeBarUnit = "";
     options.nodeBarFormatSpecifier = ",.0f";
     options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
     options.nodeBarScale = d3.scaleLinear();
-    options.nodeBarRange = [50, 200];
+    options.nodeBarRange = [0, 200];
+    options.nodeBarRoot = false; // display bar for root node?
+    options.nodeBarUpdateScale = true; // update scale or use current scale
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -1059,6 +1136,8 @@
         if (_options.locale) {
           chartAPI.formatDefaultLocale(_options.locale);
         }
+        options.nodeBarLabel = _options.label || options.nodeBarField;
+        options.nodeBarLabelInside = typeof _options.labelInside !== "undefined" ? _options.labelInside : options.nodeBarLabelInside;
         options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
         options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
         options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
@@ -1066,6 +1145,9 @@
         options.nodeBarFormat = _options.format ? d3.format(_options.format) : options.nodeBarFormat;
         options.nodeBarScale = _options.scale || options.nodeBarScale;
         options.nodeBarRange = _options.range || options.nodeBarRange;
+        options.nodeBarDomain = _options.domain || options.nodeBarDomain;
+        options.nodeBarRoot = typeof _options.rootBar !== "undefined" ? _options.rootBar : options.nodeBarRoot;
+        options.nodeBarUpdateScale = typeof _options.updateScale !== "undefined" ? _options.updateScale : options.nodeBarUpdateScale;
       }
       if (typeof options.updateScales === "function") options.updateScales();
       return chartAPI;

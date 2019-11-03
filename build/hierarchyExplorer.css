@@ -54,6 +54,7 @@
 
     .node .bar-label {
       stroke: none;
+      fill: black;
       font: 0.8em sans-serif;
     }
 
