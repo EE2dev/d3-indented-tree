@@ -76,7 +76,7 @@ function createScales(options, config) {
         dom = [extent[0], 0];
       } else {
         dom = [-maxExtent, maxExtent];
-        options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] * 2];
+        options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRangeUpperBound * 2];
       }
     }
     else { dom = options.nodeBarDomain;}
@@ -195,7 +195,6 @@ function update(source, options, config){
     .attr("d", "M 0 0 h 0");
   
   nodeBarEnter.append("rect")
-    //.attr("class", "node-bar box")
     .attr("class", n.setNodeBarDefaultClass)
     .attr("y", -8)
     .attr("height", 16);
@@ -228,6 +227,7 @@ function update(source, options, config){
 
   if (options.nodeBarOn) {
     nodeUpdate.selectAll(".node-bar.box")
+      .attr("class", n.setNodeBarDefaultClass)
       .style("fill", n.getNodeBarRectFill)
       .style("stroke", n.getNodeBarRectStroke)
       .attr("x", n.getXNodeBarRect)

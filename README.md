@@ -546,8 +546,13 @@ Sets the transition duration for the transitions.
   }
 
   /* setting the fill of the node bar for positive values */
-  .node .node-bar-positive {
+  .node .node-bar.node-bar-positive {
     fill: steelblue;
+  }
+
+  /* setting the fill of the node bar for negative values */
+  .node .node-bar.node-bar-negative {
+    fill: darkorange;
   }
 
   /* setting the style of the node bar labels */  

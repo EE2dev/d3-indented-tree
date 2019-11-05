@@ -2,8 +2,6 @@ import * as d3 from "d3";
 
 export let nodesAPI = {};
 let options;
-let nodeExtendArray;
-let xEnd;
 const connectorLengthMin = 50;
 let oldLabelField , newLabelField;
 
@@ -91,7 +89,7 @@ nodesAPI.updateNodeImage = function (transition) {
 };
 
 nodesAPI.computeNodeExtend = function() {
-  nodeExtendArray = [];
+  let nodeExtendArray = [];
   d3.selectAll(".node").each(function(d) {
     const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
     const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
@@ -100,10 +98,11 @@ nodesAPI.computeNodeExtend = function() {
       : imageBBox.x + imageBBox.width;
     d.nodeBar = {};
     d.nodeBar.nodeEnd = nodeEnd;
-    nodeExtendArray.push(d.y + nodeEnd  + 5);
+    nodeExtendArray.push(d.y + nodeEnd + 5);
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
-  xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options.nodeBarRange[1];
+  let xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options.nodeBarRange[1];
+  console.log("xEnd: " + xEnd);
 
   d3.selectAll(".node").each(function(d) {
     d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField]);
@@ -193,6 +192,10 @@ nodesAPI.getNodeBarTextAnchor = function(d) {
 };
 
 nodesAPI.setNodeBarDefaultClass = function(d) {
-  return d.data[options.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+  if (!oldLabelField || oldLabelField === newLabelField) { 
+    return d.data[options.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+  } else {
+    return d3.select(this).attr("class");
+  }
 };
 

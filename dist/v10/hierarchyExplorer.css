@@ -44,11 +44,11 @@
       stroke-dasharray: 2;
     }
 
-    .node .node-bar-positive {
+    .node .node-bar.node-bar-positive {
       fill: steelblue;
     }
 
-    .node .node-bar-negative {
+    .node .node-bar.node-bar-negative {
       fill: darkorange;
     }
 

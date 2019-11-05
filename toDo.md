@@ -79,7 +79,15 @@ https://gitlab.com/snippets/1703535
   [ok] do dashed array just to the beginning of the nodeBarLabel
   [ok] domain can be set in api 
 
+nodeBars: bugs
+- new filed -> color white
+- new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
+
+- update on exit (if sel.exit.size() > 0) initialize new
+ .domain .clamp for other (linkWidth)
+
 Draw background for TextLabel
+tradeoff with Animation
 
 * allow negativ values for linkWidth range for the tree to go left 
 * reimplement range linkWidth such that node starts after range

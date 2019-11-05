@@ -31,6 +31,7 @@ export default function (_dataSpec) {
   options.nodeBarScale = d3.scaleLinear();
   options.nodeBarDomain; // domain of the scale
   options.nodeBarRange = [0, 200];
+  options.nodeBarRangeUpperBound = options.nodeBarRange[1];
   options.nodeBarExtentPosNeg; // true if extent of nodeBarField has negative and positive values
   options.nodeBarRoot = false; // display bar for root node?
   options.nodeBarUpdateScale = true; // update scale or use current scale
@@ -190,6 +191,7 @@ export default function (_dataSpec) {
       options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
       options.nodeBarScale  = _options.scale || options.nodeBarScale;
       options.nodeBarRange = _options.range || options.nodeBarRange;
+      if (_options.range) { options.nodeBarRangeUpperBound = options.nodeBarRange[1]; }
       options.nodeBarDomain = _options.domain || options.nodeBarDomain;
       options.nodeBarRoot = (typeof (_options.rootBar) !== "undefined") ? _options.rootBar : options.nodeBarRoot;
       options.nodeBarUpdateScale = (typeof (_options.updateScale) !== "undefined") ? _options.updateScale : options.nodeBarUpdateScale;
