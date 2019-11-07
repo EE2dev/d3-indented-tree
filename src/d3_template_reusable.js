@@ -35,6 +35,7 @@ export default function (_dataSpec) {
   options.nodeBarExtentPosNeg; // true if extent of nodeBarField has negative and positive values
   options.nodeBarRoot = false; // display bar for root node?
   options.nodeBarUpdateScale = true; // update scale or use current scale
+  options.nodeBarTranslateX = 50; // distance between node lebel end and start of minimal neg bar.
 
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -190,6 +191,7 @@ export default function (_dataSpec) {
       options.nodeBarUnit = _options.unit || options.nodeBarUnit;
       options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
       options.nodeBarScale  = _options.scale || options.nodeBarScale;
+      options.nodeBarTranslateX = _options.translateX || options.nodeBarTranslateX;
       options.nodeBarRange = _options.range || options.nodeBarRange;
       if (_options.range) { options.nodeBarRangeUpperBound = options.nodeBarRange[1]; }
       options.nodeBarDomain = _options.domain || options.nodeBarDomain;

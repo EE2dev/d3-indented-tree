@@ -2,7 +2,6 @@ import * as d3 from "d3";
 
 export let nodesAPI = {};
 let options;
-const connectorLengthMin = 50;
 let oldLabelField , newLabelField;
 
 nodesAPI.initialize = function(_options) { 
@@ -101,7 +100,7 @@ nodesAPI.computeNodeExtend = function() {
     nodeExtendArray.push(d.y + nodeEnd + 5);
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
-  let xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options.nodeBarRange[1];
+  let xEnd = nodeExtendArray.maxExtend + options.nodeBarTranslateX + options.nodeBarRange[1];
   console.log("xEnd: " + xEnd);
 
   d3.selectAll(".node").each(function(d) {
@@ -140,7 +139,7 @@ const getBarLabelWidth = function(text) {
     .append("text")
     .style("visibility", "hidden")
     .attr("class", "bar-label temp")
-    .text(text);
+    .text(isNaN(text) ? text : options.nodeBarFormat(text) + options.nodeBarUnit);
 
   const w = sel.node().getBBox().width;
   sel.remove();

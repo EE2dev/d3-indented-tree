@@ -401,7 +401,8 @@ Displays/ transitions the bar for each node to the new value.
         * `scale` is a *function* defining the scale used to map the values to the node bar width (default is `d3.scaleLinear()`).
         * `domain` is an *array* refering to the domain of the scale (default is calculated based on the extent of the corresponding field values).
         * `range` is an *array* refering to the range of the scale (default is `[0, 200]`). In case the domain contains positive and negative values, the range is used separately but scaled correspondingly for positive and negative values to compute the width of their node bars.
-        * `updateScale` specifies a *boolean* property denoting whether the current scale should be reused for a transition. (default is `true`).         
+        * `updateScale` specifies a *boolean* property denoting whether the current scale should be reused for a transition. (default is `true`).   
+         * `translateX` specifies a *number* property denoting the minimal distance between the node label and the node bar. (default is `50`).       
 
 * No argument:
     * with no argument the function returns the name of the numeric field for the node bars.

@@ -71,7 +71,7 @@ function createScales(options, config) {
       const maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1])); 
       options.nodeBarExtentPosNeg = (extent[0] * extent[1] >= 0); 
       if (extent[0] >= 0 && extent[1] >= 0) {
-        dom = [0, maxExtent];
+        dom = [0, maxExtent]; 
       } else if (extent[0] < 0 && extent[1] < 0) {
         dom = [extent[0], 0];
       } else {

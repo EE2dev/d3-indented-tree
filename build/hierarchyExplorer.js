@@ -458,7 +458,6 @@
 
   var nodesAPI = {};
   var options$1 = void 0;
-  var connectorLengthMin = 50;
   var oldLabelField$1 = void 0,
       newLabelField$1 = void 0;
 
@@ -532,7 +531,7 @@
       nodeExtendArray.push(d.y + nodeEnd + 5);
     });
     nodeExtendArray.maxExtend = Math.max.apply(Math, nodeExtendArray);
-    var xEnd = nodeExtendArray.maxExtend + connectorLengthMin + options$1.nodeBarRange[1];
+    var xEnd = nodeExtendArray.maxExtend + options$1.nodeBarTranslateX + options$1.nodeBarRange[1];
     console.log("xEnd: " + xEnd);
 
     d3.selectAll(".node").each(function (d) {
@@ -565,7 +564,7 @@
   };
 
   var getBarLabelWidth = function getBarLabelWidth(text) {
-    var sel = d3.select("g.node").append("text").style("visibility", "hidden").attr("class", "bar-label temp").text(text);
+    var sel = d3.select("g.node").append("text").style("visibility", "hidden").attr("class", "bar-label temp").text(isNaN(text) ? text : options$1.nodeBarFormat(text) + options$1.nodeBarUnit);
 
     var w = sel.node().getBBox().width;
     sel.remove();
@@ -973,6 +972,7 @@
     options.nodeBarRangeUpperBound = options.nodeBarRange[1];
     options.nodeBarRoot = false; // display bar for root node?
     options.nodeBarUpdateScale = true; // update scale or use current scale
+    options.nodeBarTranslateX = 50; // distance between node lebel end and start of minimal neg bar.
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -1136,6 +1136,7 @@
         options.nodeBarUnit = _options.unit || options.nodeBarUnit;
         options.nodeBarFormat = _options.format ? d3.format(_options.format) : options.nodeBarFormat;
         options.nodeBarScale = _options.scale || options.nodeBarScale;
+        options.nodeBarTranslateX = _options.translateX || options.nodeBarTranslateX;
         options.nodeBarRange = _options.range || options.nodeBarRange;
         if (_options.range) {
           options.nodeBarRangeUpperBound = options.nodeBarRange[1];
