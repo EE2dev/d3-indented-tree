@@ -69,11 +69,11 @@ linksAPI.getLinkStrokeWidth = function (d) {
 };
 
 linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
-  return (!options.linkLabelOn) ? "" : d.data[labelField]; 
+  return (!options.linkLabelOn || !d.data[labelField]) ? "" : d.data[labelField]; 
 };
 
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
-  if (!options.linkLabelOn) {
+  if (!options.linkLabelOn || !d.data[labelField]) {
     return "";
   } // else if (typeof d.data[labelField] === "string") {
   else if (isNaN(d.data[labelField])) {
@@ -85,12 +85,14 @@ linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField
 
 linksAPI.getLinkTextTween = function(d) { 
   const selection = d3.select(this);
+  /*
   if (!options.linkLabelOn) {
     return function() { selection.text(""); };
   } 
+  */
   const numberStart = linksAPI.getLinkLabel(d, oldLabelField);
   const numberEnd = linksAPI.getLinkLabel(d, newLabelField);
-  if (isNaN(numberStart) || isNaN(numberEnd)) {
+  if (!numberStart || !numberEnd || isNaN(numberStart) || isNaN(numberEnd)) {
     return function() { selection.text(numberEnd); };
   }
   const i = d3.interpolateNumber(numberStart, numberEnd);

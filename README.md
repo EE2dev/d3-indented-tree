@@ -196,7 +196,7 @@ Then the javascript part would look like:
 ``` 
 ### 2.3. CSV (relational) format
 A csv file format consisting of one row for each leaf. Each row contains the keys of each node traversed from the root down to the leaf and the corresponding data for that leaf.
-The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference the columns of each level in its top-down traversal order with the property ```hierarchyLevels``` (see below for the example). The first element contains a *string* that is used as the root while the other elements reference column names. It the first element is ```"$"``` then the root node will stay without a node label.
+The keys for each level reside in their corresponding columns. The *dataSpec* object has to reference the columns of each level in its top-down traversal order with the property ```hierarchyLevels``` (see below for the example). The first element contains a *string* that is used as the root while the other elements reference column names. If the first element is ```"$"``` then the root node will stay without a node label. Note that this representation can assign other data to the root node.
 
 Internally, the separator ```"$"``` is used when the node key is build by concatenating the corresponding columns. If this character is contained in the data, the separator can be changed by specifying the ```separator```property of the *dataSpec* object. The column name ```"__he_name"``` is reserved internally for storing the node label.
 ```
@@ -388,7 +388,6 @@ Displays/ transitions the bar for each node to the new value.
     
 2. argument (optional):
     * An *object* with the following properties can be used to further specify the mapping:
-        * `rootBar` specifies a *boolean* property denoting whether a node bar is displayed for the root node bar. (default is `false`). This has to be set with the initial call of <i>myChart</i>.<b>nodeBar</b>() and does not transition.
         * `label` specifies the *string* field name for the node bar label (default is the field which is specified as the first argument and used for drawing the bars).
         * `labelInside` specifies a *boolean* property denoting whether to place the label inside the bars (`labelInside: true`) or next to the bar (default is `false`). 
         * `unit` specifies a suffix *string* for the node bar label (default is `""`).
@@ -402,7 +401,7 @@ Displays/ transitions the bar for each node to the new value.
         * `domain` is an *array* refering to the domain of the scale (default is calculated based on the extent of the corresponding field values).
         * `range` is an *array* refering to the range of the scale (default is `[0, 200]`). In case the domain contains positive and negative values, the range is used separately but scaled correspondingly for positive and negative values to compute the width of their node bars.
         * `updateScale` specifies a *boolean* property denoting whether the current scale should be reused for a transition. (default is `true`).   
-         * `translateX` specifies a *number* property denoting the minimal distance between the node label and the node bar. (default is `50`).       
+        * `translateX` specifies a *number* property denoting the minimal distance in pixels between the node label and the node bar. (default is `50`).       
 
 * No argument:
     * with no argument the function returns the name of the numeric field for the node bars.

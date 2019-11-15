@@ -359,13 +359,13 @@
   linksAPI.getLinkLabel = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    return !options.linkLabelOn ? "" : d.data[labelField];
+    return !options.linkLabelOn || !d.data[labelField] ? "" : d.data[labelField];
   };
 
   linksAPI.getLinkLabelFormatted = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    if (!options.linkLabelOn) {
+    if (!options.linkLabelOn || !d.data[labelField]) {
       return "";
     } // else if (typeof d.data[labelField] === "string") {
     else if (isNaN(d.data[labelField])) {
@@ -377,14 +377,14 @@
 
   linksAPI.getLinkTextTween = function (d) {
     var selection = d3.select(this);
+    /*
     if (!options.linkLabelOn) {
-      return function () {
-        selection.text("");
-      };
-    }
+      return function() { selection.text(""); };
+    } 
+    */
     var numberStart = linksAPI.getLinkLabel(d, oldLabelField);
     var numberEnd = linksAPI.getLinkLabel(d, newLabelField);
-    if (isNaN(numberStart) || isNaN(numberEnd)) {
+    if (!numberStart || !numberEnd || isNaN(numberStart) || isNaN(numberEnd)) {
       return function () {
         selection.text(numberEnd);
       };
@@ -532,7 +532,7 @@
     });
     nodeExtendArray.maxExtend = Math.max.apply(Math, nodeExtendArray);
     var xEnd = nodeExtendArray.maxExtend + options$1.nodeBarTranslateX + options$1.nodeBarRange[1];
-    console.log("xEnd: " + xEnd);
+    // console.log("xEnd: " + xEnd);
 
     d3.selectAll(".node").each(function (d) {
       d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField$1]);
@@ -560,6 +560,7 @@
           d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
         }
       }
+      console.log("connector: " + d.nodeBar.connectorLength);
     });
   };
 
@@ -820,8 +821,10 @@
       n.computeNodeExtend();
     }
 
-    var nodeBarEnter = nodeEnter.filter(function (d, i) {
-      return options.nodeBarRoot ? true : i > 0;
+    var nodeBarEnter = nodeEnter
+    //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
+    .filter(function (d) {
+      return d.data[options.nodeBarField] !== null;
     }).append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
     nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
@@ -970,7 +973,6 @@
     options.nodeBarScale = d3.scaleLinear();
     options.nodeBarRange = [0, 200];
     options.nodeBarRangeUpperBound = options.nodeBarRange[1];
-    options.nodeBarRoot = false; // display bar for root node?
     options.nodeBarUpdateScale = true; // update scale or use current scale
     options.nodeBarTranslateX = 50; // distance between node lebel end and start of minimal neg bar.
 
@@ -1142,7 +1144,6 @@
           options.nodeBarRangeUpperBound = options.nodeBarRange[1];
         }
         options.nodeBarDomain = _options.domain || options.nodeBarDomain;
-        options.nodeBarRoot = typeof _options.rootBar !== "undefined" ? _options.rootBar : options.nodeBarRoot;
         options.nodeBarUpdateScale = typeof _options.updateScale !== "undefined" ? _options.updateScale : options.nodeBarUpdateScale;
       }
       if (typeof options.updateScales === "function") options.updateScales();

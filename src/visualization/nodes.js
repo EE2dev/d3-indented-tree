@@ -101,7 +101,7 @@ nodesAPI.computeNodeExtend = function() {
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
   let xEnd = nodeExtendArray.maxExtend + options.nodeBarTranslateX + options.nodeBarRange[1];
-  console.log("xEnd: " + xEnd);
+  // console.log("xEnd: " + xEnd);
 
   d3.selectAll(".node").each(function(d) {
     d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField]);
@@ -131,6 +131,7 @@ nodesAPI.computeNodeExtend = function() {
         d.nodeBar.connectorLength = d.nodeBar.posStart - (d.nodeBar.nodeEnd + 5 + 5);
       }
     }
+    console.log("connector: " + d.nodeBar.connectorLength);
   });
 };
 

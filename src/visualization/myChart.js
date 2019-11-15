@@ -185,7 +185,8 @@ function update(source, options, config){
   if (options.nodeBarOn) { n.computeNodeExtend(); }
 
   const nodeBarEnter = nodeEnter
-    .filter((d,i) => options.nodeBarRoot ? true : i > 0)
+    //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
+    .filter(d => d.data[options.nodeBarField] !== null)
     .append("g")
     .attr("class", "node-bar")
     .attr("display", options.nodeBarOn ? "inline" : "none");

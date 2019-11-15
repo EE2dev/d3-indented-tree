@@ -79,9 +79,12 @@ https://gitlab.com/snippets/1703535
   [ok] do dashed array just to the beginning of the nodeBarLabel
   [ok] domain can be set in api 
 
-nodeBars: bugs
-- new filed -> color white
-- new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
+[ok] nodeBars: bugs
+[ok]  new field -> color white
+[ok]  new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
+
+- nodeBar connector too long
+- update nodeBar connector + linkLabels on collapse, expand
 
 - update on exit (if sel.exit.size() > 0) initialize new
  .domain .clamp for other (linkWidth)
@@ -92,9 +95,14 @@ tradeoff with Animation
 * allow negativ values for linkWidth range for the tree to go left 
 * reimplement range linkWidth such that node starts after range
  - For LinkLabel: if number size < rect ? --> move label left/ right of link down
- - updateScale for linkWidth, linkStrength
 
-* linkLabel background: not stroke but rectangle with background color and 20% tranparency, rounded corners 
+https://stackoverflow.com/questions/46907149/svg-text-background-color-with-border-radius-and-padding-that-matches-the-text-w
+
+https://stackoverflow.com/questions/15500894/background-color-of-text-in-svg
+
+ - updateScale for linkWidth, linkStrength accordingly
+
+* linkLabel background: not stroke but rectangle with background color and 20% tranparency, rounded corners /when computing rect position, initialize with label alignment
 - concept for transitions of linklabel effect on linkLabelBackground
 
 * color themes
@@ -109,6 +117,7 @@ tradeoff with Animation
 * applications (chess, basketball, nfl, soccer, flags, d3.js)
 https://www.chess.com/article/view/how-many-chess-players-are-there-in-the-world
 * observable
+* save image as svg or png https://stackoverflow.com/questions/36303964/save-d3-chart-as-image
 
 [bug] if links are in transition and collapse or expand is called, the links can get too long
 * add slow expansion of tree https://stackoverflow.com/questions/35834304/d3js-collapsible-tree-entering-transition-using-depth-first-style/35838978#35838978

@@ -10,27 +10,37 @@
 
   <!-- paste data in aside tag -->
   <aside id="data">
-level1;level2;level3;size1;size2;size3;color
-Eve;Cain;;1;2;4;rgb(100 23 80)
-Eve;Seth;;-45;20;4;rgb(100 23 80)
-Eve;Seth;Enos;3;2;4;rgb(100 23 80)
-Eve;Seth;Noam;3;2;4;rgb(100 23 80)
-Eve;Abel;;32;2;4;rgb(100 23 80)
-Eve;Awan;Enoch;3;2;4;rgb(100 23 80)
-Eve;Azura;;5;2;4;rgb(100 23 80)
-Eve;;;3;2;4;rgb(100 23 80)
+key,parent,position,play,offense,score,bar
+"Seahawks at 49ers",,,,,,
+Q1,"Seahawks at 49ers",,,,,
+Kickoff,Q1,,,,,
+1st and 10,Q1,,,,, 
+2nd and 1,Q1,,,,, 
+Seahawks ball at SEA 25,Kickoff,25,Touchback,49ers,0 : 0,10 
+Seahawks ball at SEA 34,1st and 10,34,(Wilson) 9 yard pass to Lockett,Seahawks,0 : 0,10
+Seahawks ball at SF 6,2nd and 1,94,(Carson) 70 yard run,Seahawks,0 : 0,10
   </aside>
 
   <script>
     const dataSpec = {
       source: "aside#data",
-      hierarchyLevels: ["$", "level1", "level2", "level3"],
-      delimiter: ";",
+      // convertTypes: "none",
+     // hierarchyLevels: ["$", "level1", "level2", "level3"],
+    //  delimiter: ";",
     };
     const myChart = hierarchyExplorer.chart(dataSpec)
       .debugOn(true)
-      .linkLabel("size1")
-      .nodeSort("size1")
+      /*
+      .nodeImageFile(
+        d =>  d.depth === 3 ? "https://static.nfl.com/static/content/public/static/wildcat/assets/img/logos/teams/SEA.svg"
+        : "", {width: 30, height: 30})
+        */
+      .linkHeight(30)
+      .linkWidth("position", {range: [100, 300]})
+      .linkLabel("play", {align: false, onTop: false})
+      .nodeBar("bar", {label: "score", labelInside: true, range: [0, 32]
+        , rectFill: () => "lightblue", rectStroke: () => "steelblue", textFill: () => "steelblue"})
+      // .nodeSort("size1")
       // .nodeBar("size1", {rootBar: true})
     ;
     showChart(); // for preprocessing data see below
