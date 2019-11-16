@@ -27,7 +27,7 @@ nodesAPI.updateNode = function (transition) {
     if (options.nodeImageSelectionUpdate && typeof options.nodeImageSelectionUpdate === "function") {
       options.nodeImageSelectionUpdate(transition);
     } else if (options.nodeImageSelectionAppend && typeof options.nodeImageSelectionAppend === "function") {
-      return; // do nothing - custom SVG append provided but no custom SVG update 
+      return; // do nothing - custom SVG append provided but no custom SVG update  
     } else { nodesAPI.updateNodeSVG(transition); }
   }
 };
