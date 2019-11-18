@@ -181,9 +181,13 @@ function update(source, options, config){
     return d.data[options.nodeLabelField];
   });
 
-  // add nodeBar
-  if (options.nodeBarOn) { n.computeNodeExtend(); }
+  nodeEnter.attr("transform", 
+    function () {
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
+    })
+    .style("visibility", "visible");
 
+  // add nodeBar
   const nodeBarEnter = nodeEnter
     //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
     .filter(d => d.data[options.nodeBarField] !== null)
@@ -205,14 +209,11 @@ function update(source, options, config){
     .attr("dy", ".35em") ;
   // end nodeBar
 
-  nodeEnter.attr("transform", 
-    function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    })
-    .style("visibility", "visible");
+  let nodeMerge = node.merge(nodeEnter);
+  if (options.nodeBarOn) { n.computeNodeExtend(nodeMerge); }
 
   // Transition nodes to their new position.
-  let nodeUpdate = node.merge(nodeEnter)
+  let nodeUpdate = nodeMerge
     .transition()
     .duration(options.transitionDuration);
   

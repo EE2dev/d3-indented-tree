@@ -519,22 +519,29 @@
   nodesAPI.updateNodeImage = function (transition) {
     transition.select(".nodeImage").attr("xlink:href", options$1.nodeImageFileAppend);
   };
-
-  nodesAPI.computeNodeExtend = function () {
+  nodesAPI.computeNodeExtend = function (sel) {
     var nodeExtendArray = [];
-    d3.selectAll(".node").each(function (d) {
+    // d3.selectAll(".node").each(function(d) {
+    sel.each(function (d) {
       var labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
       var imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
       var nodeEnd = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
       d.nodeBar = {};
       d.nodeBar.nodeEnd = nodeEnd;
       nodeExtendArray.push(d.y + nodeEnd + 5);
+      // console.log("d.y: " + d.y);
+      // console.log("nodeEnd: " + nodeEnd);
     });
     nodeExtendArray.maxExtend = Math.max.apply(Math, nodeExtendArray);
     var xEnd = nodeExtendArray.maxExtend + options$1.nodeBarTranslateX + options$1.nodeBarRange[1];
-    // console.log("xEnd: " + xEnd);
+    /*
+    console.log("nodeExtendArray: " + nodeExtendArray);
+    console.log("options.nodeBarRAnge[1]: " + options.nodeBarRange[1]);
+    console.log("xEnd: " + xEnd);
+    */
 
-    d3.selectAll(".node").each(function (d) {
+    // d3.selectAll(".node").each(function(d) {
+    sel.each(function (d) {
       d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField$1]);
       d.nodeBar.connectorLengthToNegStart = xEnd - d.y - options$1.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
       d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart;
@@ -816,11 +823,11 @@
       return d.data[options.nodeLabelField];
     });
 
-    // add nodeBar
-    if (options.nodeBarOn) {
-      n.computeNodeExtend();
-    }
+    nodeEnter.attr("transform", function () {
+      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
+    }).style("visibility", "visible");
 
+    // add nodeBar
     var nodeBarEnter = nodeEnter
     //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
     .filter(function (d) {
@@ -834,12 +841,13 @@
     nodeBarEnter.append("text").attr("class", "node-bar bar-label").attr("dy", ".35em");
     // end nodeBar
 
-    nodeEnter.attr("transform", function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    }).style("visibility", "visible");
+    var nodeMerge = node.merge(nodeEnter);
+    if (options.nodeBarOn) {
+      n.computeNodeExtend(nodeMerge);
+    }
 
     // Transition nodes to their new position.
-    var nodeUpdate = node.merge(nodeEnter).transition().duration(options.transitionDuration);
+    var nodeUpdate = nodeMerge.transition().duration(options.transitionDuration);
 
     nodeUpdate.attr("transform", function (d) {
       return "translate(" + d.y + "," + d.x + ") scale(1,1)";

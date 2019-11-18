@@ -86,10 +86,10 @@ nodesAPI.updateNodeImage = function (transition) {
     .select(".nodeImage")
     .attr("xlink:href", options.nodeImageFileAppend);    
 };
-
-nodesAPI.computeNodeExtend = function() {
+nodesAPI.computeNodeExtend = function(sel ) {
   let nodeExtendArray = [];
-  d3.selectAll(".node").each(function(d) {
+  // d3.selectAll(".node").each(function(d) {
+  sel.each(function(d) {
     const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
     const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
     const nodeEnd = (labelBBox.width !== 0) ? 
@@ -98,12 +98,19 @@ nodesAPI.computeNodeExtend = function() {
     d.nodeBar = {};
     d.nodeBar.nodeEnd = nodeEnd;
     nodeExtendArray.push(d.y + nodeEnd + 5);
+    // console.log("d.y: " + d.y);
+    // console.log("nodeEnd: " + nodeEnd);
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
   let xEnd = nodeExtendArray.maxExtend + options.nodeBarTranslateX + options.nodeBarRange[1];
-  // console.log("xEnd: " + xEnd);
-
-  d3.selectAll(".node").each(function(d) {
+  /*
+  console.log("nodeExtendArray: " + nodeExtendArray);
+  console.log("options.nodeBarRAnge[1]: " + options.nodeBarRange[1]);
+  console.log("xEnd: " + xEnd);
+  */
+ 
+  // d3.selectAll(".node").each(function(d) {
+  sel.each(function(d) {
     d.nodeBar.LabelWidth = getBarLabelWidth(d.data[newLabelField]);
     d.nodeBar.connectorLengthToNegStart = xEnd - d.y - options.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
     d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart;

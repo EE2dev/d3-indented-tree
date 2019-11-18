@@ -84,6 +84,7 @@ https://gitlab.com/snippets/1703535
 [ok]  new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
 
 - nodeBar connector too long
+[bug] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
 - update nodeBar connector + linkLabels on collapse, expand
 
 - update on exit (if sel.exit.size() > 0) initialize new
