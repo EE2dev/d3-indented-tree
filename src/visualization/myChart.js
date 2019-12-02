@@ -69,7 +69,7 @@ function createScales(options, config) {
     if (!options.nodeBarDomain) { 
       const extent = d3.extent(nodes, d => +d.data[options.nodeBarField]);
       const maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1])); 
-      options.nodeBarExtentPosNeg = (extent[0] * extent[1] >= 0); 
+      options.nodeBarExtentPosNeg = (extent[0] * extent[1] < 0); 
       if (extent[0] >= 0 && extent[1] >= 0) {
         dom = [0, maxExtent]; 
       } else if (extent[0] < 0 && extent[1] < 0) {
@@ -181,11 +181,14 @@ function update(source, options, config){
     return d.data[options.nodeLabelField];
   });
 
-  nodeEnter.attr("transform", 
+  /*
+  nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
     function () {
       return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
     })
     .style("visibility", "visible");
+    */
+  nodeEnter.style("visibility", "hidden");
 
   // add nodeBar
   const nodeBarEnter = nodeEnter
@@ -211,6 +214,9 @@ function update(source, options, config){
 
   let nodeMerge = node.merge(nodeEnter);
   if (options.nodeBarOn) { n.computeNodeExtend(nodeMerge); }
+
+  nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
+    .style("visibility", "visible");
 
   // Transition nodes to their new position.
   let nodeUpdate = nodeMerge

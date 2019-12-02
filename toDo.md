@@ -78,24 +78,29 @@ https://gitlab.com/snippets/1703535
   [ok] text animated accordingly
   [ok] do dashed array just to the beginning of the nodeBarLabel
   [ok] domain can be set in api 
+  [ok] nodeBars: bugs
+  [ok]  new field -> color white
+  [ok]  new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
+  [none] relational data depend on order of missing values - just for undefined data
+  [ok] nodeBar connector too long
+  [ok] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
+  [ok] getVerticalAlignmentRef _> if label inside is before neg bar 
 
-[ok] nodeBars: bugs
-[ok]  new field -> color white
-[ok]  new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
 
-- nodeBar connector too long
-[bug] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
 - update nodeBar connector + linkLabels on collapse, expand
+[bug] sometimes link Label moved to left
+- user can set dom of a scale
 
 - update on exit (if sel.exit.size() > 0) initialize new
  .domain .clamp for other (linkWidth)
 
-Draw background for TextLabel
+- Draw background for TextLabel (nodeBars + linkWidth)
 tradeoff with Animation
 
 * allow negativ values for linkWidth range for the tree to go left 
 * reimplement range linkWidth such that node starts after range
  - For LinkLabel: if number size < rect ? --> move label left/ right of link down
+* style (font-variant-numeric) for animated numbers
 
 https://stackoverflow.com/questions/46907149/svg-text-background-color-with-border-radius-and-padding-that-matches-the-text-w
 

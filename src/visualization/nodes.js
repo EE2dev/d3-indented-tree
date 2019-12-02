@@ -86,6 +86,8 @@ nodesAPI.updateNodeImage = function (transition) {
     .select(".nodeImage")
     .attr("xlink:href", options.nodeImageFileAppend);    
 };
+
+/*
 nodesAPI.computeNodeExtend = function(sel ) {
   let nodeExtendArray = [];
   // d3.selectAll(".node").each(function(d) {
@@ -97,17 +99,19 @@ nodesAPI.computeNodeExtend = function(sel ) {
       : imageBBox.x + imageBBox.width;
     d.nodeBar = {};
     d.nodeBar.nodeEnd = nodeEnd;
+    d.nodeBar.connectorStart = d.y + nodeEnd + 5;
+    d.nodeBar.verticalAlignmentRef = ;
     nodeExtendArray.push(d.y + nodeEnd + 5);
-    // console.log("d.y: " + d.y);
-    // console.log("nodeEnd: " + nodeEnd);
+    console.log("d.y: " + d.y);
+    console.log("nodeEnd: " + nodeEnd);
   });
   nodeExtendArray.maxExtend = Math.max(...nodeExtendArray);
   let xEnd = nodeExtendArray.maxExtend + options.nodeBarTranslateX + options.nodeBarRange[1];
-  /*
+  
   console.log("nodeExtendArray: " + nodeExtendArray);
-  console.log("options.nodeBarRAnge[1]: " + options.nodeBarRange[1]);
+  console.log("options.nodeBarRange[1]: " + options.nodeBarRange[1]);
   console.log("xEnd: " + xEnd);
-  */
+
  
   // d3.selectAll(".node").each(function(d) {
   sel.each(function(d) {
@@ -140,6 +144,91 @@ nodesAPI.computeNodeExtend = function(sel ) {
     }
     console.log("connector: " + d.nodeBar.connectorLength);
   });
+};
+*/
+
+nodesAPI.computeNodeExtend = function(sel ) {
+  let alignmentAnchorArray = [];
+  let anchorXPos;
+
+  const filteredSel = sel.filter(d => d.data[newLabelField]);
+  filteredSel.each(function(d) {
+    const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
+    const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
+    const nodeEnd = (labelBBox.width !== 0) ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
+    d.nodeBar = {};
+    d.nodeBar.connectorStart = nodeEnd + 5;
+    d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField]);
+    alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
+
+    // alignmentAnchorArray.push(d.y + nodeEnd + 5);
+    // console.log("d.y: " + d.y);
+    // console.log("nodeEnd: " + nodeEnd);
+    console.log("connctorStart: " + d.nodeBar.connectorStart);
+  });
+  alignmentAnchorArray.anchor = Math.max(...alignmentAnchorArray);
+  anchorXPos = alignmentAnchorArray.anchor + options.nodeBarTranslateX;
+
+  // xEnd = anchorXPos + options.nodeBarRange[1];
+  
+  console.log("alignmentAnchorArray: " + alignmentAnchorArray);
+  console.log("options.nodeBarRange[1]: " + options.nodeBarRange[1]);
+  console.log("anchorXPos: " + anchorXPos);
+
+ 
+  // d3.selectAll(".node").each(function(d) {
+  filteredSel.each(function(d) {
+    // d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField]);
+    /*
+    d.nodeBar.connectorLengthToNegStart = xEnd - d.y - options.nodeBarRange[1] - d.nodeBar.nodeEnd - 5;
+    d.nodeBar.negStart = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart;
+    d.nodeBar.negEnd = d.nodeBar.nodeEnd + 5 + d.nodeBar.connectorLengthToNegStart + options.nodeBarScale(0);
+    d.nodeBar.posStart = d.nodeBar.negEnd;
+    */
+    d.nodeBar.anchor = anchorXPos - d.y;
+    d.nodeBar.negStart = d.nodeBar.anchor - options.nodeBarRange[1] / 2;
+
+    if (d.data[options.nodeBarField] < 0) { 
+      if (options.nodeBarLabelInside) {
+        d.nodeBar.textX = d.nodeBar.anchor - 5;
+        // comparison if the label is left of bar because bar is too short
+        d.nodeBar.connectorLength = labelLargerThanNegBar(d) ?
+          (d.nodeBar.textX - d.nodeBar.labelWidth - 5) - d.nodeBar.connectorStart
+          : (d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField] + nodesAPI.getWidthNodeBarRect(d)) - 5) 
+            - d.nodeBar.connectorStart;
+      } else { // labelInside === false
+        d.nodeBar.textX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5;
+        d.nodeBar.connectorLength = (d.nodeBar.textX - d.nodeBar.labelWidth - 5) - d.nodeBar.connectorStart;
+      }
+    } else { // d.data[options.nodeBarField] >= 0
+      if (options.nodeBarLabelInside) {
+        d.nodeBar.textX = d.nodeBar.anchor + 5;
+        d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
+      }
+      else { // labelInside === false
+        d.nodeBar.textX = options.nodeBarExtentPosNeg 
+          ? d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) + 5
+          : d.nodeBar.anchor + options.nodeBarScale(d.data[options.nodeBarField]) + 5;
+        d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
+      }
+    } 
+    console.log("connector: " + d.nodeBar.connectorLength);
+  });
+};
+
+const labelLargerThanNegBar = d => d.nodeBar.labelWidth + 5 > nodesAPI.getWidthNodeBarRect(d);
+
+// get the anchor (0) point of all node bars for alignment 
+const getVerticalAlignmentRef = function(d, pos) {
+  if (!options.nodeBarLabelInside && d.data[options.nodeBarField] < 0) {
+    pos += 5 + d.nodeBar.labelWidth;
+  } else if (options.nodeBarLabelInside && d.data[options.nodeBarField] < 0) {
+    if (labelLargerThanNegBar(d)) {
+      pos += d.nodeBar.labelWidth + 5 - nodesAPI.getWidthNodeBarRect(d);
+    }
+  }
+  pos += d.data[options.nodeBarField] < 0 ? 5 + nodesAPI.getWidthNodeBarRect(d) : 5;
+  return pos;
 };
 
 const getBarLabelWidth = function(text) {
@@ -177,7 +266,13 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   };
 };
 
+/*
 nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.nodeEnd + 5} 0 h ${-d.nodeBar.connectorLength}`;
+nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
+nodesAPI.getWidthNodeBarRect = d => Math.abs(options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0));
+nodesAPI.getXNodeBarText = d => d.nodeBar.textX;
+*/
+nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
 nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
 nodesAPI.getWidthNodeBarRect = d => Math.abs(options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0));
 nodesAPI.getXNodeBarText = d => d.nodeBar.textX;
