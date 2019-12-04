@@ -86,6 +86,13 @@ https://gitlab.com/snippets/1703535
   [ok] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
   [ok] getVerticalAlignmentRef _> if label inside is before neg bar 
 
+- linkWidth neg values
+- update Label placement linkLabel
+- update nodeBars for neg linkWidth
+- background for linkLabel (default)
+- background for nodeBars (default)
+- scale linkLabel like nodeBars
+- update blocks/ examples
 
 - update nodeBar connector + linkLabels on collapse, expand
 [bug] sometimes link Label moved to left

@@ -91,7 +91,7 @@ nodesAPI.computeNodeExtend = function(sel ) {
   let alignmentAnchorArray = [];
   let anchorXPos;
 
-  const filteredSel = sel.filter(d => d.data[newLabelField]);
+  const filteredSel = sel.filter(d => typeof(d.data[newLabelField]) !== "undefined" );
   filteredSel.each(function(d) {
     const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
     const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
