@@ -14,12 +14,12 @@
     level1;level2;level3;size1;size2;size3;color
     Eve;Cain;;1;2;4;rgb(100 23 80)
     Eve;Seth;;-45;20;4;rgb(100 23 80)
-    Eve;Seth;Enos;3;2;4;rgb(100 23 80)
-    Eve;Seth;Noam;3;2;4;rgb(100 23 80)
+    Eve;Seth;Enos;-50;2;4;rgb(100 23 80)
+    Eve;Seth;Noam;50;2;4;rgb(100 23 80)
     Eve;Abel;;32;2;4;rgb(100 23 80)
-    Eve;Awan;Enoch;-2333.3;2;5;rgb(100 23 80)
-    Eve;Azura;;;2;4;rgb(100 23 80)
-    Eve;;;-88883;2;4;rgb(100 23 80)
+    Eve;Awan;Enoch;-50.3;2;5;rgb(100 23 80)
+    Eve;Azura;;0;2;4;rgb(100 23 80)
+    Eve;;;-50;2;4;rgb(100 23 80)
   </aside>
   
     <script>
@@ -30,7 +30,8 @@
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
         .debugOn(true)
-        .linkWidth("size1", {range: [-100, 0]})
+        .margin({top: 20, right: 10, bottom: 20, left: 400})
+        .linkWidth("size1", {range: [-100, 100]})
         .linkLabel("size1", {unit: " cust"})
         .nodeSort("size1")
         .nodeBar("size1", {translateX: 1, unit: " customers", labelInside: true})

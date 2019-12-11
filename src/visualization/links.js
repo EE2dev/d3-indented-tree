@@ -21,15 +21,20 @@ linksAPI.getLinkD = function (d, direction, updatePattern = false) {
   const linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
   const linkStrength = linksAPI.getLinkStrength(d, options);
   let path;
-  if (direction === "down"){
+  if (direction === "vertical"){
     if (updatePattern) { // for updated links use .x of last child to support resorted nodes/links
       const xLastChild = d.parent.children[d.parent.children.length - 1].x;
       path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (xLastChild + linkStrength / 2 - d.parent.x);
     } else {
       path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (d.x + linkStrength / 2 - d.parent.x);
     }
-  } else if (direction === "right"){
-    path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
+  } else if (direction === "horizontal"){
+    const m = (d.y >= d.parent.y) ? 
+      (d.y - (d.parent.y + linkStrengthParent / 2)) 
+      : (d.y - (d.parent.y - linkStrengthParent / 2));
+    path = "M 0 0" + "H" + m;
+    console.log("Name: "+ d.name + " m: " + m);
+    // path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
   }
   return path;
 };
@@ -69,11 +74,13 @@ linksAPI.getLinkStrokeWidth = function (d) {
 };
 
 linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
-  return (!options.linkLabelOn || !d.data[labelField]) ? "" : d.data[labelField]; 
+  return (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") ? "" : d.data[labelField]; 
 };
 
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
-  if (!options.linkLabelOn || !d.data[labelField]) {
+  //  if (!options.linkLabelOn || !d.data[labelField]) {
+  // console.log(d.name + " " + d.data[labelField] + " " + isNaN(d.data[labelField]));
+  if (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") {
     return "";
   } // else if (typeof d.data[labelField] === "string") {
   else if (isNaN(d.data[labelField])) {
@@ -92,12 +99,17 @@ linksAPI.getLinkTextTween = function(d) {
   */
   const numberStart = linksAPI.getLinkLabel(d, oldLabelField);
   const numberEnd = linksAPI.getLinkLabel(d, newLabelField);
-  if (!numberStart || !numberEnd || isNaN(numberStart) || isNaN(numberEnd)) {
+
+  if (!isNumber(numberStart) || !isNumber(numberEnd)) {
     return function() { selection.text(numberEnd); };
   }
   const i = d3.interpolateNumber(numberStart, numberEnd);
   return function(t) { selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); };
 };
+
+function isNumber(num) {
+  return typeof(num) === "number";
+}
 
 linksAPI.getLinkRTranslate = function (d) {
   return "translate(" + (linksAPI.getLinkStrength(d.parent) / 2) + " " + (d.x - d.parent.x) + ")";

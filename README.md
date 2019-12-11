@@ -383,7 +383,7 @@ Transitions to the new number label on top of the links.
 
 Displays/ transitions the bar for each node to the new value. 
 1. argument:
-    * to set the node bar dynamically, provide the name of a field as a *string*. The values of the field must be *numeric*. 
+    * to set the node bar dynamically, provide the name of a field as a *string*. The values of the field must be *numeric*. If node bars should be display for some but not all nodes, e.g. not for internal nodes, simply have a missing value for this field. 
     * to switch the node bars on or off provide a <i>boolean</i>. 
     
 2. argument (optional):

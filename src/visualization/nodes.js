@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { linksAPI } from "./links.js";
 
 export let nodesAPI = {};
 let options;
@@ -87,17 +88,22 @@ nodesAPI.updateNodeImage = function (transition) {
     .attr("xlink:href", options.nodeImageFileAppend);    
 };
 
-nodesAPI.computeNodeExtend = function(sel ) {
+nodesAPI.computeNodeExtend = function(sel) {
   let alignmentAnchorArray = [];
   let anchorXPos;
 
+  const l = linksAPI;
+  l.initialize(options);
+
   const filteredSel = sel.filter(d => typeof(d.data[newLabelField]) !== "undefined" );
   filteredSel.each(function(d) {
-    const labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
+    const labelBBox = d3.select(this).select(".node-label").node().getBBox();
     const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
     const nodeEnd = (labelBBox.width !== 0) ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
     d.nodeBar = {};
-    d.nodeBar.connectorStart = nodeEnd + 5;
+    d.nodeBar.connectorStart = (!d.parent || d.y >= d.parent.y) ? 
+      nodeEnd + 5 
+      : (d.parent.y - d.y) + l.getLinkStrength(d.parent, options) / 2 + 5;
     d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField]);
     alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
 
@@ -122,7 +128,7 @@ nodesAPI.computeNodeExtend = function(sel ) {
         // comparison if the label is left of bar because bar is too short
         d.nodeBar.connectorLength = labelLargerThanNegBar(d) ?
           (d.nodeBar.textX - d.nodeBar.labelWidth - 5) - d.nodeBar.connectorStart
-          : (d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField] + nodesAPI.getWidthNodeBarRect(d)) - 5) 
+          : (d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5) 
             - d.nodeBar.connectorStart;
       } else { // labelInside === false
         d.nodeBar.textX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5;
@@ -134,13 +140,15 @@ nodesAPI.computeNodeExtend = function(sel ) {
         d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
       }
       else { // labelInside === false
-        d.nodeBar.textX = options.nodeBarExtentPosNeg 
+        d.nodeBar.textX = options.nodeBarNeg 
           ? d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) + 5
           : d.nodeBar.anchor + options.nodeBarScale(d.data[options.nodeBarField]) + 5;
         d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
       }
     } 
-    if (options.debugOn) { console.log("connector: " + d.nodeBar.connectorLength);}
+    if (options.debugOn) { console.log("connector: " + d.nodeBar.connectorLength); 
+      console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
+    }
   });
 };
 
@@ -194,8 +202,24 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   };
 };
 
+/*
+nodesAPI.getNodeBarLabelTween = function(d) {
+  if (!d.parent) { return; }
+
+  const numberStart = oldLabelField ? d.data[oldLabelField] : d.data[newLabelField];
+  const numberEnd = d.data[newLabelField];
+
+  .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
+  .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
+
+  const i = d3.interpolateNumber(numberStart, numberEnd);
+}
+*/
+
 nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
-nodesAPI.getXNodeBarRect = d => d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]));
+nodesAPI.getXNodeBarRect = d => options.nodeBarNeg ?
+  d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]))
+  : d.nodeBar.anchor;
 nodesAPI.getWidthNodeBarRect = d => Math.abs(options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0));
 nodesAPI.getXNodeBarText = d => d.nodeBar.textX;
 

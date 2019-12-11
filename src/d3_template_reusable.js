@@ -32,9 +32,11 @@ export default function (_dataSpec) {
   options.nodeBarDomain; // domain of the scale
   options.nodeBarRange = [0, 200];
   options.nodeBarRangeUpperBound = options.nodeBarRange[1];
-  options.nodeBarExtentPosNeg; // true if extent of nodeBarField has negative and positive values
+  options.nodeBarRangeAdjusted = false; // true if range is doubled for pos + neg bars
+  options.nodeBarNeg; // true if nodeBarField has at least one negative value
   options.nodeBarUpdateScale = true; // update scale or use current scale
   options.nodeBarTranslateX = 50; // distance between node lebel end and start of minimal neg bar.
+  options.nodeBarState = {}; // properties oldField and newField for transitions
 
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -183,19 +185,24 @@ export default function (_dataSpec) {
     if (options.nodeBarOn) {
       if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
       options.nodeBarLabel = _options.label || options.nodeBarField;
+      options.nodeBarState.oldField = options.nodeBarState.newField;
+      options.nodeBarState.newField = options.nodeBarLabel;
       options.nodeBarLabelInside = (typeof (_options.labelInside) !== "undefined") ? _options.labelInside : options.nodeBarLabelInside;
       options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
       options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
       options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
       options.nodeBarUnit = _options.unit || options.nodeBarUnit;
       options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
-      options.nodeBarScale  = _options.scale || options.nodeBarScale;
       options.nodeBarTranslateX = _options.translateX || options.nodeBarTranslateX;
-      options.nodeBarRange = _options.range || options.nodeBarRange;
+      options.nodeBarScale  = _options.scale || options.nodeBarScale;
+      //options.nodeBarRange = _options.range || options.nodeBarRange;
+      if (_options.range) { options.nodeBarRange = _options.range; options.nodeBarRangeAdjusted = false;}
       if (_options.range) { options.nodeBarRangeUpperBound = options.nodeBarRange[1]; }
       options.nodeBarDomain = _options.domain || options.nodeBarDomain;
-      options.nodeBarUpdateScale = (typeof (_options.updateScale) !== "undefined") ? _options.updateScale : options.nodeBarUpdateScale;
-      
+      if (typeof (_options.updateScale) !== "undefined") {
+        options.nodeBarUpdateScale = _options.updateScale;
+      } 
+      // options.nodeBarUpdateScale = (typeof (_options.updateScale) !== "undefined") ? _options.updateScale : options.nodeBarUpdateScale;
     }
     if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;

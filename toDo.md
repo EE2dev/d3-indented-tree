@@ -86,12 +86,18 @@ https://gitlab.com/snippets/1703535
   [ok] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
   [ok] getVerticalAlignmentRef _> if label inside is before neg bar 
 
+- nodeBar change of fields leads to twice the range if posNeg was before
+- change if nodeBars are just neg
+- CSS also in readme change from CamelCase to hyphenated
+- switch global newlinklabel, newlinkWidth setting to options
+--> nodeSort can be chained after linkLabel/nodeBar.tween without jump
 - linkWidth neg values
-- update Label placement linkLabel
 - update nodeBars for neg linkWidth
+- update Label placement linkLabel
+- update SVG translate for neg values
 - background for linkLabel (default)
 - background for nodeBars (default)
-- scale linkLabel like nodeBars
+- scale linkWidth, linkHeight, like nodeBars
 - update blocks/ examples
 
 - update nodeBar connector + linkLabels on collapse, expand
