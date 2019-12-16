@@ -191,22 +191,13 @@ function update(source, options, config){
     return d.data[options.nodeLabelField];
   });
 
-  /*
-  nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
-    function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    })
-    .style("visibility", "visible");
-    */
   nodeEnter.style("visibility", "hidden");
 
   // add nodeBar
   const nodeBarEnter = nodeEnter
-    //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
-    .filter(d => d.data[options.nodeBarField] !== null)
     .append("g")
     .attr("class", "node-bar")
-    .attr("display", options.nodeBarOn ? "inline" : "none");
+    .style("display", d => options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none");
 
   nodeBarEnter.append("path")
     .attr("class", "node-bar connector")
@@ -223,6 +214,9 @@ function update(source, options, config){
   // end nodeBar
 
   let nodeMerge = node.merge(nodeEnter);
+  
+  nodeMerge.selectAll("g.node-bar").style("display", 
+    d => options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none");
   if (options.nodeBarOn) { n.computeNodeExtend(nodeMerge); }
 
   nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")

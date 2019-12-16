@@ -891,21 +891,12 @@
       return d.data[options.nodeLabelField];
     });
 
-    /*
-    nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
-      function () {
-        return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-      })
-      .style("visibility", "visible");
-      */
     nodeEnter.style("visibility", "hidden");
 
     // add nodeBar
-    var nodeBarEnter = nodeEnter
-    //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
-    .filter(function (d) {
-      return d.data[options.nodeBarField] !== null;
-    }).append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+    var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").style("display", function (d) {
+      return options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none";
+    });
 
     nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
 
@@ -915,6 +906,10 @@
     // end nodeBar
 
     var nodeMerge = node.merge(nodeEnter);
+
+    nodeMerge.selectAll("g.node-bar").style("display", function (d) {
+      return options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none";
+    });
     if (options.nodeBarOn) {
       n.computeNodeExtend(nodeMerge);
     }

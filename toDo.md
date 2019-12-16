@@ -88,6 +88,7 @@ https://gitlab.com/snippets/1703535
 
 - nodeBar change of fields leads to twice the range if posNeg was before
 - change if nodeBars are just neg
+- Nodebar bei missing nicht anzeigen (statt 0)
 - CSS also in readme change from CamelCase to hyphenated
 - switch global newlinklabel, newlinkWidth setting to options
 --> nodeSort can be chained after linkLabel/nodeBar.tween without jump

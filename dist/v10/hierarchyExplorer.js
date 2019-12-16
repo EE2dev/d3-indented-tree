@@ -307,7 +307,7 @@
     var linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
     var linkStrength = linksAPI.getLinkStrength(d, options);
     var path = void 0;
-    if (direction === "down") {
+    if (direction === "vertical") {
       if (updatePattern) {
         // for updated links use .x of last child to support resorted nodes/links
         var xLastChild = d.parent.children[d.parent.children.length - 1].x;
@@ -315,8 +315,11 @@
       } else {
         path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
       }
-    } else if (direction === "right") {
-      path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
+    } else if (direction === "horizontal") {
+      var m = d.y >= d.parent.y ? d.y - (d.parent.y + linkStrengthParent / 2) : d.y - (d.parent.y - linkStrengthParent / 2);
+      path = "M 0 0" + "H" + m;
+      console.log("Name: " + d.name + " m: " + m);
+      // path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
     }
     return path;
   };
@@ -359,13 +362,15 @@
   linksAPI.getLinkLabel = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    return !options.linkLabelOn || !d.data[labelField] ? "" : d.data[labelField];
+    return !options.linkLabelOn || typeof d.data[labelField] === "undefined" ? "" : d.data[labelField];
   };
 
   linksAPI.getLinkLabelFormatted = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    if (!options.linkLabelOn || !d.data[labelField]) {
+    //  if (!options.linkLabelOn || !d.data[labelField]) {
+    // console.log(d.name + " " + d.data[labelField] + " " + isNaN(d.data[labelField]));
+    if (!options.linkLabelOn || typeof d.data[labelField] === "undefined") {
       return "";
     } // else if (typeof d.data[labelField] === "string") {
     else if (isNaN(d.data[labelField])) {
@@ -384,7 +389,8 @@
     */
     var numberStart = linksAPI.getLinkLabel(d, oldLabelField);
     var numberEnd = linksAPI.getLinkLabel(d, newLabelField);
-    if (!numberStart || !numberEnd || isNaN(numberStart) || isNaN(numberEnd)) {
+
+    if (!isNumber(numberStart) || !isNumber(numberEnd)) {
       return function () {
         selection.text(numberEnd);
       };
@@ -394,6 +400,10 @@
       selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit);
     };
   };
+
+  function isNumber(num) {
+    return typeof num === "number";
+  }
 
   linksAPI.getLinkRTranslate = function (d) {
     return "translate(" + linksAPI.getLinkStrength(d.parent) / 2 + " " + (d.x - d.parent.x) + ")";
@@ -524,15 +534,18 @@
     var alignmentAnchorArray = [];
     var anchorXPos = void 0;
 
+    var l = linksAPI;
+    l.initialize(options$1);
+
     var filteredSel = sel.filter(function (d) {
       return typeof d.data[newLabelField$1] !== "undefined";
     });
     filteredSel.each(function (d) {
-      var labelBBox = d3.select(this).select(".nodeLabel").node().getBBox();
+      var labelBBox = d3.select(this).select(".node-label").node().getBBox();
       var imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
       var nodeEnd = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
       d.nodeBar = {};
-      d.nodeBar.connectorStart = nodeEnd + 5;
+      d.nodeBar.connectorStart = !d.parent || d.y >= d.parent.y ? nodeEnd + 5 : d.parent.y - d.y + l.getLinkStrength(d.parent, options$1) / 2 + 5;
       d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField$1]);
       alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
 
@@ -557,7 +570,7 @@
         if (options$1.nodeBarLabelInside) {
           d.nodeBar.textX = d.nodeBar.anchor - 5;
           // comparison if the label is left of bar because bar is too short
-          d.nodeBar.connectorLength = labelLargerThanNegBar(d) ? d.nodeBar.textX - d.nodeBar.labelWidth - 5 - d.nodeBar.connectorStart : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField] + nodesAPI.getWidthNodeBarRect(d)) - 5 - d.nodeBar.connectorStart;
+          d.nodeBar.connectorLength = labelLargerThanNegBar(d) ? d.nodeBar.textX - d.nodeBar.labelWidth - 5 - d.nodeBar.connectorStart : d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5 - d.nodeBar.connectorStart;
         } else {
           // labelInside === false
           d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5;
@@ -570,12 +583,13 @@
           d.nodeBar.connectorLength = d.nodeBar.anchor - 5 - d.nodeBar.connectorStart;
         } else {
           // labelInside === false
-          d.nodeBar.textX = options$1.nodeBarExtentPosNeg ? d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5 : d.nodeBar.anchor + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
+          d.nodeBar.textX = options$1.nodeBarNeg ? d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5 : d.nodeBar.anchor + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
           d.nodeBar.connectorLength = d.nodeBar.anchor - 5 - d.nodeBar.connectorStart;
         }
       }
       if (options$1.debugOn) {
         console.log("connector: " + d.nodeBar.connectorLength);
+        console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
       }
     });
   };
@@ -636,11 +650,25 @@
     };
   };
 
+  /*
+  nodesAPI.getNodeBarLabelTween = function(d) {
+    if (!d.parent) { return; }
+
+    const numberStart = oldLabelField ? d.data[oldLabelField] : d.data[newLabelField];
+    const numberEnd = d.data[newLabelField];
+
+    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
+    .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
+
+    const i = d3.interpolateNumber(numberStart, numberEnd);
+  }
+  */
+
   nodesAPI.getNodeBarD = function (d) {
     return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h " + -d.nodeBar.connectorLength;
   };
   nodesAPI.getXNodeBarRect = function (d) {
-    return d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField]));
+    return options$1.nodeBarNeg ? d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField])) : d.nodeBar.anchor;
   };
   nodesAPI.getWidthNodeBarRect = function (d) {
     return Math.abs(options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0));
@@ -746,14 +774,24 @@
           return +d.data[options.nodeBarField];
         });
         var maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1]));
-        options.nodeBarExtentPosNeg = extent[0] * extent[1] < 0;
+        // options.nodeBarNeg = (extent[0] * extent[1] < 0); 
+        options.nodeBarNeg = extent[0] < 0;
         if (extent[0] >= 0 && extent[1] >= 0) {
           dom = [0, maxExtent];
+          if (options.nodeBarRangeAdjusted) {
+            options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] / 2];
+            options.nodeBarRangeAdjusted = false;
+          }
         } else if (extent[0] < 0 && extent[1] < 0) {
           dom = [extent[0], 0];
+          if (options.nodeBarRangeAdjusted) {
+            options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] / 2];
+            options.nodeBarRangeAdjusted = false;
+          }
         } else {
           dom = [-maxExtent, maxExtent];
           options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRangeUpperBound * 2];
+          options.nodeBarRangeAdjusted = true;
         }
       } else {
         dom = options.nodeBarDomain;
@@ -837,7 +875,11 @@
 
     nodeEnter.call(n.appendNode);
 
-    nodeEnter.append("text").attr("class", "nodeLabel").attr("x", options.nodeLabelPadding).attr("dy", ".35em").attr("text-anchor", "start").text(function (d) {
+    nodeEnter.append("text").attr("class", "node-label").attr("x", function (d) {
+      return !d.parent || d.y >= d.parent.y ? options.nodeLabelPadding : -options.nodeLabelPadding;
+    }).attr("dy", ".35em").attr("text-anchor", function (d) {
+      return !d.parent || d.y >= d.parent.y ? "start" : "end";
+    }).text(function (d) {
       if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
         return d.data[options.nodeLabelField].substring(0, options.nodeLabelLength) + "...";
       } else {
@@ -849,21 +891,12 @@
       return d.data[options.nodeLabelField];
     });
 
-    /*
-    nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
-      function () {
-        return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-      })
-      .style("visibility", "visible");
-      */
     nodeEnter.style("visibility", "hidden");
 
     // add nodeBar
-    var nodeBarEnter = nodeEnter
-    //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
-    .filter(function (d) {
-      return d.data[options.nodeBarField] !== null;
-    }).append("g").attr("class", "node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
+    var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").style("display", function (d) {
+      return options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none";
+    });
 
     nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
 
@@ -873,6 +906,10 @@
     // end nodeBar
 
     var nodeMerge = node.merge(nodeEnter);
+
+    nodeMerge.selectAll("g.node-bar").style("display", function (d) {
+      return options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none";
+    });
     if (options.nodeBarOn) {
       n.computeNodeExtend(nodeMerge);
     }
@@ -887,6 +924,13 @@
     });
 
     nodeUpdate.call(n.updateNode);
+
+    /*
+    nodeUpdate.selectAll(".node-label")
+      .call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
+      .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
+      .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
+      */
 
     nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
@@ -905,7 +949,7 @@
       return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
     }).remove();
 
-    nodeExit.select(".nodeLabel").style("fill-opacity", 1e-6);
+    nodeExit.select(".node-label").style("fill-opacity", 1e-6);
 
     // 2. Update the links…
     var l = linksAPI;
@@ -923,12 +967,12 @@
     linkEnter // filter to just draw this connector link for last child of parent
     .filter(function (d) {
       return d.id === d.parent.children[d.parent.children.length - 1].id;
-    }).append("path").attr("class", "link down").attr("d", function () {
-      return l.getLinkD(origin, "down");
+    }).append("path").attr("class", "link vertical").attr("d", function () {
+      return l.getLinkD(origin, "vertical");
     });
 
-    linkEnter.append("path").attr("class", "link right").attr("d", function () {
-      return l.getLinkD(origin, "right");
+    linkEnter.append("path").attr("class", "link horizontal").attr("d", function () {
+      return l.getLinkD(origin, "horizontal");
     });
 
     linkEnter.append("text").style("opacity", 1e-6);
@@ -948,16 +992,16 @@
       return "translate(" + d.parent.y + " " + d.parent.x + ")";
     });
 
-    linkUpdate.select("path.link.down").attr("d", function (d) {
-      return l.getLinkD(d, "down", true);
+    linkUpdate.select("path.link.vertical").attr("d", function (d) {
+      return l.getLinkD(d, "vertical", true);
     }).style("stroke", function (d) {
       return options.linkColorInherit ? l.getLinkStroke(d.parent) : "";
     }).style("stroke-width", function (d) {
       return l.getLinkStrokeWidth(d.parent);
     });
 
-    linkUpdate.select("path.link.right").attr("d", function (d) {
-      return l.getLinkD(d, "right");
+    linkUpdate.select("path.link.horizontal").attr("d", function (d) {
+      return l.getLinkD(d, "horizontal");
     }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
 
     linkUpdate.select("text").attr("dy", l.getDy).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
@@ -972,12 +1016,12 @@
     linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")");
 
     var destination = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-    linkExit.selectAll("path.link.down").attr("d", function () {
-      return l.getLinkD(destination, "down");
+    linkExit.selectAll("path.link.vertical").attr("d", function () {
+      return l.getLinkD(destination, "vertical");
     });
 
-    linkExit.selectAll("path.link.right").attr("d", function () {
-      return l.getLinkD(destination, "right");
+    linkExit.selectAll("path.link.horizontal").attr("d", function () {
+      return l.getLinkD(destination, "horizontal");
     }).attr("transform", "translate(0 0)");
 
     linkExit.select("text").attr("x", 0).attr("y", 0).style("opacity", 1e-6);
@@ -1014,8 +1058,10 @@
     options.nodeBarScale = d3.scaleLinear();
     options.nodeBarRange = [0, 200];
     options.nodeBarRangeUpperBound = options.nodeBarRange[1];
+    options.nodeBarRangeAdjusted = false; // true if range is doubled for pos + neg bars
     options.nodeBarUpdateScale = true; // update scale or use current scale
     options.nodeBarTranslateX = 50; // distance between node lebel end and start of minimal neg bar.
+    options.nodeBarState = {}; // properties oldField and newField for transitions
 
     options.nodeImageFile = false; // node image from file or selection
     options.nodeImageFileAppend = undefined; //callback function which returns a image URL
@@ -1172,20 +1218,28 @@
           chartAPI.formatDefaultLocale(_options.locale);
         }
         options.nodeBarLabel = _options.label || options.nodeBarField;
+        options.nodeBarState.oldField = options.nodeBarState.newField;
+        options.nodeBarState.newField = options.nodeBarLabel;
         options.nodeBarLabelInside = typeof _options.labelInside !== "undefined" ? _options.labelInside : options.nodeBarLabelInside;
         options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
         options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
         options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
         options.nodeBarUnit = _options.unit || options.nodeBarUnit;
         options.nodeBarFormat = _options.format ? d3.format(_options.format) : options.nodeBarFormat;
-        options.nodeBarScale = _options.scale || options.nodeBarScale;
         options.nodeBarTranslateX = _options.translateX || options.nodeBarTranslateX;
-        options.nodeBarRange = _options.range || options.nodeBarRange;
+        options.nodeBarScale = _options.scale || options.nodeBarScale;
+        //options.nodeBarRange = _options.range || options.nodeBarRange;
+        if (_options.range) {
+          options.nodeBarRange = _options.range;options.nodeBarRangeAdjusted = false;
+        }
         if (_options.range) {
           options.nodeBarRangeUpperBound = options.nodeBarRange[1];
         }
         options.nodeBarDomain = _options.domain || options.nodeBarDomain;
-        options.nodeBarUpdateScale = typeof _options.updateScale !== "undefined" ? _options.updateScale : options.nodeBarUpdateScale;
+        if (typeof _options.updateScale !== "undefined") {
+          options.nodeBarUpdateScale = _options.updateScale;
+        }
+        // options.nodeBarUpdateScale = (typeof (_options.updateScale) !== "undefined") ? _options.updateScale : options.nodeBarUpdateScale;
       }
       if (typeof options.updateScales === "function") options.updateScales();
       return chartAPI;
