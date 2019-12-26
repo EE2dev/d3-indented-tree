@@ -10,38 +10,23 @@
 
   <!-- paste data in aside tag -->
   <aside id="data">
-level1;level2;level3;size1;size2;size3;color
-Eve;Cain;;1;2;4;rgb(100 23 80)
-Eve;Seth;;-45;20;4;rgb(100 23 80)
-Eve;Seth;Enos;3;2;4;rgb(100 23 80)
-Eve;Seth;Noam;3;2;4;rgb(100 23 80)
-Eve;Abel;;32;2;4;rgb(100 23 80)
-Eve;Awan;Enoch;-2333.3;2;5;rgb(100 23 80)
-Eve;Azura;;;2;4;rgb(100 23 80)
-Eve;;;-88883;2;4;rgb(100 23 80)
+key,parent,size,weight,color
+Eve,,,14,yellow
+Cain,Eve,4.647,20.3,black
+Seth,Eve,13,-205.3,steelblue
   </aside>
 
   <script>
     const dataSpec = {
       source: "aside#data",
-      hierarchyLevels: ["$", "level1", "level2", "level3"],
-      delimiter: ";",
     };
     const myChart = hierarchyExplorer.chart(dataSpec)
       .debugOn(true)
-      .linkWidth("size1", {range: [100, 300]})
-      .linkLabel("size1", {unit: " cust"})
-      .nodeSort("size1")
-      .nodeBar("size1", {translateX: 1, unit: " customers", labelInside: true})
-      // .nodeBar("size1", {rootBar: true})
+      .linkLabel("size")
+      .nodeSort("size")
+      //.nodeBar("size")
     ;
     showChart(); // for preprocessing data see below
-    
-    /*
-    window.setTimeout(function() {
-        myChart.nodeBar("size2", {updateScale: false});
-    }, 2000);
-    */
 
     function showChart(_file, preprocessed) {
       const selection = d3.select("body")

@@ -69,14 +69,24 @@ function createScales(options, config) {
     if (!options.nodeBarDomain) { 
       const extent = d3.extent(nodes, d => +d.data[options.nodeBarField]);
       const maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1])); 
-      options.nodeBarExtentPosNeg = (extent[0] * extent[1] >= 0); 
+      // options.nodeBarNeg = (extent[0] * extent[1] < 0); 
+      options.nodeBarNeg = (extent[0] < 0);
       if (extent[0] >= 0 && extent[1] >= 0) {
         dom = [0, maxExtent]; 
+        if (options.nodeBarRangeAdjusted) {
+          options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] / 2];
+          options.nodeBarRangeAdjusted = false;
+        } 
       } else if (extent[0] < 0 && extent[1] < 0) {
         dom = [extent[0], 0];
+        if (options.nodeBarRangeAdjusted) {
+          options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] / 2];
+          options.nodeBarRangeAdjusted = false;
+        }
       } else {
         dom = [-maxExtent, maxExtent];
         options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRangeUpperBound * 2];
+        options.nodeBarRangeAdjusted = true;
       }
     }
     else { dom = options.nodeBarDomain;}
@@ -165,10 +175,10 @@ function update(source, options, config){
   nodeEnter.call(n.appendNode);
 
   nodeEnter.append("text")
-    .attr("class", "nodeLabel")
-    .attr("x", options.nodeLabelPadding)
+    .attr("class", "node-label")
+    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
     .attr("dy", ".35em")
-    .attr("text-anchor", "start")
+    .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end")
     .text(function (d) {
       if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
         return d.data[options.nodeLabelField].substring(0, options.nodeLabelLength) + "...";
@@ -181,15 +191,13 @@ function update(source, options, config){
     return d.data[options.nodeLabelField];
   });
 
-  // add nodeBar
-  if (options.nodeBarOn) { n.computeNodeExtend(); }
+  nodeEnter.style("visibility", "hidden");
 
+  // add nodeBar
   const nodeBarEnter = nodeEnter
-    //.filter((d,i) => options.nodeBarRoot ? true : i > 0)
-    .filter(d => d.data[options.nodeBarField] !== null)
     .append("g")
     .attr("class", "node-bar")
-    .attr("display", options.nodeBarOn ? "inline" : "none");
+    .style("display", d => options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none");
 
   nodeBarEnter.append("path")
     .attr("class", "node-bar connector")
@@ -205,14 +213,17 @@ function update(source, options, config){
     .attr("dy", ".35em") ;
   // end nodeBar
 
-  nodeEnter.attr("transform", 
-    function () {
-      return "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)";
-    })
+  let nodeMerge = node.merge(nodeEnter);
+  
+  nodeMerge.selectAll("g.node-bar").style("display", 
+    d => options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none");
+  if (options.nodeBarOn) { n.computeNodeExtend(nodeMerge); }
+
+  nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
     .style("visibility", "visible");
 
   // Transition nodes to their new position.
-  let nodeUpdate = node.merge(nodeEnter)
+  let nodeUpdate = nodeMerge
     .transition()
     .duration(options.transitionDuration);
   
@@ -222,6 +233,13 @@ function update(source, options, config){
     });
 
   nodeUpdate.call(n.updateNode);
+
+  /*
+  nodeUpdate.selectAll(".node-label")
+    .call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
+    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
+    .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
+    */
   
   nodeUpdate.selectAll("g.node-bar")
     .attr("display", options.nodeBarOn ? "inline" : "none");
@@ -252,7 +270,7 @@ function update(source, options, config){
     })
     .remove();
 
-  nodeExit.select(".nodeLabel")
+  nodeExit.select(".node-label")
     .style("fill-opacity", 1e-6);
   
   // 2. Update the links…
@@ -274,12 +292,12 @@ function update(source, options, config){
   linkEnter // filter to just draw this connector link for last child of parent
     .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
     .append("path")
-    .attr("class", "link down")
-    .attr("d", () => l.getLinkD(origin, "down"));
+    .attr("class", "link vertical")
+    .attr("d", () => l.getLinkD(origin, "vertical"));
     
   linkEnter.append("path")
-    .attr("class", "link right")
-    .attr("d", () => l.getLinkD(origin, "right"));
+    .attr("class", "link horizontal")
+    .attr("d", () => l.getLinkD(origin, "horizontal"));
 
   linkEnter
     .append("text")   
@@ -303,13 +321,13 @@ function update(source, options, config){
 
   linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
 
-  linkUpdate.select("path.link.down")
-    .attr("d", (d) => l.getLinkD(d, "down", true))
+  linkUpdate.select("path.link.vertical")
+    .attr("d", (d) => l.getLinkD(d, "vertical", true))
     .style("stroke", (d) => options.linkColorInherit ? l.getLinkStroke(d.parent) : "")
     .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
 
-  linkUpdate.select("path.link.right")
-    .attr("d", (d) => l.getLinkD(d, "right"))
+  linkUpdate.select("path.link.horizontal")
+    .attr("d", (d) => l.getLinkD(d, "horizontal"))
     .attr("transform", l.getLinkRTranslate)
     .style("stroke", l.getLinkStroke)
     .style("stroke-width", l.getLinkStrokeWidth);
@@ -330,11 +348,11 @@ function update(source, options, config){
   linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")"); 
 
   const destination = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-  linkExit.selectAll("path.link.down")
-    .attr("d", () => l.getLinkD(destination, "down")); 
+  linkExit.selectAll("path.link.vertical")
+    .attr("d", () => l.getLinkD(destination, "vertical")); 
 
-  linkExit.selectAll("path.link.right")
-    .attr("d", () => l.getLinkD(destination, "right"))
+  linkExit.selectAll("path.link.horizontal")
+    .attr("d", () => l.getLinkD(destination, "horizontal"))
     .attr("transform", "translate(0 0)");
 
   linkExit

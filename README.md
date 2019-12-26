@@ -383,7 +383,7 @@ Transitions to the new number label on top of the links.
 
 Displays/ transitions the bar for each node to the new value. 
 1. argument:
-    * to set the node bar dynamically, provide the name of a field as a *string*. The values of the field must be *numeric*. 
+    * to set the node bar dynamically, provide the name of a field as a *string*. The values of the field must be *numeric*. If node bars should be display for some but not all nodes, e.g. not for internal nodes, simply have a missing value for this field. 
     * to switch the node bars on or off provide a <i>boolean</i>. 
     
 2. argument (optional):
@@ -401,7 +401,7 @@ Displays/ transitions the bar for each node to the new value.
         * `domain` is an *array* refering to the domain of the scale (default is calculated based on the extent of the corresponding field values).
         * `range` is an *array* refering to the range of the scale (default is `[0, 200]`). In case the domain contains positive and negative values, the range is used separately but scaled correspondingly for positive and negative values to compute the width of their node bars.
         * `updateScale` specifies a *boolean* property denoting whether the current scale should be reused for a transition. (default is `true`).   
-        * `translateX` specifies a *number* property denoting the minimal distance in pixels between the node label and the node bar. (default is `50`).       
+        * `translateX` specifies a *number* property denoting the minimal distance in pixels for the connector between the node label and the node bar. (default is `50`).       
 
 * No argument:
     * with no argument the function returns the name of the numeric field for the node bars.
