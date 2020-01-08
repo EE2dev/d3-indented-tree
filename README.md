@@ -68,8 +68,9 @@ Here is a minimal template sufficient to call hierarchy explorer. A reference to
 
 ```html
 <!DOCTYPE html>
-  <meta charset="utf-8">
+<html>
   <head>
+    <meta charset="utf-8">
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
@@ -521,12 +522,12 @@ Sets the transition duration for the transitions.
   } 
 
   /* changing the font size for node labels */
-  .node .nodeLabel {
+  .node .node-label {
     font: 1em sans-serif;
   }
 
   /* changing the color of the node labels */
-  .node .nodeLabel {
+  .node .node-label {
     fill: black;
   }
 

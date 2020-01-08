@@ -318,7 +318,9 @@
     } else if (direction === "horizontal") {
       var m = d.y >= d.parent.y ? d.y - (d.parent.y + linkStrengthParent / 2) : d.y - (d.parent.y - linkStrengthParent / 2);
       path = "M 0 0" + "H" + m;
-      console.log("Name: " + d.name + " m: " + m);
+      if (options.debugOn) {
+        console.log("Name: " + d.name + " m: " + m);
+      }
       // path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
     }
     return path;
@@ -492,7 +494,7 @@
       if (options$1.nodeImageSelectionUpdate && typeof options$1.nodeImageSelectionUpdate === "function") {
         options$1.nodeImageSelectionUpdate(transition);
       } else if (options$1.nodeImageSelectionAppend && typeof options$1.nodeImageSelectionAppend === "function") {
-        return; // do nothing - custom SVG append provided but no custom SVG update 
+        return; // do nothing - custom SVG append provided but no custom SVG update  
       } else {
         nodesAPI.updateNodeSVG(transition);
       }
@@ -500,21 +502,21 @@
   };
 
   nodesAPI.appendNodeSVG = function (selection) {
-    selection.append("rect").attr("class", "nodeImage").attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
+    selection.append("rect").attr("class", "node-image").attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
 
     var sel2 = selection;
     sel2.append("line").attr("class", function (d) {
-      return d._children ? "cross nodeImage" : "cross invisible";
+      return d._children ? "cross node-image" : "cross invisible";
     }).attr("x1", 0).attr("y1", -5).attr("x2", 0).attr("y2", 5);
 
     sel2.append("line").attr("class", function (d) {
-      return d._children ? "cross nodeImage" : "cross invisible";
+      return d._children ? "cross node-image" : "cross invisible";
     }).attr("x1", -5).attr("y1", 0).attr("x2", 5).attr("y2", 0);
   };
 
   nodesAPI.updateNodeSVG = function (transition) {
     transition.selectAll("line.cross").attr("class", function (d) {
-      return d._children ? "cross nodeImage" : "cross invisible";
+      return d._children ? "cross node-image" : "cross invisible";
     });
   };
 
@@ -523,11 +525,11 @@
       var col = d3.select("div.chart").style("background-color");
       selection.append("rect").attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY).style("stroke", col).style("fill", col);
     }
-    selection.append("image").attr("class", "nodeImage").attr("xlink:href", options$1.nodeImageFileAppend).attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY);
+    selection.append("image").attr("class", "node-image").attr("xlink:href", options$1.nodeImageFileAppend).attr("width", options$1.nodeImageWidth).attr("height", options$1.nodeImageHeight).attr("x", options$1.nodeImageX).attr("y", options$1.nodeImageY);
   };
 
   nodesAPI.updateNodeImage = function (transition) {
-    transition.select(".nodeImage").attr("xlink:href", options$1.nodeImageFileAppend);
+    transition.select(".node-image").attr("xlink:href", options$1.nodeImageFileAppend);
   };
 
   nodesAPI.computeNodeExtend = function (sel) {
@@ -542,7 +544,7 @@
     });
     filteredSel.each(function (d) {
       var labelBBox = d3.select(this).select(".node-label").node().getBBox();
-      var imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
+      var imageBBox = d3.select(this).select(".node-image").node().getBBox();
       var nodeEnd = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
       d.nodeBar = {};
       d.nodeBar.connectorStart = !d.parent || d.y >= d.parent.y ? nodeEnd + 5 : d.parent.y - d.y + l.getLinkStrength(d.parent, options$1) / 2 + 5;
@@ -619,8 +621,8 @@
     return w;
   };
 
-  // transitions the node bar label through interpolattion and adjusts the class of the node bar
-  //  when the sign of the node bar label changes
+  // transitions the node bar label through interpolation and adjust the class of the node bar
+  // when the sign of the node bar label changes
   nodesAPI.getNodeBarLabelTween = function (d) {
     var selection = d3.select(this);
     if (!options$1.nodeBarOn) {
@@ -631,14 +633,22 @@
     var numberStart = oldLabelField$1 ? d.data[oldLabelField$1] : d.data[newLabelField$1];
     var numberEnd = d.data[newLabelField$1];
     if (isNaN(numberStart) || isNaN(numberEnd)) {
+      // typeof NumberStart or numberEnd == "string"
       return function () {
         selection.text(numberEnd);
       };
     }
+
     var i = d3.interpolateNumber(numberStart, numberEnd);
     var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
       return d2.id === d.id;
     });
+    if (!numberStart) {
+      // if numberStart === null or 0
+      correspondingBar.attr("class", function () {
+        return numberEnd >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+      });
+    }
     return function (t) {
       var num = i(t);
       if (numberStart * num < 0) {
@@ -648,6 +658,11 @@
       }
       selection.text(options$1.nodeBarFormat(num) + options$1.nodeBarUnit);
     };
+  };
+
+  nodesAPI.sameBarLabel = function () {
+    console.log("sameBarlabel: " + (oldLabelField$1 === newLabelField$1));
+    return oldLabelField$1 === newLabelField$1;
   };
 
   /*
@@ -682,7 +697,8 @@
   };
 
   nodesAPI.getNodeBarRectFill = function (d) {
-    return options$1.nodeBarRectFill ? options$1.nodeBarRectFill(d) : d3.select(this).style("fill");
+    return options$1.nodeBarRectFill ? options$1.nodeBarRectFill(d) : null;
+    // return options.nodeBarRectFill ? options.nodeBarRectFill(d) : d3.select(this).style("fill");
   };
 
   nodesAPI.getNodeBarRectStroke = function (d) {
@@ -704,6 +720,8 @@
   ////////////////////////////////////////////////////
   // add visualization specific processing here     //
   //////////////////////////////////////////////////// 
+
+  var transCounter = 0;
 
   function myChart(selection, data, options) {
     var config = {};
@@ -917,7 +935,11 @@
     nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)").style("visibility", "visible");
 
     // Transition nodes to their new position.
-    var nodeUpdate = nodeMerge.transition().duration(options.transitionDuration);
+    var trans = "trans" + transCounter++;
+    var nodeUpdate = nodeMerge.transition(trans).duration(options.transitionDuration);
+
+    console.log("transition: " + trans);
+    console.log("nodeUpdate.size: " + nodeUpdate.size());
 
     nodeUpdate.attr("transform", function (d) {
       return "translate(" + d.y + "," + d.x + ") scale(1,1)";
@@ -936,8 +958,10 @@
 
     if (options.nodeBarOn) {
       nodeUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass).style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
-      nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill).call(function (sel) {
-        return sel.tween("nodeBarLabel", n.getNodeBarLabelTween);
+      nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill)
+      //.call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
+      .call(function (sel) {
+        return n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween);
       }).attr("x", n.getXNodeBarText);
       nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
     }
@@ -961,7 +985,7 @@
     });
 
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link").attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link").attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
 
     var origin = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
     linkEnter // filter to just draw this connector link for last child of parent
@@ -989,7 +1013,7 @@
     l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
     linkUpdate.attr("transform", function (d) {
-      return "translate(" + d.parent.y + " " + d.parent.x + ")";
+      return "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)";
     });
 
     linkUpdate.select("path.link.vertical").attr("d", function (d) {

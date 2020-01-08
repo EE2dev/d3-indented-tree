@@ -85,12 +85,15 @@ https://gitlab.com/snippets/1703535
   [ok] nodeBar connector too long
   [ok] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
   [ok] getVerticalAlignmentRef _> if label inside is before neg bar 
+  [ok] nodeBar change of fields leads to twice the range if posNeg was before
+  [ok] trnasition bodeBar from null to negative --> correct color
+  [ok] change if nodeBars are just neg
+  [ok] Nodebar bei missing nicht anzeigen (statt 0)
+  [ok] CSS also in readme change from CamelCase to hyphenated
+  [ok] change html of Readme template to <html> and <meta charste="utf-8">
+  [none] switch global newlinklabel, newlinkWidth setting to options
 
-- nodeBar change of fields leads to twice the range if posNeg was before
-- change if nodeBars are just neg
-- Nodebar bei missing nicht anzeigen (statt 0)
-- CSS also in readme change from CamelCase to hyphenated
-- switch global newlinklabel, newlinkWidth setting to options
+[bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
 --> nodeSort can be chained after linkLabel/nodeBar.tween without jump
 - linkWidth neg values
 - update nodeBars for neg linkWidth
@@ -98,8 +101,11 @@ https://gitlab.com/snippets/1703535
 - update SVG translate for neg values
 - background for linkLabel (default)
 - background for nodeBars (default)
+- refactor nodeBars
 - scale linkWidth, linkHeight, like nodeBars
+- linkLabel.tween like nodeBars (color change on tween transition -> new api for setting colors with css, default no color distinction)
 - update blocks/ examples
+- change html of examples to <html> and <meta charste="utf-8">
 
 - update nodeBar connector + linkLabels on collapse, expand
 [bug] sometimes link Label moved to left

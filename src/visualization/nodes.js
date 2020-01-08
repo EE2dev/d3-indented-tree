@@ -35,7 +35,7 @@ nodesAPI.updateNode = function (transition) {
 
 nodesAPI.appendNodeSVG = function (selection) {
   selection.append("rect")
-    .attr("class", "nodeImage")
+    .attr("class", "node-image")
     .attr("x", -5)
     .attr("y", -5) 
     .attr("width", 10)
@@ -43,14 +43,14 @@ nodesAPI.appendNodeSVG = function (selection) {
 
   const sel2 = selection;
   sel2.append("line")
-    .attr("class", d => d._children ? "cross nodeImage" : "cross invisible")
+    .attr("class", d => d._children ? "cross node-image" : "cross invisible")
     .attr("x1", 0)
     .attr("y1", -5) 
     .attr("x2", 0)
     .attr("y2", 5);
 
   sel2.append("line")
-    .attr("class", d => d._children ? "cross nodeImage" : "cross invisible")
+    .attr("class", d => d._children ? "cross node-image" : "cross invisible")
     .attr("x1", -5)
     .attr("y1", 0) 
     .attr("x2", 5)
@@ -59,7 +59,7 @@ nodesAPI.appendNodeSVG = function (selection) {
 
 nodesAPI.updateNodeSVG = function (transition) {
   transition.selectAll("line.cross")
-    .attr("class", d => d._children ? "cross nodeImage" : "cross invisible");
+    .attr("class", d => d._children ? "cross node-image" : "cross invisible");
 };
 
 nodesAPI.appendNodeImage = function (selection) {
@@ -74,7 +74,7 @@ nodesAPI.appendNodeImage = function (selection) {
       .style("fill", col);
   }
   selection.append("image")
-    .attr("class", "nodeImage")
+    .attr("class", "node-image")
     .attr("xlink:href", options.nodeImageFileAppend)
     .attr("width", options.nodeImageWidth)
     .attr("height", options.nodeImageHeight)
@@ -84,7 +84,7 @@ nodesAPI.appendNodeImage = function (selection) {
 
 nodesAPI.updateNodeImage = function (transition) {
   transition
-    .select(".nodeImage")
+    .select(".node-image")
     .attr("xlink:href", options.nodeImageFileAppend);    
 };
 
@@ -98,7 +98,7 @@ nodesAPI.computeNodeExtend = function(sel) {
   const filteredSel = sel.filter(d => typeof(d.data[newLabelField]) !== "undefined" );
   filteredSel.each(function(d) {
     const labelBBox = d3.select(this).select(".node-label").node().getBBox();
-    const imageBBox = d3.select(this).select(".nodeImage").node().getBBox();
+    const imageBBox = d3.select(this).select(".node-image").node().getBBox();
     const nodeEnd = (labelBBox.width !== 0) ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
     d.nodeBar = {};
     d.nodeBar.connectorStart = (!d.parent || d.y >= d.parent.y) ? 
@@ -146,7 +146,8 @@ nodesAPI.computeNodeExtend = function(sel) {
         d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
       }
     } 
-    if (options.debugOn) { console.log("connector: " + d.nodeBar.connectorLength); 
+    if (options.debugOn) { 
+      console.log("connector: " + d.nodeBar.connectorLength); 
       console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
     }
   });
@@ -179,8 +180,8 @@ const getBarLabelWidth = function(text) {
   return w;
 };
 
-// transitions the node bar label through interpolattion and adjusts the class of the node bar
-//  when the sign of the node bar label changes
+// transitions the node bar label through interpolation and adjust the class of the node bar
+// when the sign of the node bar label changes
 nodesAPI.getNodeBarLabelTween = function(d) { 
   const selection = d3.select(this);
   if (!options.nodeBarOn) {
@@ -188,11 +189,15 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   } 
   const numberStart = oldLabelField ? d.data[oldLabelField] : d.data[newLabelField];
   const numberEnd = d.data[newLabelField];
-  if (isNaN(numberStart) || isNaN(numberEnd)) {
+  if (isNaN(numberStart) || isNaN(numberEnd)) { // typeof NumberStart or numberEnd == "string"
     return function() { selection.text(numberEnd); };
   }
+
   const i = d3.interpolateNumber(numberStart, numberEnd);
   const correspondingBar = d3.selectAll(".node-bar.box").filter((d2) => d2.id === d.id);
+  if (!numberStart) { // if numberStart === null or 0
+    correspondingBar.attr("class", () => numberEnd >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative");
+  }
   return function(t) { 
     const num = i(t);
     if (numberStart * num < 0) {
@@ -200,6 +205,11 @@ nodesAPI.getNodeBarLabelTween = function(d) {
     }
     selection.text(options.nodeBarFormat(num) + options.nodeBarUnit); 
   };
+};
+
+nodesAPI.sameBarLabel = () => {
+  console.log("sameBarlabel: " + (oldLabelField === newLabelField));
+  return (oldLabelField === newLabelField);
 };
 
 /*
@@ -228,7 +238,8 @@ nodesAPI.getNodeBarTextFill = function(d) {
 };
 
 nodesAPI.getNodeBarRectFill = function(d) {
-  return options.nodeBarRectFill ? options.nodeBarRectFill(d) : d3.select(this).style("fill");
+  return options.nodeBarRectFill ? options.nodeBarRectFill(d) : null;
+  // return options.nodeBarRectFill ? options.nodeBarRectFill(d) : d3.select(this).style("fill");
 };
 
 nodesAPI.getNodeBarRectStroke = function(d) {

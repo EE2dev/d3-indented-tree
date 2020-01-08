@@ -6,6 +6,8 @@ import { nodesAPI } from "./nodes.js";
 // add visualization specific processing here     //
 //////////////////////////////////////////////////// 
 
+let transCounter = 0;
+
 export function myChart(selection, data, options){
   let config = {};
   config.width = options.svgDimensions.width - options.margin.right - options.margin.left;
@@ -223,14 +225,16 @@ function update(source, options, config){
     .style("visibility", "visible");
 
   // Transition nodes to their new position.
+  let trans = "trans" + transCounter++; 
   let nodeUpdate = nodeMerge
-    .transition()
+    .transition(trans)
     .duration(options.transitionDuration);
   
+  console.log("transition: " + trans);
+  console.log("nodeUpdate.size: " + nodeUpdate.size());
+
   nodeUpdate
-    .attr("transform", function (d) {
-      return "translate(" + d.y + "," + d.x + ") scale(1,1)";
-    });
+    .attr("transform", d => "translate(" + d.y + "," + d.x + ") scale(1,1)");
 
   nodeUpdate.call(n.updateNode);
 
@@ -254,7 +258,8 @@ function update(source, options, config){
     nodeUpdate.selectAll(".node-bar.bar-label")
       .style("text-anchor", n.getNodeBarTextAnchor)
       .style("fill", n.getNodeBarTextFill)
-      .call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
+      //.call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
+      .call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
       .attr("x", n.getXNodeBarText);
     nodeUpdate.selectAll(".node-bar.connector")
       .attr("d", n.getNodeBarD);
@@ -286,7 +291,7 @@ function update(source, options, config){
   // Enter any new links at the parent's previous position.
   const linkEnter = link.enter().insert("g", "g.node")
     .attr("class", "link")
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
   
   const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
   linkEnter // filter to just draw this connector link for last child of parent
@@ -319,7 +324,7 @@ function update(source, options, config){
   
   l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
-  linkUpdate.attr("transform", (d) => "translate(" + d.parent.y + " " + d.parent.x + ")");
+  linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
 
   linkUpdate.select("path.link.vertical")
     .attr("d", (d) => l.getLinkD(d, "vertical", true))

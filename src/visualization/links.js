@@ -33,7 +33,9 @@ linksAPI.getLinkD = function (d, direction, updatePattern = false) {
       (d.y - (d.parent.y + linkStrengthParent / 2)) 
       : (d.y - (d.parent.y - linkStrengthParent / 2));
     path = "M 0 0" + "H" + m;
-    console.log("Name: "+ d.name + " m: " + m);
+    if (options.debugOn) { 
+      console.log("Name: "+ d.name + " m: " + m);
+    }
     // path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
   }
   return path;

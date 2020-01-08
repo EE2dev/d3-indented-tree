@@ -18,7 +18,7 @@
       display:none;
     }
 
-    .node .nodeImage {
+    .node .node-image {
       stroke: grey;
       stroke-width: 1px;
     }

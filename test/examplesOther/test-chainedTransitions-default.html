@@ -7,16 +7,13 @@
     <link rel="stylesheet" type="text/css" href="../../build/hierarchyExplorer.css">
     <script src="../../build/hierarchyExplorer.js"></script>
     <style>
-      .node .node-image {
-        stroke: deeppink;
-      }
     </style>
   </head>
   
   <body>
     <!-- paste data in aside tag -->
     <aside id="data">
-key,parent,size,weight,color
+key,parent,pos,neg,color
 Eve,,,-14,yellow
 Cain,Eve,4.647,-20.3,black
 Seth,Eve,13,-205.3,steelblue
@@ -27,20 +24,27 @@ Seth,Eve,13,-205.3,steelblue
         source: "aside#data",
       };
       const myChart = hierarchyExplorer.chart(dataSpec)
-        .debugOn(true)
-        .linkLabel("size")
-        .nodeSort("size")
+        //.debugOn(true)
+        .linkLabel("pos")
+        .nodeSort("pos")
+        .transitionDuration(10000)
         //.nodeBar("size")
       ;
       showChart(); // for preprocessing data see below
 
       window.setTimeout(function() {
-        myChart.nodeBar("size");
-      }, 2000);
+        myChart.nodeBar("pos");
+      }, 11000);
 
       window.setTimeout(function() {
-        myChart.nodeBar("weight");
-      }, 4000);
+        myChart.nodeBar("neg");
+      }, 22000);
+
+      /*
+      window.setTimeout(function() {
+        myChart.nodeSort("neg");
+      }, 25000);
+      */
 
       function showChart(_file, preprocessed) {
         const selection = d3.select("body")
