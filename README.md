@@ -43,6 +43,10 @@ More examples demonstrating specific API calls:
 
 #### API examples to customize the nodes
 
+- [myChart.nodeBar()](https://bl.ocks.org/EE2dev/43cb20a616ebce5c968ab73306935cc8)
+- [myChart.nodeBar() - 2](https://bl.ocks.org/EE2dev/74caee55c7ceafdd51ffcbd0a84bbf4d)
+- [myChart.nodeBar() - 3](https://bl.ocks.org/EE2dev/6a7b128ebc25b5e84a90e5af73c117ec)
+- [myChart.nodeBar() - 4](https://bl.ocks.org/EE2dev/01878dc1794f0c0a28e53328d8f040a2)
 - [myChart.nodeImageFile()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 - [myChart.nodeImageFile() - 2](https://bl.ocks.org/EE2dev/ca01964c928a37de65bd429f8f094a1c)
 - [myChart.nodeImageSelection()](https://bl.ocks.org/EE2dev/43fffd334158b6d10454e5b8c6689786)
@@ -64,7 +68,7 @@ More examples demonstrating specific API calls:
 
 ## 1. How to use Hierarchy explorer
 
-Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object property*. 
+Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object* property. 
 
 ```html
 <!DOCTYPE html>
@@ -75,7 +79,6 @@ Here is a minimal template sufficient to call hierarchy explorer. A reference to
     <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
   </head>
-  
   <body>  
     <script>
       const dataSpec = {source: "path/to/data/data.json"};
@@ -224,7 +227,7 @@ Oceania,,38
 ``` 
 
 ### 2.4. Embedding data into a html node
-In case you want to run hierarchy explorer without a server, you can put your data into a html node. The format of the data has to be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>.
+In case you want to run hierarchy explorer without a server, you can put your data into a html node. The format of the data can be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>. If the data is in JSON format you can also include it <a href="#21-json-format">inline</a>.
 The data source is then referenced in the `dataSpec` object by assigning the `source` property to a *string* denoting the selector to the node with the data.
 
 An example for embedded hierarchical csv data:
@@ -514,7 +517,7 @@ Sets the transition duration for the transitions.
 * the first argument is an <i>integer</i> referencing the duration of a transition in milliseconds (default is ```750```).
 * with no argument returns the transition duration for the transitions.
 
-### 3.3 CSS styling
+### 3.4 CSS styling
 ```css
   /* changing the font size for link labels and node labels */
   div.chart {

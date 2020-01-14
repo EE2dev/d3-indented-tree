@@ -94,7 +94,7 @@ https://gitlab.com/snippets/1703535
   [none] switch global newlinklabel, newlinkWidth setting to options
 
 [bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
---> nodeSort can be chained after linkLabel/nodeBar.tween without jump
+--> nodeSort can be chained after linkLabel/nodeBar.tween without jump and if nodeSort is called before not after
 - linkWidth neg values
 - update nodeBars for neg linkWidth
 - update Label placement linkLabel

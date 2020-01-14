@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <aside id="data">
+level1;level2;level3;size1;size2;size3;color
+Eve;Cain;;1;2;4;rgb(100 23 80)
+Eve;Seth;;-45;2;4;rgb(100 23 80)
+Eve;Seth;Enos;3;2;4;rgb(100 23 80)
+Eve;Seth;Noam;3;2;4;rgb(100 23 80)
+Eve;Abel;;32;2;4;rgb(100 23 80)
+Eve;Awan;Enoch;3;2;4;rgb(100 23 80)
+Eve;Azura;;5;2;4;rgb(100 23 80)
+Eve;;;3;2;4;rgb(100 23 80)
+    </aside>
+    
+    <script>
+      const dataSpec = {
+        source: "aside#data",
+        hierarchyLevels: ["$", "level1", "level2", "level3"],
+        delimiter: ";",
+      };
+      const myChart = hierarchyExplorer.chart(dataSpec)
+        .linkLabel("size1")
+        .nodeSort("size1")
+        .nodeBar("size1")
+      ;
+      showChart(); 
+  
+      function showChart() {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(myChart);
+      }          
+    </script>
+  </body>
+</html>  
