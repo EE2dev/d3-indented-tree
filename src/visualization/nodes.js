@@ -192,6 +192,9 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   if (isNaN(numberStart) || isNaN(numberEnd)) { // typeof NumberStart or numberEnd == "string"
     return function() { selection.text(numberEnd); };
   }
+  if (nodesAPI.sameBarLabel()) {
+    return function() { selection.text(options.nodeBarFormat(numberEnd) + options.nodeBarUnit); };
+  }
 
   const i = d3.interpolateNumber(numberStart, numberEnd);
   const correspondingBar = d3.selectAll(".node-bar.box").filter((d2) => d2.id === d.id);

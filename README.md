@@ -326,6 +326,27 @@ Transitions the height (vertical length) of the links.
 * the first argument is an <i>integer</i> referencing link height in pixels (default is ```20```).
 * with no argument returns the height of the links.
 
+<a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Transitions to the new number label on top of the links. 
+
+1. argument:
+    * to set the label dynamically, provide the name of a field as a *string*. The values of the field can be *numeric* or *string*. 
+    * to switch the label on or off provide a <i>boolean</i>. 
+    
+2. argument (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `unit` specifies a suffix *string* for the label (default is `""`).
+        * `format` refers to the format *string* of the label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
+        * `locale` is an *object* overriding the default locale format with the specified locale format.
+        The locale is affecting the display of the link label if the `format` property is specified. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
+
+        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`). If `onTop` is set to false and the label overlaps with the previous link due to increase font size, the *linkHeight* can be increased. 
+        * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth (centers the longest label per depth on the shortest link). Default is ```true```.
+        * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
+
+* No argument:
+    * with no argument the function returns the name of the numeric field for the link labels.
 
 <a name="link_linkStrength" href="#link_linkStrength">#</a> <i>myChart</i>.<b>linkStrength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
 
@@ -358,28 +379,6 @@ Transitions to the new width (horizontal length) of the links. The horizontal li
 
 * No argument:
   * with no argument the function returns the static width of the links.
-
-<a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
-
-Transitions to the new number label on top of the links. 
-
-1. argument:
-    * to set the label dynamically, provide the name of a field as a *string*. The values of the field can be *numeric* or *string*. 
-    * to switch the label on or off provide a <i>boolean</i>. 
-    
-2. argument (optional):
-    * An *object* with the following properties can be used to further specify the mapping: 
-        * `unit` specifies a suffix *string* for the label (default is `""`).
-        * `format` refers to the format *string* of the label number as [the format specifier for d3-format](https://github.com/d3/d3-format#locale_format) [(examples)](http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e). (default is `",.0f"`). 
-        * `locale` is an *object* overriding the default locale format with the specified locale format.
-        The locale is affecting the display of the link label if the `format` property is specified. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
-
-        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`). If `onTop` is set to false and the label overlaps with the previous link due to increase font size, the *linkHeight* can be increased. 
-        * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth (centers the longest label per depth on the shortest link). Default is ```true```.
-        * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
-
-* No argument:
-    * with no argument the function returns the name of the numeric field for the link labels.
 
 ### 3.2 Nodes
 

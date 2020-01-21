@@ -132,7 +132,9 @@ function click(d, options, config){
     d.children = d._children;
     d._children = null;
   }
+  options.transitionDuration = options.transitionDurationClick;
   update(d, options, config);
+  options.transitionDuration = options.transitionDurationDefault;
 }
 
 function update(source, options, config){
@@ -258,8 +260,8 @@ function update(source, options, config){
     nodeUpdate.selectAll(".node-bar.bar-label")
       .style("text-anchor", n.getNodeBarTextAnchor)
       .style("fill", n.getNodeBarTextFill)
-      //.call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
-      .call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
+      .call(sel => sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
+      //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
       .attr("x", n.getXNodeBarText);
     nodeUpdate.selectAll(".node-bar.connector")
       .attr("d", n.getNodeBarD);

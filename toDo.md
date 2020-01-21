@@ -92,6 +92,8 @@ https://gitlab.com/snippets/1703535
   [ok] CSS also in readme change from CamelCase to hyphenated
   [ok] change html of Readme template to <html> and <meta charste="utf-8">
   [none] switch global newlinklabel, newlinkWidth setting to options
+  [ok] (previous bug) nodeBar labels dissappeared aber collapse expand
+  [ok] transitionDuration separated for collapse/expand
 
 [bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
 --> nodeSort can be chained after linkLabel/nodeBar.tween without jump and if nodeSort is called before not after
@@ -110,6 +112,8 @@ https://gitlab.com/snippets/1703535
 - update nodeBar connector + linkLabels on collapse, expand
 [bug] sometimes link Label moved to left
 - user can set dom of a scale
+
+- collapse() API: () .mode: bySize/byHeight/byID .location .collapseAll === true (default)
 
 - update on exit (if sel.exit.size() > 0) initialize new
  .domain .clamp for other (linkWidth)
