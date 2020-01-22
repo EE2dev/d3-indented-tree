@@ -293,8 +293,10 @@ function update(source, options, config){
   // Enter any new links at the parent's previous position.
   const linkEnter = link.enter().insert("g", "g.node")
     .attr("class", "link")
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
-  
+  //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+
+
   const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
   linkEnter // filter to just draw this connector link for last child of parent
     .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
@@ -326,7 +328,8 @@ function update(source, options, config){
   
   l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
-  linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
+  // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
+  linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ")");
 
   linkUpdate.select("path.link.vertical")
     .attr("d", (d) => l.getLinkD(d, "vertical", true))

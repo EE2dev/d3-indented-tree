@@ -638,6 +638,11 @@
         selection.text(numberEnd);
       };
     }
+    if (nodesAPI.sameBarLabel()) {
+      return function () {
+        selection.text(options$1.nodeBarFormat(numberEnd) + options$1.nodeBarUnit);
+      };
+    }
 
     var i = d3.interpolateNumber(numberStart, numberEnd);
     var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
@@ -851,7 +856,9 @@
       d.children = d._children;
       d._children = null;
     }
+    options.transitionDuration = options.transitionDurationClick;
     update(d, options, config);
+    options.transitionDuration = options.transitionDurationDefault;
   }
 
   function update(source, options, config) {
@@ -958,11 +965,11 @@
 
     if (options.nodeBarOn) {
       nodeUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass).style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
-      nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill)
-      //.call(sel => sel.tween("nodeBarLabel", n.getNodeBarLabelTween))
-      .call(function (sel) {
-        return n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween);
-      }).attr("x", n.getXNodeBarText);
+      nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill).call(function (sel) {
+        return sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween);
+      })
+      //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
+      .attr("x", n.getXNodeBarText);
       nodeUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
     }
 
@@ -985,7 +992,9 @@
     });
 
     // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link").attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
+    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link")
+    //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
 
     var origin = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
     linkEnter // filter to just draw this connector link for last child of parent
@@ -1012,8 +1021,9 @@
 
     l.computeLabelDimensions(d3.selectAll(".link text.label"));
 
+    // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
     linkUpdate.attr("transform", function (d) {
-      return "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)";
+      return "translate(" + d.parent.y + " " + d.parent.x + ")";
     });
 
     linkUpdate.select("path.link.vertical").attr("d", function (d) {
@@ -1068,6 +1078,8 @@
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.svgDimensions = { height: 800, width: 1400 };
     options.transitionDuration = 750;
+    options.transitionDurationDefault = 750; // for all transitions except expand/collapse
+    options.transitionDurationClick = 750; // for expand/collapse transitions
     options.locale = undefined;
 
     options.defaultColor = "grey";
@@ -1199,6 +1211,7 @@
     chartAPI.transitionDuration = function (_) {
       if (!arguments.length) return options.transitionDuration;
       options.transitionDuration = _;
+      options.transitionDurationDefault = _;
       return chartAPI;
     };
 
