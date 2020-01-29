@@ -33,9 +33,11 @@ linksAPI.getLinkD = function (d, direction, updatePattern = false) {
       (d.y - (d.parent.y + linkStrengthParent / 2)) 
       : (d.y - (d.parent.y - linkStrengthParent / 2));
     path = "M 0 0" + "H" + m;
+    /*
     if (options.debugOn) { 
       console.log("Name: "+ d.name + " m: " + m);
     }
+    */
     // path = "M 0 0" + "H" + (d.y - (d.parent.y + linkStrengthParent / 2));
   }
   return path;
@@ -144,29 +146,31 @@ linksAPI.computeLabelDimensions = function (sel) {
       const width = d3.select(this).node().getBBox().width;
       const text = d3.select(this).text();
       // if (!dims[d.depth]) {
-      if (!dims.get(d.depth)) {
-        dimProperties.maxX = width;
-        dimProperties.minX = width;
-        dimProperties.maxY = height;
-        dimProperties.maxXText = text;
-        dimProperties.maxYText = text;
-        dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-        // dims.push(dimProperties);
-        dims.set(d.depth, dimProperties);
-      } else {  
-        dimProperties = dims.get(d.depth);
-        if (dimProperties.maxX < width) {   
+      if (width <= d.y - d.parent.y - 5) {
+        if (!dims.get(d.parent.id)) {
           dimProperties.maxX = width;
-          dimProperties.maxXText = text;
-        } 
-        if (dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
-          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-        } 
-        if (dimProperties.maxY < height) {
+          dimProperties.minX = width;
           dimProperties.maxY = height;
+          dimProperties.maxXText = text;
           dimProperties.maxYText = text;
-        } 
-        dims.set(d.depth, dimProperties);
+          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+          // dims.push(dimProperties);
+          dims.set(d.parent.id, dimProperties);
+        } else {  
+          dimProperties = dims.get(d.parent.id);
+          if (dimProperties.maxX < width) {   
+            dimProperties.maxX = width;
+            dimProperties.maxXText = text;
+          } 
+          if (dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
+            dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+          } 
+          if (dimProperties.maxY < height) {
+            dimProperties.maxY = height;
+            dimProperties.maxYText = text;
+          } 
+          dims.set(d.parent.id, dimProperties);
+        }
       }
     });
   labelDimensions = dims;
@@ -175,11 +179,13 @@ linksAPI.computeLabelDimensions = function (sel) {
     .each(function(d) {
       const width = d3.select(this).node().getBBox().width;
       const text = d3.select(this).text();
-      console.log(text + ": " + (width) + " " + (labelDimensions.get(d.depth).posXCenter));
-      console.log("  dy:" + d.y + " d.parent.y:"+ d.parent.y);
+      
       // if (width < d.y - d.parent.y - labelDimensions.get(d.depth).posXCenter) {
       if (width <= d.y - d.parent.y - 5) {  
-        d.linkLabelAnchor = labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2;
+        console.log("(" + d.id + ")" + text + ": " + (width) + " " + (labelDimensions.get(d.parent.id).posXCenter));
+        console.log("  dy:" + d.y + " d.parent.y:"+ d.parent.y);
+        console.log("  posXC:" + labelDimensions.get(d.parent.id).posXCenter + " maxX/2:"+ labelDimensions.get(d.parent.id).maxX / 2);
+        d.linkLabelAnchor = labelDimensions.get(d.parent.id).posXCenter + labelDimensions.get(d.parent.id).maxX / 2;
       } else {
         d.linkLabelAnchor = (d.y - d.parent.y) - 10;
       }

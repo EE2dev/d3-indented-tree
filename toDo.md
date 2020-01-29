@@ -103,6 +103,7 @@ https://gitlab.com/snippets/1703535
 
 -linksAPI.computeLabelDimensions for each branch not just each depth
 - linkWidth neg values
+- option to turn off link labels when link width is too short
 - update nodeBars for neg linkWidth
 - update Label placement linkLabel
 - update SVG translate for neg values
