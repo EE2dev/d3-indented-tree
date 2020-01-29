@@ -422,8 +422,8 @@
   linksAPI.getLinkTextPositionX = function (d) {
     /* aligned: x center position of the shortest link + half the extent of the longest label */
     var shiftAlign = options.linkLabelAligned ?
-    // labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
-    labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 : (d.y - d.parent.y) / 2;
+    // labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 
+    d.linkLabelAnchor : (d.y - d.parent.y) / 2;
     return shiftAlign;
   };
 
@@ -462,6 +462,20 @@
       }
     });
     labelDimensions = dims;
+    // set linkLabelAnchor
+    sel.each(function (d) {
+      var width = d3.select(this).node().getBBox().width;
+      var text = d3.select(this).text();
+      console.log(text + ": " + width + " " + labelDimensions.get(d.depth).posXCenter);
+      console.log("  dy:" + d.y + " d.parent.y:" + d.parent.y);
+      // if (width < d.y - d.parent.y - labelDimensions.get(d.depth).posXCenter) {
+      if (width <= d.y - d.parent.y - 5) {
+        d.linkLabelAnchor = labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2;
+      } else {
+        d.linkLabelAnchor = d.y - d.parent.y - 10;
+      }
+    });
+
     if (options.debugOn) {
       console.log("dimensions:");
       console.log(dims);
@@ -858,7 +872,6 @@
     }
     options.transitionDuration = options.transitionDurationClick;
     update(d, options, config);
-    options.transitionDuration = options.transitionDurationDefault;
   }
 
   function update(source, options, config) {
@@ -1000,7 +1013,9 @@
     linkEnter // filter to just draw this connector link for last child of parent
     .filter(function (d) {
       return d.id === d.parent.children[d.parent.children.length - 1].id;
-    }).append("path").attr("class", "link vertical").attr("d", function () {
+    }).lower() // with lower(9 vertical links are pushed to the root of the DOM,
+    // so link labes on horizontal links are further down and thus are visible when overlapping
+    .append("path").attr("class", "link vertical").attr("d", function () {
       return l.getLinkD(origin, "vertical");
     });
 
@@ -1065,6 +1080,7 @@
       d.x0 = d.x;
       d.y0 = d.y;
     });
+    options.transitionDuration = options.transitionDurationDefault;
   }
 
   function d3_template_reusable (_dataSpec) {
@@ -1077,9 +1093,9 @@
     options.debugOn = false;
     options.margin = { top: 20, right: 10, bottom: 20, left: 10 };
     options.svgDimensions = { height: 800, width: 1400 };
-    options.transitionDuration = 750;
     options.transitionDurationDefault = 750; // for all transitions except expand/collapse
-    options.transitionDurationClick = 750; // for expand/collapse transitions
+    options.transitionDurationClick = 750; // for expand/collapse transitions and initial transition
+    options.transitionDuration = options.transitionDurationClick;
     options.locale = undefined;
 
     options.defaultColor = "grey";
@@ -1210,7 +1226,6 @@
 
     chartAPI.transitionDuration = function (_) {
       if (!arguments.length) return options.transitionDuration;
-      options.transitionDuration = _;
       options.transitionDurationDefault = _;
       return chartAPI;
     };

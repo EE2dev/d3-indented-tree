@@ -128,8 +128,8 @@ linksAPI.getLinkLabelColor = function (d) {
 linksAPI.getLinkTextPositionX = function (d) {
   /* aligned: x center position of the shortest link + half the extent of the longest label */
   const shiftAlign = options.linkLabelAligned ? 
-    // labelDimensions[d.depth].posXCenter + labelDimensions[d.depth].maxX / 2 
-    labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 
+    // labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 
+    d.linkLabelAnchor
     : (d.y - d.parent.y) / 2;
   return shiftAlign;
 };
@@ -170,6 +170,21 @@ linksAPI.computeLabelDimensions = function (sel) {
       }
     });
   labelDimensions = dims;
+  // set linkLabelAnchor
+  sel
+    .each(function(d) {
+      const width = d3.select(this).node().getBBox().width;
+      const text = d3.select(this).text();
+      console.log(text + ": " + (width) + " " + (labelDimensions.get(d.depth).posXCenter));
+      console.log("  dy:" + d.y + " d.parent.y:"+ d.parent.y);
+      // if (width < d.y - d.parent.y - labelDimensions.get(d.depth).posXCenter) {
+      if (width <= d.y - d.parent.y - 5) {  
+        d.linkLabelAnchor = labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2;
+      } else {
+        d.linkLabelAnchor = (d.y - d.parent.y) - 10;
+      }
+    });
+
   if (options.debugOn) {
     console.log("dimensions:");
     console.log(dims);

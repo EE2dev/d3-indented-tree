@@ -134,7 +134,6 @@ function click(d, options, config){
   }
   options.transitionDuration = options.transitionDurationClick;
   update(d, options, config);
-  options.transitionDuration = options.transitionDurationDefault;
 }
 
 function update(source, options, config){
@@ -296,14 +295,15 @@ function update(source, options, config){
   //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
     .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
 
-
   const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
   linkEnter // filter to just draw this connector link for last child of parent
     .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
+    .lower() // with lower(9 vertical links are pushed to the root of the DOM,
+    // so link labes on horizontal links are further down and thus are visible when overlapping
     .append("path")
     .attr("class", "link vertical")
     .attr("d", () => l.getLinkD(origin, "vertical"));
-    
+   
   linkEnter.append("path")
     .attr("class", "link horizontal")
     .attr("d", () => l.getLinkD(origin, "horizontal"));
@@ -376,4 +376,5 @@ function update(source, options, config){
     d.x0 = d.x;
     d.y0 = d.y;
   }); 
+  options.transitionDuration = options.transitionDurationDefault;
 }

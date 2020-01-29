@@ -94,9 +94,14 @@ https://gitlab.com/snippets/1703535
   [none] switch global newlinklabel, newlinkWidth setting to options
   [ok] (previous bug) nodeBar labels dissappeared aber collapse expand
   [ok] transitionDuration separated for collapse/expand
+  [ok] transitionDuration separted for first time build up of visualization
+  [ok] link labels are below vertical paths and thus visible when overlapping
+  [none] DOM of SVG g.link elements could be reorded and grouped via g.branch (with transform) 
 
 [bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
 --> nodeSort can be chained after linkLabel/nodeBar.tween without jump and if nodeSort is called before not after
+
+-linksAPI.computeLabelDimensions for each branch not just each depth
 - linkWidth neg values
 - update nodeBars for neg linkWidth
 - update Label placement linkLabel
@@ -107,8 +112,13 @@ https://gitlab.com/snippets/1703535
 - scale linkWidth, linkHeight, like nodeBars
 - linkLabel.tween like nodeBars (color change on tween transition -> new api for setting colors with css, default no color distinction)
 - update blocks/ examples
-- change html of examples to <html> and <meta charste="utf-8">
+- move API example to API section
+- change html of examples to <html> and <meta charset="utf-8">
 
+[feature] link label placement
+[feature] 
+[feature] 
+[feature] 
 - update nodeBar connector + linkLabels on collapse, expand
 [bug] sometimes link Label moved to left
 - user can set dom of a scale
