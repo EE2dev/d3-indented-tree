@@ -299,7 +299,7 @@ function update(source, options, config){
   linkEnter // filter to just draw this connector link for last child of parent
     .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
     .lower() // with lower(9 vertical links are pushed to the root of the DOM,
-    // so link labes on horizontal links are further down and thus are visible when overlapping
+    // so link labels on horizontal links are further down and thus are visible when overlapping
     .append("path")
     .attr("class", "link vertical")
     .attr("d", () => l.getLinkD(origin, "vertical"));
@@ -326,7 +326,7 @@ function update(source, options, config){
     .transition()
     .duration(options.transitionDuration);
   
-  l.computeLabelDimensions(d3.selectAll(".link text.label"));
+  l.setupLabelDimensions(d3.selectAll(".link text.label"));
 
   // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
   linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ")");

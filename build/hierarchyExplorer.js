@@ -287,7 +287,7 @@
   var options = void 0;
   var oldLabelField = void 0,
       newLabelField = void 0;
-  var labelDimensions = void 0;
+  // let labelDimensions;
 
   linksAPI.initialize = function (_options) {
     options = _options;
@@ -372,8 +372,6 @@
   linksAPI.getLinkLabelFormatted = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    //  if (!options.linkLabelOn || !d.data[labelField]) {
-    // console.log(d.name + " " + d.data[labelField] + " " + isNaN(d.data[labelField]));
     if (!options.linkLabelOn || typeof d.data[labelField] === "undefined") {
       return "";
     } // else if (typeof d.data[labelField] === "string") {
@@ -406,7 +404,8 @@
   };
 
   function isNumber(num) {
-    return typeof num === "number";
+    // return typeof(num) === "number";
+    return !isNaN(num);
   }
 
   linksAPI.getLinkRTranslate = function (d) {
@@ -421,24 +420,96 @@
     }
   };
 
+  /* aligned: x center position of the shortest link + half the extent of the longest label of siblings */
   linksAPI.getLinkTextPositionX = function (d) {
-    /* aligned: x center position of the shortest link + half the extent of the longest label */
-    var shiftAlign = options.linkLabelAligned ?
-    // labelDimensions.get(d.depth).posXCenter + labelDimensions.get(d.depth).maxX / 2 
-    d.linkLabelAnchor : (d.y - d.parent.y) / 2;
+    return options.linkLabelAligned ? d.linkLabelPos : (d.y - d.parent.y) / 2;
+  };
+  /*
+    const shiftAlign = options.linkLabelAligned ? d.linkLabelAnchor : (d.y - d.parent.y) / 2;
     return shiftAlign;
   };
+  */
 
-  linksAPI.computeLabelDimensions = function (sel) {
+  linksAPI.setupLabelDimensions = function (sel) {
+    /*
     // let dims = [];
-    var dims = new Map();
+    const dims = new Map();
+    sel
+      .each(function(d) {
+        let dimProperties = {};
+        const height = d3.select(this).node().getBBox().height;
+        const width = d3.select(this).node().getBBox().width;
+        const text = d3.select(this).text();
+        // if (!dims[d.depth]) {
+        if (width <= d.y - d.parent.y - 5) {
+          if (!dims.get(d.parent.id)) {
+            dimProperties.maxX = width;
+            dimProperties.minX = width;
+            dimProperties.maxY = height;
+            dimProperties.maxXText = text;
+            dimProperties.maxYText = text;
+            dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+            // dims.push(dimProperties);
+            dims.set(d.parent.id, dimProperties);
+          } else {  
+            dimProperties = dims.get(d.parent.id);
+            if (dimProperties.maxX < width) {   
+              dimProperties.maxX = width;
+              dimProperties.maxXText = text;
+            } 
+            if (dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
+              dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+            } 
+            if (dimProperties.maxY < height) {
+              dimProperties.maxY = height;
+              dimProperties.maxYText = text;
+            } 
+            dims.set(d.parent.id, dimProperties);
+          }
+        }
+      });
+    */
+    var dimArray = computeLabelDimensions(sel);
+    storeLinkLabelAnchor(sel, dimArray);
+
+    /*
+    // set linkLabelAnchor
+    sel
+      .each(function(d) {
+        const width = d3.select(this).node().getBBox().width;
+        // const text = d3.select(this).text();
+    
+        if (width <= d.y - d.parent.y - 5) {  
+          //console.log("(" + d.id + ")" + text + ": " + (width) + " " + (labelDimensions.get(d.parent.id).posXCenter));
+          //console.log("  dy:" + d.y + " d.parent.y:"+ d.parent.y);
+          //console.log("  posXC:" + labelDimensions.get(d.parent.id).posXCenter + " maxX/2:"+ labelDimensions.get(d.parent.id).maxX / 2);
+          //d.linkLabelAnchor = labelDimensions.get(d.parent.id).posXCenter + labelDimensions.get(d.parent.id).maxX / 2;
+          d.linkLabelAnchor = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
+        } else {
+          d.linkLabelAnchor = (d.y - d.parent.y) - 10;
+        }
+      });
+      */
+
+    if (options.debugOn) {
+      console.log("dimensions:");
+      console.log(dimArray);
+    }
+  };
+
+  function computeLabelDimensions(sel) {
+    var dimArray = [];
+    var dimsPositive = new Map();
+    var dimsNegative = new Map(); // for link labels on links going to the left
+    var dims = void 0;
     sel.each(function (d) {
       var dimProperties = {};
       var height = d3.select(this).node().getBBox().height;
       var width = d3.select(this).node().getBBox().width;
       var text = d3.select(this).text();
-      // if (!dims[d.depth]) {
-      if (width <= d.y - d.parent.y - 5) {
+
+      dims = d.y >= d.parent.y ? dimsPositive : dimsNegative;
+      if (width <= Math.abs(d.y - d.parent.y) - 5) {
         if (!dims.get(d.parent.id)) {
           dimProperties.maxX = width;
           dimProperties.minX = width;
@@ -446,7 +517,6 @@
           dimProperties.maxXText = text;
           dimProperties.maxYText = text;
           dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-          // dims.push(dimProperties);
           dims.set(d.parent.id, dimProperties);
         } else {
           dimProperties = dims.get(d.parent.id);
@@ -465,28 +535,33 @@
         }
       }
     });
-    labelDimensions = dims;
-    // set linkLabelAnchor
+    dimArray.push(dimsPositive);
+    dimArray.push(dimsNegative);
+    return dimArray;
+  }
+
+  function storeLinkLabelAnchor(sel, dimArray) {
+    var dims = void 0;
     sel.each(function (d) {
       var width = d3.select(this).node().getBBox().width;
-      var text = d3.select(this).text();
-
-      // if (width < d.y - d.parent.y - labelDimensions.get(d.depth).posXCenter) {
-      if (width <= d.y - d.parent.y - 5) {
-        console.log("(" + d.id + ")" + text + ": " + width + " " + labelDimensions.get(d.parent.id).posXCenter);
-        console.log("  dy:" + d.y + " d.parent.y:" + d.parent.y);
-        console.log("  posXC:" + labelDimensions.get(d.parent.id).posXCenter + " maxX/2:" + labelDimensions.get(d.parent.id).maxX / 2);
-        d.linkLabelAnchor = labelDimensions.get(d.parent.id).posXCenter + labelDimensions.get(d.parent.id).maxX / 2;
+      dims = d.y >= d.parent.y ? dimArray[0] : dimArray[1];
+      d.linkLabelAnchor = "end";
+      if (width <= Math.abs(d.y - d.parent.y) - 5) {
+        // if (width <= d.y - d.parent.y - 5) {  
+        d.linkLabelPos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
       } else {
-        d.linkLabelAnchor = d.y - d.parent.y - 10;
+        // label to short to fit on link
+        if (d.y >= d.parent.y) {
+          // link to the left
+          d.linkLabelPos = d.y - d.parent.y - 10;
+        } else {
+          // link to the right
+          d.linkLabelPos = d.y - d.parent.y + 10;
+          d.linkLabelAnchor = "start";
+        }
       }
     });
-
-    if (options.debugOn) {
-      console.log("dimensions:");
-      console.log(dims);
-    }
-  };
+  }
 
   var nodesAPI = {};
   var options$1 = void 0;
@@ -1040,7 +1115,7 @@
     // Transition links to their new position.
     var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
 
-    l.computeLabelDimensions(d3.selectAll(".link text.label"));
+    l.setupLabelDimensions(d3.selectAll(".link text.label"));
 
     // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
     linkUpdate.attr("transform", function (d) {
@@ -1101,7 +1176,7 @@
     options.svgDimensions = { height: 800, width: 1400 };
     options.transitionDurationDefault = 750; // for all transitions except expand/collapse
     options.transitionDurationClick = 750; // for expand/collapse transitions and initial transition
-    options.transitionDuration = options.transitionDurationClick;
+    options.transitionDuration = options.transitionDurationDefault;
     options.locale = undefined;
 
     options.defaultColor = "grey";
@@ -1233,6 +1308,7 @@
     chartAPI.transitionDuration = function (_) {
       if (!arguments.length) return options.transitionDuration;
       options.transitionDurationDefault = _;
+      options.transitionDuration = _;
       return chartAPI;
     };
 

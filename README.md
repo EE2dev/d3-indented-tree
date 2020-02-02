@@ -341,7 +341,7 @@ Transitions to the new number label on top of the links.
         * `locale` is an *object* overriding the default locale format with the specified locale format.
         The locale is affecting the display of the link label if the `format` property is specified. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
 
-        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. (default is `true`). If `onTop` is set to false and the label overlaps with the previous link due to increase font size, the *linkHeight* can be increased. 
+        * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. The default value is `true`. If `onTop` is set to false and the label overlaps with the previous link due to increased font size, the *linkHeight* can be increased. 
         * `align` specifies a *boolean* property denoting whether to align the label horizontally, meaning for each depth the labels are right-aligned. Passing ```false``` aligns the label horizontally centered on the link, ```true``` right-aligns the labels of the same depth (centers the longest label per depth on the shortest link). Default is ```true```.
         * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
 

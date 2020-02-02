@@ -15,7 +15,7 @@ export default function (_dataSpec) {
   options.svgDimensions = {height: 800, width: 1400};
   options.transitionDurationDefault = 750; // for all transitions except expand/collapse
   options.transitionDurationClick = 750; // for expand/collapse transitions and initial transition
-  options.transitionDuration = options.transitionDurationClick;
+  options.transitionDuration = options.transitionDurationDefault;
   options.locale = undefined;
 
   options.defaultColor = "grey";
@@ -150,6 +150,7 @@ export default function (_dataSpec) {
   chartAPI.transitionDuration = function(_) {
     if (!arguments.length) return options.transitionDuration;
     options.transitionDurationDefault = _;
+    options.transitionDuration = _;
     return chartAPI;
   };  
 

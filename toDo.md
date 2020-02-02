@@ -1,4 +1,10 @@
 ## to do
+
+[bug] : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
+[bug] sometimes link Label moved to left
+[bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
+--> nodeSort can be chained after linkLabel/nodeBar.tween without jump and if nodeSort is called before not after
+
 [ok] convert tree to reusable
 [ok] read json file
 [ok] linkStrength function or number
@@ -10,7 +16,6 @@
 [ok] linkColor set with "value"
 [ok] linkStrength dynamic example
 [ok] linkWidth / linkStrength with "weight" in linkLabel2.html
-[bug] : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
 [ok] remove .value if cases
 [ok] adjust API function
 [ok] update docu (default field ok - propagation)
@@ -72,16 +77,15 @@ https://gitlab.com/snippets/1703535
   [ok] default visualization with no bar for root
   [ok] allow for negative values to have bars to the left by default.
   [ok]  (if range[a,b] then create scale for [-b, -a] for negative values)
-  [none]  divergingScale: true
   [ok] animation for changes from pos to negativ: 
-  [none]  two chained transition split in half to go to 0.
+  [deferred]  two chained transition split in half to go to 0.
   [ok] text animated accordingly
   [ok] do dashed array just to the beginning of the nodeBarLabel
   [ok] domain can be set in api 
   [ok] nodeBars: bugs
   [ok]  new field -> color white
   [ok]  new field -> bars get wider (nodeBar.html size1 -> size2 -> size1 or size1 -> size1 -> size1)
-  [none] relational data depend on order of missing values - just for undefined data
+  [deferred] relational data depend on order of missing values - just for undefined data
   [ok] nodeBar connector too long
   [ok] nodeBar3 collapse[EvE] -> expand -> Expand[Enoch]
   [ok] getVerticalAlignmentRef _> if label inside is before neg bar 
@@ -91,19 +95,20 @@ https://gitlab.com/snippets/1703535
   [ok] Nodebar bei missing nicht anzeigen (statt 0)
   [ok] CSS also in readme change from CamelCase to hyphenated
   [ok] change html of Readme template to <html> and <meta charste="utf-8">
-  [none] switch global newlinklabel, newlinkWidth setting to options
+  [deferred] switch global newlinklabel, newlinkWidth setting to options
   [ok] (previous bug) nodeBar labels dissappeared aber collapse expand
   [ok] transitionDuration separated for collapse/expand
   [ok] transitionDuration separted for first time build up of visualization
   [ok] link labels are below vertical paths and thus visible when overlapping
-  [none] DOM of SVG g.link elements could be reorded and grouped via g.branch (with transform) 
+  [deferred] DOM of SVG g.link elements could be reorded and grouped via g.branch (with transform) 
+  [ok] linksAPI.computeLabelDimensions for each branch not just each depth
 
-[bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
---> nodeSort can be chained after linkLabel/nodeBar.tween without jump and if nodeSort is called before not after
-
--linksAPI.computeLabelDimensions for each branch not just each depth
-- linkWidth neg values
+- linkWidth neg values ()use d.linkLabelAnchor
 - option to turn off link labels when link width is too short
+- linkLabelAlignment: start, aligned, centered
+- update blcoks with linkLabel align
+- update blocks with nodeImage
+
 - update nodeBars for neg linkWidth
 - update Label placement linkLabel
 - update SVG translate for neg values
@@ -121,7 +126,6 @@ https://gitlab.com/snippets/1703535
 [feature] 
 [feature] 
 - update nodeBar connector + linkLabels on collapse, expand
-[bug] sometimes link Label moved to left
 - user can set dom of a scale
 
 - collapse() API: () .mode: bySize/byHeight/byID .location .collapseAll === true (default)
