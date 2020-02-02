@@ -716,7 +716,7 @@
     return w;
   };
 
-  // transitions the node bar label through interpolation and adjust the class of the node bar
+  // transitions the node bar label through interpolation and adjust the class of the node bar, adjusts the text-anchor
   // when the sign of the node bar label changes
   nodesAPI.getNodeBarLabelTween = function (d) {
     var selection = d3.select(this);
@@ -727,6 +727,9 @@
     }
     var numberStart = oldLabelField$1 ? d.data[oldLabelField$1] : d.data[newLabelField$1];
     var numberEnd = d.data[newLabelField$1];
+    selection.style("text-anchor", function () {
+      return numberStart < 0 ? "end" : "start";
+    });
     if (isNaN(numberStart) || isNaN(numberEnd)) {
       // typeof NumberStart or numberEnd == "string"
       return function () {
@@ -743,6 +746,7 @@
     var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
       return d2.id === d.id;
     });
+
     if (!numberStart) {
       // if numberStart === null or 0
       correspondingBar.attr("class", function () {
@@ -751,9 +755,12 @@
     }
     return function (t) {
       var num = i(t);
-      if (numberStart * num < 0) {
+      if (numberStart * num <= 0) {
         correspondingBar.attr("class", function () {
           return num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+        });
+        selection.style("text-anchor", function () {
+          return num < 0 ? "end" : "start";
         });
       }
       selection.text(options$1.nodeBarFormat(num) + options$1.nodeBarUnit);
@@ -1059,7 +1066,9 @@
 
     if (options.nodeBarOn) {
       nodeUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass).style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
-      nodeUpdate.selectAll(".node-bar.bar-label").style("text-anchor", n.getNodeBarTextAnchor).style("fill", n.getNodeBarTextFill).call(function (sel) {
+      nodeUpdate.selectAll(".node-bar.bar-label")
+      //.style("text-anchor", n.getNodeBarTextAnchor)
+      .style("fill", n.getNodeBarTextFill).call(function (sel) {
         return sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween);
       })
       //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
@@ -1095,7 +1104,7 @@
     .filter(function (d) {
       return d.id === d.parent.children[d.parent.children.length - 1].id;
     }).lower() // with lower(9 vertical links are pushed to the root of the DOM,
-    // so link labes on horizontal links are further down and thus are visible when overlapping
+    // so link labels on horizontal links are further down and thus are visible when overlapping
     .append("path").attr("class", "link vertical").attr("d", function () {
       return l.getLinkD(origin, "vertical");
     });

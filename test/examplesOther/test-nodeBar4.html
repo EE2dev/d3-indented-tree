@@ -30,17 +30,18 @@ Seth,Eve,13,-205.3,steelblue
         .debugOn(true)
         .linkLabel("size")
         .nodeSort("size")
+        .transitionDuration(10000)
         //.nodeBar("size")
       ;
       showChart(); // for preprocessing data see below
 
       window.setTimeout(function() {
         myChart.nodeBar("size");
-      }, 2000);
+      }, 10000);
 
       window.setTimeout(function() {
         myChart.nodeBar("weight");
-      }, 4000);
+      }, 20000);
 
       function showChart(_file, preprocessed) {
         const selection = d3.select("body")

@@ -257,7 +257,7 @@ function update(source, options, config){
       .attr("x", n.getXNodeBarRect)
       .attr("width", n.getWidthNodeBarRect);
     nodeUpdate.selectAll(".node-bar.bar-label")
-      .style("text-anchor", n.getNodeBarTextAnchor)
+      //.style("text-anchor", n.getNodeBarTextAnchor)
       .style("fill", n.getNodeBarTextFill)
       .call(sel => sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
       //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))

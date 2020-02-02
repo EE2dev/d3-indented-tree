@@ -180,7 +180,7 @@ const getBarLabelWidth = function(text) {
   return w;
 };
 
-// transitions the node bar label through interpolation and adjust the class of the node bar
+// transitions the node bar label through interpolation and adjust the class of the node bar, adjusts the text-anchor
 // when the sign of the node bar label changes
 nodesAPI.getNodeBarLabelTween = function(d) { 
   const selection = d3.select(this);
@@ -189,6 +189,7 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   } 
   const numberStart = oldLabelField ? d.data[oldLabelField] : d.data[newLabelField];
   const numberEnd = d.data[newLabelField];
+  selection.style("text-anchor", () => numberStart < 0 ? "end" : "start");
   if (isNaN(numberStart) || isNaN(numberEnd)) { // typeof NumberStart or numberEnd == "string"
     return function() { selection.text(numberEnd); };
   }
@@ -198,13 +199,15 @@ nodesAPI.getNodeBarLabelTween = function(d) {
 
   const i = d3.interpolateNumber(numberStart, numberEnd);
   const correspondingBar = d3.selectAll(".node-bar.box").filter((d2) => d2.id === d.id);
+  
   if (!numberStart) { // if numberStart === null or 0
     correspondingBar.attr("class", () => numberEnd >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative");
   }
   return function(t) { 
     const num = i(t);
-    if (numberStart * num < 0) {
+    if (numberStart * num <= 0) {
       correspondingBar.attr("class", () => num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative");
+      selection.style("text-anchor", () => num < 0 ? "end" : "start");
     }
     selection.text(options.nodeBarFormat(num) + options.nodeBarUnit); 
   };

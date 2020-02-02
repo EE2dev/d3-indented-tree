@@ -102,6 +102,7 @@ https://gitlab.com/snippets/1703535
   [ok] link labels are below vertical paths and thus visible when overlapping
   [deferred] DOM of SVG g.link elements could be reorded and grouped via g.branch (with transform) 
   [ok] linksAPI.computeLabelDimensions for each branch not just each depth
+  [ok] nodeBar transition updated to correctly adjust text-anchor during transtioning over 0 
 
 - linkWidth neg values ()use d.linkLabelAnchor
 - option to turn off link labels when link width is too short
