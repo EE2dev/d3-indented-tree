@@ -11,15 +11,15 @@
   
   <!-- paste data in aside tag -->
   <aside id="data">
-    level1;level2;level3;size1;size2;size3;color
-    Eve;Cain;;1;2;4;rgb(100 23 80)
-    Eve;Seth;;-45;20;4;rgb(100 23 80)
-    Eve;Seth;Enos;-5;2;4;rgb(100 23 80)
-    Eve;Seth;Noam;50;2;4;rgb(100 23 80)
-    Eve;Abel;;32;2;4;rgb(100 23 80)
-    Eve;Awan;Enoch;-50.3;2;5;rgb(100 23 80)
-    Eve;Azura;;0;2;4;rgb(100 23 80)
-    Eve;;;-3;2;4;rgb(100 23 80)
+level1;level2;level3;size1;size2;size3;color
+Eve;Cain;;1;2;4;rgb(100 23 80)
+Eve;Seth;;-45;20;4;rgb(100 23 80)
+Eve;Seth;Enos;-5;2;4;rgb(100 23 80)
+Eve;Seth;Noam;50;2;4;rgb(100 23 80)
+Eve;Abel;;32;2;4;rgb(100 23 80)
+Eve;Awan;Enoch;-50.3;2;5;rgb(100 23 80)
+Eve;Azura;;-32;2;4;rgb(100 23 80)
+Eve;;;-3;2;4;rgb(100 23 80)
   </aside>
   
     <script>
@@ -32,7 +32,7 @@
         .debugOn(true)
         .margin({top: 20, right: 10, bottom: 20, left: 400})
         .linkWidth("size1", {range: [-100, 100]})
-        .linkLabel("size1", {unit: " cust", onTop: false})
+        .linkLabel("size1", {unit: " cust", always: true})
         .nodeSort("size1")
         .nodeBar("size1", {translateX: 1, unit: " customers", labelInside: true})
         ;

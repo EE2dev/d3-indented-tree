@@ -134,6 +134,7 @@ function click(d, options, config){
   }
   options.transitionDuration = options.transitionDurationClick;
   update(d, options, config);
+  options.transitionDuration = options.transitionDurationDefault;
 }
 
 function update(source, options, config){
@@ -316,7 +317,7 @@ function update(source, options, config){
   const linkMerge = link.merge(linkEnter);
   linkMerge.select("text")
     .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
-    .attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
     .attr("dy", l.getInitialDy)
     .text(d => l.getLinkLabelFormatted(d))
     .style("fill", l.getLinkLabelColor); 
@@ -345,10 +346,12 @@ function update(source, options, config){
   linkUpdate
     .select("text")  
     .attr("dy", l.getDy)
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("text-anchor", l.getLinkLabelAnchor)
     .attr("x", l.getLinkTextPositionX)
     .attr("y", d => d.x - d.parent.x)
     .call(sel => sel.tween("text", l.getLinkTextTween))
-    .style("opacity", 1); 
+    .style("opacity", d => (!options.linkLabelAlways && !d.linkLabelAlways) ? 0 : 1); 
 
   // Transition exiting nodes to the parent's new position.
   const linkExit = link.exit().transition()
@@ -376,5 +379,4 @@ function update(source, options, config){
     d.x0 = d.x;
     d.y0 = d.y;
   }); 
-  options.transitionDuration = options.transitionDurationDefault;
 }

@@ -79,7 +79,8 @@ export default function (_dataSpec) {
   options.linkLabelOn = false;
   options.linkLabelUnit = "";
   options.linkLabelOnTop = true;
-  options.linkLabelAligned = true; // otherwise centered
+  options.linkLabelAlignment = "aligned"; // "aligned", "start", "middle" or "end"
+  options.linkLabelAlways = false; // always display link Label ? if false, lael is not displayed if longer than link
   options.linkLabelFormatSpecifier = ",.0f"; 
   options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
   options.linkLabelColor; // function for setting the label color based on the value.
@@ -267,7 +268,8 @@ export default function (_dataSpec) {
       options.linkLabelUnit = _options.unit || options.linkLabelUnit;
       options.linkLabelFormat = (_options.format) ? d3.format(_options.format) : options.linkLabelFormat;
       options.linkLabelOnTop = (typeof (_options.onTop) !== "undefined") ? _options.onTop : options.linkLabelOnTop;
-      options.linkLabelAligned = (typeof (_options.align) !== "undefined") ? _options.align : options.linkLabelAligned;
+      options.linkLabelAlways = (typeof (_options.always) !== "undefined") ? _options.always : options.linkLabelAlways;
+      options.linkLabelAlignment = _options.align || options.linkLabelAlignment;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;

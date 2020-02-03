@@ -384,11 +384,11 @@
 
   linksAPI.getLinkTextTween = function (d) {
     var selection = d3.select(this);
-    /*
     if (!options.linkLabelOn) {
-      return function() { selection.text(""); };
-    } 
-    */
+      return function () {
+        selection.text("");
+      };
+    }
     var numberStart = linksAPI.getLinkLabel(d, oldLabelField);
     var numberEnd = linksAPI.getLinkLabel(d, newLabelField);
 
@@ -409,7 +409,9 @@
   }
 
   linksAPI.getLinkRTranslate = function (d) {
-    return "translate(" + linksAPI.getLinkStrength(d.parent) / 2 + " " + (d.x - d.parent.x) + ")";
+    var shift = d.y >= d.parent.y ? linksAPI.getLinkStrength(d.parent) / 2 : -1 * linksAPI.getLinkStrength(d.parent) / 2;
+    return "translate(" + shift + " " + (d.x - d.parent.x) + ")";
+    // return "translate(" + (linksAPI.getLinkStrength(d.parent) / 2) + " " + (d.x - d.parent.x) + ")";
   };
 
   linksAPI.getLinkLabelColor = function (d) {
@@ -422,74 +424,24 @@
 
   /* aligned: x center position of the shortest link + half the extent of the longest label of siblings */
   linksAPI.getLinkTextPositionX = function (d) {
-    return options.linkLabelAligned ? d.linkLabelPos : (d.y - d.parent.y) / 2;
+    return options.linkLabelAlignment === "aligned" ? d.linkLabelPos : (d.y - d.parent.y) / 2;
   };
   /*
     const shiftAlign = options.linkLabelAligned ? d.linkLabelAnchor : (d.y - d.parent.y) / 2;
     return shiftAlign;
   };
   */
+  linksAPI.getLinkLabelAnchor = function (d) {
+    if (options.linkLabelAlignment === "aligned") {
+      return d.linkLabelAnchor;
+    } else {
+      return options.linkLabelAlignment; // "start", "middle" or "end"
+    }
+  };
 
   linksAPI.setupLabelDimensions = function (sel) {
-    /*
-    // let dims = [];
-    const dims = new Map();
-    sel
-      .each(function(d) {
-        let dimProperties = {};
-        const height = d3.select(this).node().getBBox().height;
-        const width = d3.select(this).node().getBBox().width;
-        const text = d3.select(this).text();
-        // if (!dims[d.depth]) {
-        if (width <= d.y - d.parent.y - 5) {
-          if (!dims.get(d.parent.id)) {
-            dimProperties.maxX = width;
-            dimProperties.minX = width;
-            dimProperties.maxY = height;
-            dimProperties.maxXText = text;
-            dimProperties.maxYText = text;
-            dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-            // dims.push(dimProperties);
-            dims.set(d.parent.id, dimProperties);
-          } else {  
-            dimProperties = dims.get(d.parent.id);
-            if (dimProperties.maxX < width) {   
-              dimProperties.maxX = width;
-              dimProperties.maxXText = text;
-            } 
-            if (dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
-              dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-            } 
-            if (dimProperties.maxY < height) {
-              dimProperties.maxY = height;
-              dimProperties.maxYText = text;
-            } 
-            dims.set(d.parent.id, dimProperties);
-          }
-        }
-      });
-    */
     var dimArray = computeLabelDimensions(sel);
     storeLinkLabelAnchor(sel, dimArray);
-
-    /*
-    // set linkLabelAnchor
-    sel
-      .each(function(d) {
-        const width = d3.select(this).node().getBBox().width;
-        // const text = d3.select(this).text();
-    
-        if (width <= d.y - d.parent.y - 5) {  
-          //console.log("(" + d.id + ")" + text + ": " + (width) + " " + (labelDimensions.get(d.parent.id).posXCenter));
-          //console.log("  dy:" + d.y + " d.parent.y:"+ d.parent.y);
-          //console.log("  posXC:" + labelDimensions.get(d.parent.id).posXCenter + " maxX/2:"+ labelDimensions.get(d.parent.id).maxX / 2);
-          //d.linkLabelAnchor = labelDimensions.get(d.parent.id).posXCenter + labelDimensions.get(d.parent.id).maxX / 2;
-          d.linkLabelAnchor = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
-        } else {
-          d.linkLabelAnchor = (d.y - d.parent.y) - 10;
-        }
-      });
-      */
 
     if (options.debugOn) {
       console.log("dimensions:");
@@ -524,7 +476,9 @@
             dimProperties.maxX = width;
             dimProperties.maxXText = text;
           }
-          if (dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
+          if (d.y >= d.parent.y && dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
+            dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+          } else if (d.y < d.parent.y && dimProperties.posXCenter < (d.y - d.parent.y) / 2) {
             dimProperties.posXCenter = (d.y - d.parent.y) / 2;
           }
           if (dimProperties.maxY < height) {
@@ -546,11 +500,12 @@
       var width = d3.select(this).node().getBBox().width;
       dims = d.y >= d.parent.y ? dimArray[0] : dimArray[1];
       d.linkLabelAnchor = "end";
+      d.linkLabelAlways = true;
       if (width <= Math.abs(d.y - d.parent.y) - 5) {
-        // if (width <= d.y - d.parent.y - 5) {  
         d.linkLabelPos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
       } else {
-        // label to short to fit on link
+        // label too short to fit on link
+        d.linkLabelAlways = false;
         if (d.y >= d.parent.y) {
           // link to the left
           d.linkLabelPos = d.y - d.parent.y - 10;
@@ -960,6 +915,7 @@
     }
     options.transitionDuration = options.transitionDurationClick;
     update(d, options, config);
+    options.transitionDuration = options.transitionDurationDefault;
   }
 
   function update(source, options, config) {
@@ -1117,7 +1073,9 @@
 
     // update merged selection before transition
     var linkMerge = link.merge(linkEnter);
-    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above").attr("text-anchor", options.linkLabelAligned ? "end" : "middle").attr("dy", l.getInitialDy).text(function (d) {
+    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above")
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("dy", l.getInitialDy).text(function (d) {
       return l.getLinkLabelFormatted(d);
     }).style("fill", l.getLinkLabelColor);
 
@@ -1143,11 +1101,15 @@
       return l.getLinkD(d, "horizontal");
     }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
 
-    linkUpdate.select("text").attr("dy", l.getDy).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
+    linkUpdate.select("text").attr("dy", l.getDy)
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("text-anchor", l.getLinkLabelAnchor).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
       return d.x - d.parent.x;
     }).call(function (sel) {
       return sel.tween("text", l.getLinkTextTween);
-    }).style("opacity", 1);
+    }).style("opacity", function (d) {
+      return !options.linkLabelAlways && !d.linkLabelAlways ? 0 : 1;
+    });
 
     // Transition exiting nodes to the parent's new position.
     var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
@@ -1170,7 +1132,6 @@
       d.x0 = d.x;
       d.y0 = d.y;
     });
-    options.transitionDuration = options.transitionDurationDefault;
   }
 
   function d3_template_reusable (_dataSpec) {
@@ -1245,7 +1206,8 @@
     options.linkLabelOn = false;
     options.linkLabelUnit = "";
     options.linkLabelOnTop = true;
-    options.linkLabelAligned = true; // otherwise centered
+    options.linkLabelAlignment = "aligned"; // "aligned", "start", "middle" or "end"
+    options.linkLabelAlways = false; // always display link Label ? if false, lael is not displayed if longer than link
     options.linkLabelFormatSpecifier = ",.0f";
     options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
 
@@ -1456,7 +1418,8 @@
         options.linkLabelUnit = _options.unit || options.linkLabelUnit;
         options.linkLabelFormat = _options.format ? d3.format(_options.format) : options.linkLabelFormat;
         options.linkLabelOnTop = typeof _options.onTop !== "undefined" ? _options.onTop : options.linkLabelOnTop;
-        options.linkLabelAligned = typeof _options.align !== "undefined" ? _options.align : options.linkLabelAligned;
+        options.linkLabelAlways = typeof _options.always !== "undefined" ? _options.always : options.linkLabelAlways;
+        options.linkLabelAlignment = _options.align || options.linkLabelAlignment;
       }
       if (typeof options.updateDefault === "function") options.updateDefault();
       return chartAPI;

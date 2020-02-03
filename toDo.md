@@ -103,10 +103,14 @@ https://gitlab.com/snippets/1703535
   [deferred] DOM of SVG g.link elements could be reorded and grouped via g.branch (with transform) 
   [ok] linksAPI.computeLabelDimensions for each branch not just each depth
   [ok] nodeBar transition updated to correctly adjust text-anchor during transtioning over 0 
+  [ok] refactored transitionDuration changes
 
 - linkWidth neg values ()use d.linkLabelAnchor
-- option to turn off link labels when link width is too short
-- linkLabelAlignment: start, aligned, centered
+- option to turn off link labels when link width is too short: always: true/false
+- linkLabelAlignment: start, aligned, middle, end
+- implement labelAlignment
+
+[bug] if link label is neg and longer than link width it is display under the node bar line instead of on top (Workaround: onTop: false)
 - update blcoks with linkLabel align
 - update blocks with nodeImage
 
