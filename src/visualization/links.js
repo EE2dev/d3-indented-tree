@@ -130,7 +130,7 @@ linksAPI.getLinkLabelColor = function (d) {
 };
 
 /* aligned: x center position of the shortest link + half the extent of the longest label of siblings */
-linksAPI.getLinkTextPositionX = d => (options.linkLabelAlignment === "aligned")? d.linkLabelPos : (d.y - d.parent.y) / 2;
+linksAPI.getLinkTextPositionX = d => (options.linkLabelAlignment === "aligned")? d.linkLabel.pos : (d.y - d.parent.y) / 2;
 /*
   const shiftAlign = options.linkLabelAligned ? d.linkLabelAnchor : (d.y - d.parent.y) / 2;
   return shiftAlign;
@@ -138,7 +138,7 @@ linksAPI.getLinkTextPositionX = d => (options.linkLabelAlignment === "aligned")?
 */
 linksAPI.getLinkLabelAnchor = function(d) {
   if (options.linkLabelAlignment === "aligned") {
-    return d.linkLabelAnchor;
+    return d.linkLabel.anchor;
   } else {
     return options.linkLabelAlignment; // "start", "middle" or "end"
   }
@@ -205,34 +205,20 @@ function storeLinkLabelAnchor(sel, dimArray) {
   sel.each(function(d) {
     const width = d3.select(this).node().getBBox().width;
     dims = (d.y >= d.parent.y) ? dimArray[0] : dimArray[1];
-    d.linkLabelAnchor = "end";
-    d.linkLabelAlways = true;
+    d.linkLabel = {};
+    d.linkLabel.anchor = "end";
+    d.linkLabel.always = true;
     if (width <= Math.abs(d.y - d.parent.y) - 5) {
-      d.linkLabelPos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
+      d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
     } else { // label too short to fit on link
-      d.linkLabelAlways = false;
+      d.linkLabel.always = false;
       if (d.y >= d.parent.y) { // link to the left
-        d.linkLabelPos = (d.y - d.parent.y) - 10;
+        d.linkLabel.pos = (d.y - d.parent.y) - 10;
       } else { // link to the right
-        d.linkLabelPos =  (d.y - d.parent.y) + 10;
-        d.linkLabelAnchor = "start";
-        /*
-        d3.select("svg g")
-          .append("g")
-          //.attr("transform", d3.select(this.parentNode).attr("transform"))
-          .attr("transform", "translate(" + d.parent.y + " " + d.parent.x + ")")
-          .append("use")
-          .attr("xlink:href", "#link-label-" + d.id);
-          */
-        /*
-        // shorted nodeBar connectors to avoid overlap
-        d3.selectAll(".node-bar.connector")
-          .filter(df => df.id === d.id)
-          .attr("d", d => { 
-            d.connectorLength = d.connectorLength - (width + 5); 
-            return nodesAPI.getNodeBarDReduced(d, width + 5);
-          });
-        */
+        d.linkLabel.pos =  (d.y - d.parent.y) + 10;
+        d.linkLabel.anchor = "start";
+        d.linkLabel.width = (options.linkLabelAlways && options.linkLabelOnTop && options.linkLabelAlignment === "aligned")
+          ? width : 0;
       }
     }
   });

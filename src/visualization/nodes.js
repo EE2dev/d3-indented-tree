@@ -91,6 +91,7 @@ nodesAPI.updateNodeImage = function (transition) {
 nodesAPI.computeNodeExtend = function(sel) {
   let alignmentAnchorArray = [];
   let anchorXPos;
+  let maxLinkLabel = 0;
 
   const l = linksAPI;
   l.initialize(options);
@@ -106,11 +107,12 @@ nodesAPI.computeNodeExtend = function(sel) {
       : (d.parent.y - d.y) + l.getLinkStrength(d.parent, options) / 2 + 5;
     d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField]);
     alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
-
+    maxLinkLabel = (d.linkLabel && d.linkLabel.width > maxLinkLabel) ? d.linkLabel.width : maxLinkLabel;
     if (options.debugOn) { console.log("connctorStart: " + d.nodeBar.connectorStart);}
   });
+
   alignmentAnchorArray.anchor = Math.max(...alignmentAnchorArray);
-  anchorXPos = alignmentAnchorArray.anchor + options.nodeBarTranslateX;
+  anchorXPos = alignmentAnchorArray.anchor + options.nodeBarTranslateX + maxLinkLabel;
 
   if (options.debugOn) {
     console.log("alignmentAnchorArray: " + alignmentAnchorArray);
@@ -146,6 +148,7 @@ nodesAPI.computeNodeExtend = function(sel) {
         d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
       }
     } 
+
     if (options.debugOn) { 
       console.log("connector: " + d.nodeBar.connectorLength); 
       console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
@@ -232,9 +235,10 @@ nodesAPI.getNodeBarLabelTween = function(d) {
 }
 */
 
-nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
-// nodesAPI.getNodeBarDReduced = (d, r) => 
-//   `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength - r}`;
+// nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
+nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
+  ${(d.linkLabel && d.linkLabel.width) ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength}`;
+
 
 nodesAPI.getXNodeBarRect = d => options.nodeBarNeg ?
   d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]))

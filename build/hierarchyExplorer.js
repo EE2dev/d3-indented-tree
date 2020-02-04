@@ -426,7 +426,7 @@
 
   /* aligned: x center position of the shortest link + half the extent of the longest label of siblings */
   linksAPI.getLinkTextPositionX = function (d) {
-    return options.linkLabelAlignment === "aligned" ? d.linkLabelPos : (d.y - d.parent.y) / 2;
+    return options.linkLabelAlignment === "aligned" ? d.linkLabel.pos : (d.y - d.parent.y) / 2;
   };
   /*
     const shiftAlign = options.linkLabelAligned ? d.linkLabelAnchor : (d.y - d.parent.y) / 2;
@@ -435,7 +435,7 @@
   */
   linksAPI.getLinkLabelAnchor = function (d) {
     if (options.linkLabelAlignment === "aligned") {
-      return d.linkLabelAnchor;
+      return d.linkLabel.anchor;
     } else {
       return options.linkLabelAlignment; // "start", "middle" or "end"
     }
@@ -501,37 +501,22 @@
     sel.each(function (d) {
       var width = d3.select(this).node().getBBox().width;
       dims = d.y >= d.parent.y ? dimArray[0] : dimArray[1];
-      d.linkLabelAnchor = "end";
-      d.linkLabelAlways = true;
+      d.linkLabel = {};
+      d.linkLabel.anchor = "end";
+      d.linkLabel.always = true;
       if (width <= Math.abs(d.y - d.parent.y) - 5) {
-        d.linkLabelPos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
+        d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
       } else {
         // label too short to fit on link
-        d.linkLabelAlways = false;
+        d.linkLabel.always = false;
         if (d.y >= d.parent.y) {
           // link to the left
-          d.linkLabelPos = d.y - d.parent.y - 10;
+          d.linkLabel.pos = d.y - d.parent.y - 10;
         } else {
           // link to the right
-          d.linkLabelPos = d.y - d.parent.y + 10;
-          d.linkLabelAnchor = "start";
-          /*
-          d3.select("svg g")
-            .append("g")
-            //.attr("transform", d3.select(this.parentNode).attr("transform"))
-            .attr("transform", "translate(" + d.parent.y + " " + d.parent.x + ")")
-            .append("use")
-            .attr("xlink:href", "#link-label-" + d.id);
-            */
-          /*
-          // shorted nodeBar connectors to avoid overlap
-          d3.selectAll(".node-bar.connector")
-            .filter(df => df.id === d.id)
-            .attr("d", d => { 
-              d.connectorLength = d.connectorLength - (width + 5); 
-              return nodesAPI.getNodeBarDReduced(d, width + 5);
-            });
-          */
+          d.linkLabel.pos = d.y - d.parent.y + 10;
+          d.linkLabel.anchor = "start";
+          d.linkLabel.width = options.linkLabelAlways && options.linkLabelOnTop && options.linkLabelAlignment === "aligned" ? width : 0;
         }
       }
     });
@@ -604,6 +589,7 @@
   nodesAPI.computeNodeExtend = function (sel) {
     var alignmentAnchorArray = [];
     var anchorXPos = void 0;
+    var maxLinkLabel = 0;
 
     var l = linksAPI;
     l.initialize(options$1);
@@ -619,13 +605,14 @@
       d.nodeBar.connectorStart = !d.parent || d.y >= d.parent.y ? nodeEnd + 5 : d.parent.y - d.y + l.getLinkStrength(d.parent, options$1) / 2 + 5;
       d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField$1]);
       alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
-
+      maxLinkLabel = d.linkLabel && d.linkLabel.width > maxLinkLabel ? d.linkLabel.width : maxLinkLabel;
       if (options$1.debugOn) {
         console.log("connctorStart: " + d.nodeBar.connectorStart);
       }
     });
+
     alignmentAnchorArray.anchor = Math.max.apply(Math, alignmentAnchorArray);
-    anchorXPos = alignmentAnchorArray.anchor + options$1.nodeBarTranslateX;
+    anchorXPos = alignmentAnchorArray.anchor + options$1.nodeBarTranslateX + maxLinkLabel;
 
     if (options$1.debugOn) {
       console.log("alignmentAnchorArray: " + alignmentAnchorArray);
@@ -658,6 +645,7 @@
           d.nodeBar.connectorLength = d.nodeBar.anchor - 5 - d.nodeBar.connectorStart;
         }
       }
+
       if (options$1.debugOn) {
         console.log("connector: " + d.nodeBar.connectorLength);
         console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
@@ -760,11 +748,10 @@
   }
   */
 
+  // nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
   nodesAPI.getNodeBarD = function (d) {
-    return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h " + -d.nodeBar.connectorLength;
+    return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h \n  " + (d.linkLabel && d.linkLabel.width ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength);
   };
-  // nodesAPI.getNodeBarDReduced = (d, r) => 
-  //   `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength - r}`;
 
   nodesAPI.getXNodeBarRect = function (d) {
     return options$1.nodeBarNeg ? d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField])) : d.nodeBar.anchor;
@@ -964,7 +951,95 @@
 
     d3.select("svg").transition().duration(options.transitionDuration).attr("height", config.height);
 
-    // 1. Update the nodes…
+    // 1. Update the links…
+    var l = linksAPI;
+    l.initialize(options);
+
+    var link = config.svg.selectAll("g.link").data(links, function (d) {
+      var id = d.id + "->" + d.parent.id;
+      return id;
+    });
+
+    // Enter any new links at the parent's previous position.
+    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link")
+    //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+
+    var origin = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
+    linkEnter // filter to just draw this connector link for last child of parent
+    .filter(function (d) {
+      return d.id === d.parent.children[d.parent.children.length - 1].id;
+    }).lower() // with lower() vertical links are pushed to the root of the DOM,
+    // so link labels on horizontal links are further down and thus are visible when overlapping
+    .append("path").attr("class", "link vertical").attr("d", function () {
+      return l.getLinkD(origin, "vertical");
+    });
+
+    linkEnter.append("path").attr("class", "link horizontal").attr("d", function () {
+      return l.getLinkD(origin, "horizontal");
+    });
+
+    linkEnter.append("text").style("opacity", 1e-6);
+
+    // update merged selection before transition
+    var linkMerge = link.merge(linkEnter);
+    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above")
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("dy", l.getInitialDy).attr("id", function (d) {
+      return "link-label-" + d.id;
+    }).text(function (d) {
+      return l.getLinkLabelFormatted(d);
+    }).style("fill", l.getLinkLabelColor);
+
+    // Transition links to their new position.
+    var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
+
+    l.setupLabelDimensions(d3.selectAll(".link text.label"));
+
+    // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
+    linkUpdate.attr("transform", function (d) {
+      return "translate(" + d.parent.y + " " + d.parent.x + ")";
+    });
+
+    linkUpdate.select("path.link.vertical").attr("d", function (d) {
+      return l.getLinkD(d, "vertical", true);
+    }).style("stroke", function (d) {
+      return options.linkColorInherit ? l.getLinkStroke(d.parent) : "";
+    }).style("stroke-width", function (d) {
+      return l.getLinkStrokeWidth(d.parent);
+    });
+
+    linkUpdate.select("path.link.horizontal").attr("d", function (d) {
+      return l.getLinkD(d, "horizontal");
+    }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
+
+    linkUpdate.select("text").attr("dy", l.getDy)
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("text-anchor", l.getLinkLabelAnchor).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
+      return d.x - d.parent.x;
+    }).call(function (sel) {
+      return sel.tween("text", l.getLinkTextTween);
+    }).style("opacity", function (d) {
+      return !options.linkLabelAlways && !d.linkLabel.always ? 0 : 1;
+    });
+
+    // Transition exiting nodes to the parent's new position.
+    var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
+
+    linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")");
+
+    var destination = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
+    linkExit.selectAll("path.link.vertical").attr("d", function () {
+      return l.getLinkD(destination, "vertical");
+    });
+
+    linkExit.selectAll("path.link.horizontal").attr("d", function () {
+      return l.getLinkD(destination, "horizontal");
+    }).attr("transform", "translate(0 0)");
+
+    linkExit.select("text").attr("x", 0).attr("y", 0).style("opacity", 1e-6);
+
+    // 2. Update the nodes…
     var n = nodesAPI;
     n.initialize(options);
 
@@ -1062,94 +1137,6 @@
     }).remove();
 
     nodeExit.select(".node-label").style("fill-opacity", 1e-6);
-
-    // 2. Update the links…
-    var l = linksAPI;
-    l.initialize(options);
-
-    var link = config.svg.selectAll("g.link").data(links, function (d) {
-      var id = d.id + "->" + d.parent.id;
-      return id;
-    });
-
-    // Enter any new links at the parent's previous position.
-    var linkEnter = link.enter().insert("g", "g.node").attr("class", "link")
-    //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
-
-    var origin = { x: source.x0, y: source.y0, parent: { x: source.x0, y: source.y0 } };
-    linkEnter // filter to just draw this connector link for last child of parent
-    .filter(function (d) {
-      return d.id === d.parent.children[d.parent.children.length - 1].id;
-    }).lower() // with lower(9 vertical links are pushed to the root of the DOM,
-    // so link labels on horizontal links are further down and thus are visible when overlapping
-    .append("path").attr("class", "link vertical").attr("d", function () {
-      return l.getLinkD(origin, "vertical");
-    });
-
-    linkEnter.append("path").attr("class", "link horizontal").attr("d", function () {
-      return l.getLinkD(origin, "horizontal");
-    });
-
-    linkEnter.append("text").style("opacity", 1e-6);
-
-    // update merged selection before transition
-    var linkMerge = link.merge(linkEnter);
-    linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above")
-    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("dy", l.getInitialDy).attr("id", function (d) {
-      return "link-label-" + d.id;
-    }).text(function (d) {
-      return l.getLinkLabelFormatted(d);
-    }).style("fill", l.getLinkLabelColor);
-
-    // Transition links to their new position.
-    var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
-
-    l.setupLabelDimensions(d3.selectAll(".link text.label"));
-
-    // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
-    linkUpdate.attr("transform", function (d) {
-      return "translate(" + d.parent.y + " " + d.parent.x + ")";
-    });
-
-    linkUpdate.select("path.link.vertical").attr("d", function (d) {
-      return l.getLinkD(d, "vertical", true);
-    }).style("stroke", function (d) {
-      return options.linkColorInherit ? l.getLinkStroke(d.parent) : "";
-    }).style("stroke-width", function (d) {
-      return l.getLinkStrokeWidth(d.parent);
-    });
-
-    linkUpdate.select("path.link.horizontal").attr("d", function (d) {
-      return l.getLinkD(d, "horizontal");
-    }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
-
-    linkUpdate.select("text").attr("dy", l.getDy)
-    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("text-anchor", l.getLinkLabelAnchor).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
-      return d.x - d.parent.x;
-    }).call(function (sel) {
-      return sel.tween("text", l.getLinkTextTween);
-    }).style("opacity", function (d) {
-      return !options.linkLabelAlways && !d.linkLabelAlways ? 0 : 1;
-    });
-
-    // Transition exiting nodes to the parent's new position.
-    var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
-
-    linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")");
-
-    var destination = { x: source.x, y: source.y, parent: { x: source.x, y: source.y } };
-    linkExit.selectAll("path.link.vertical").attr("d", function () {
-      return l.getLinkD(destination, "vertical");
-    });
-
-    linkExit.selectAll("path.link.horizontal").attr("d", function () {
-      return l.getLinkD(destination, "horizontal");
-    }).attr("transform", "translate(0 0)");
-
-    linkExit.select("text").attr("x", 0).attr("y", 0).style("opacity", 1e-6);
 
     // Stash the old positions for transition.
     nodesSort.forEach(function (d) {

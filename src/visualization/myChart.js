@@ -161,7 +161,102 @@ function update(source, options, config){
     .duration(options.transitionDuration)
     .attr("height", config.height);
 
-  // 1. Update the nodes…
+  // 1. Update the links…
+  const l = linksAPI;
+  l.initialize(options);
+
+  const link = config.svg.selectAll("g.link")
+    .data(links, function (d) {
+      var id = d.id + "->" + d.parent.id;
+      return id;
+    });
+
+  // Enter any new links at the parent's previous position.
+  const linkEnter = link.enter().insert("g", "g.node")
+    .attr("class", "link")
+  //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
+    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+
+  const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
+  linkEnter // filter to just draw this connector link for last child of parent
+    .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
+    .lower() // with lower() vertical links are pushed to the root of the DOM,
+    // so link labels on horizontal links are further down and thus are visible when overlapping
+    .append("path")
+    .attr("class", "link vertical")
+    .attr("d", () => l.getLinkD(origin, "vertical"));
+   
+  linkEnter.append("path")
+    .attr("class", "link horizontal")
+    .attr("d", () => l.getLinkD(origin, "horizontal"));
+
+  linkEnter
+    .append("text")   
+    .style("opacity", 1e-6);   
+  
+  // update merged selection before transition
+  const linkMerge = link.merge(linkEnter);
+  linkMerge.select("text")
+    .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("dy", l.getInitialDy)
+    .attr("id", d => "link-label-" + d.id)
+    .text(d => l.getLinkLabelFormatted(d))
+    .style("fill", l.getLinkLabelColor); 
+
+  // Transition links to their new position.
+  const linkUpdate = linkMerge
+    .transition()
+    .duration(options.transitionDuration);
+  
+  l.setupLabelDimensions(d3.selectAll(".link text.label"));
+
+  // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
+  linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ")");
+
+  linkUpdate.select("path.link.vertical")
+    .attr("d", (d) => l.getLinkD(d, "vertical", true))
+    .style("stroke", (d) => options.linkColorInherit ? l.getLinkStroke(d.parent) : "")
+    .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
+
+  linkUpdate.select("path.link.horizontal")
+    .attr("d", (d) => l.getLinkD(d, "horizontal"))
+    .attr("transform", l.getLinkRTranslate)
+    .style("stroke", l.getLinkStroke)
+    .style("stroke-width", l.getLinkStrokeWidth);
+
+  linkUpdate
+    .select("text")  
+    .attr("dy", l.getDy)
+    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+    .attr("text-anchor", l.getLinkLabelAnchor)
+    .attr("x", l.getLinkTextPositionX)
+    .attr("y", d => d.x - d.parent.x)
+    .call(sel => sel.tween("text", l.getLinkTextTween))
+    .style("opacity", d => (!options.linkLabelAlways && !d.linkLabel.always) ? 0 : 1); 
+
+  // Transition exiting nodes to the parent's new position.
+  const linkExit = link.exit().transition()
+    .duration(options.transitionDuration)
+    .remove();
+
+  linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")"); 
+
+  const destination = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
+  linkExit.selectAll("path.link.vertical")
+    .attr("d", () => l.getLinkD(destination, "vertical")); 
+
+  linkExit.selectAll("path.link.horizontal")
+    .attr("d", () => l.getLinkD(destination, "horizontal"))
+    .attr("transform", "translate(0 0)");
+
+  linkExit
+    .select("text")
+    .attr("x", 0)
+    .attr("y", 0)
+    .style("opacity", 1e-6);
+
+  // 2. Update the nodes…
   const n = nodesAPI;
   n.initialize(options);
 
@@ -280,101 +375,6 @@ function update(source, options, config){
   nodeExit.select(".node-label")
     .style("fill-opacity", 1e-6);
   
-  // 2. Update the links…
-  const l = linksAPI;
-  l.initialize(options);
-
-  const link = config.svg.selectAll("g.link")
-    .data(links, function (d) {
-      var id = d.id + "->" + d.parent.id;
-      return id;
-    });
-
-  // Enter any new links at the parent's previous position.
-  const linkEnter = link.enter().insert("g", "g.node")
-    .attr("class", "link")
-  //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
-
-  const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
-  linkEnter // filter to just draw this connector link for last child of parent
-    .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
-    .lower() // with lower(9 vertical links are pushed to the root of the DOM,
-    // so link labels on horizontal links are further down and thus are visible when overlapping
-    .append("path")
-    .attr("class", "link vertical")
-    .attr("d", () => l.getLinkD(origin, "vertical"));
-   
-  linkEnter.append("path")
-    .attr("class", "link horizontal")
-    .attr("d", () => l.getLinkD(origin, "horizontal"));
-
-  linkEnter
-    .append("text")   
-    .style("opacity", 1e-6);   
-  
-  // update merged selection before transition
-  const linkMerge = link.merge(linkEnter);
-  linkMerge.select("text")
-    .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
-    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("dy", l.getInitialDy)
-    .attr("id", d => "link-label-" + d.id)
-    .text(d => l.getLinkLabelFormatted(d))
-    .style("fill", l.getLinkLabelColor); 
-
-  // Transition links to their new position.
-  const linkUpdate = linkMerge
-    .transition()
-    .duration(options.transitionDuration);
-  
-  l.setupLabelDimensions(d3.selectAll(".link text.label"));
-
-  // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
-  linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ")");
-
-  linkUpdate.select("path.link.vertical")
-    .attr("d", (d) => l.getLinkD(d, "vertical", true))
-    .style("stroke", (d) => options.linkColorInherit ? l.getLinkStroke(d.parent) : "")
-    .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
-
-  linkUpdate.select("path.link.horizontal")
-    .attr("d", (d) => l.getLinkD(d, "horizontal"))
-    .attr("transform", l.getLinkRTranslate)
-    .style("stroke", l.getLinkStroke)
-    .style("stroke-width", l.getLinkStrokeWidth);
-
-  linkUpdate
-    .select("text")  
-    .attr("dy", l.getDy)
-    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("text-anchor", l.getLinkLabelAnchor)
-    .attr("x", l.getLinkTextPositionX)
-    .attr("y", d => d.x - d.parent.x)
-    .call(sel => sel.tween("text", l.getLinkTextTween))
-    .style("opacity", d => (!options.linkLabelAlways && !d.linkLabelAlways) ? 0 : 1); 
-
-  // Transition exiting nodes to the parent's new position.
-  const linkExit = link.exit().transition()
-    .duration(options.transitionDuration)
-    .remove();
-
-  linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")"); 
-
-  const destination = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-  linkExit.selectAll("path.link.vertical")
-    .attr("d", () => l.getLinkD(destination, "vertical")); 
-
-  linkExit.selectAll("path.link.horizontal")
-    .attr("d", () => l.getLinkD(destination, "horizontal"))
-    .attr("transform", "translate(0 0)");
-
-  linkExit
-    .select("text")
-    .attr("x", 0)
-    .attr("y", 0)
-    .style("opacity", 1e-6);
-
   // Stash the old positions for transition.
   nodesSort.forEach(function (d) {
     d.x0 = d.x;

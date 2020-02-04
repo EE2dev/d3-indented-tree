@@ -104,6 +104,9 @@ https://gitlab.com/snippets/1703535
   [ok] linksAPI.computeLabelDimensions for each branch not just each depth
   [ok] nodeBar transition updated to correctly adjust text-anchor during transtioning over 0 
   [ok] refactored transitionDuration changes
+  [ok] refactored d.linkLabel to be an object
+  [ok] swapped creating links with creating nodes to compute linkLabel.width
+  [ok] fixed impact of linkLabel.width on nodeBarTranslateX
 
 - linkWidth neg values ()use d.linkLabelAnchor
 - option to turn off link labels when link width is too short: always: true/false
