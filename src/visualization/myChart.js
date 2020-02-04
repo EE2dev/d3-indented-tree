@@ -319,6 +319,7 @@ function update(source, options, config){
     .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
     //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
     .attr("dy", l.getInitialDy)
+    .attr("id", d => "link-label-" + d.id)
     .text(d => l.getLinkLabelFormatted(d))
     .style("fill", l.getLinkLabelColor); 
 

@@ -283,6 +283,8 @@
     return linkedDataArray;
   }
 
+  // import { nodesAPI } from "./nodes.js";
+
   var linksAPI = {};
   var options = void 0;
   var oldLabelField = void 0,
@@ -513,6 +515,23 @@
           // link to the right
           d.linkLabelPos = d.y - d.parent.y + 10;
           d.linkLabelAnchor = "start";
+          /*
+          d3.select("svg g")
+            .append("g")
+            //.attr("transform", d3.select(this.parentNode).attr("transform"))
+            .attr("transform", "translate(" + d.parent.y + " " + d.parent.x + ")")
+            .append("use")
+            .attr("xlink:href", "#link-label-" + d.id);
+            */
+          /*
+          // shorted nodeBar connectors to avoid overlap
+          d3.selectAll(".node-bar.connector")
+            .filter(df => df.id === d.id)
+            .attr("d", d => { 
+              d.connectorLength = d.connectorLength - (width + 5); 
+              return nodesAPI.getNodeBarDReduced(d, width + 5);
+            });
+          */
         }
       }
     });
@@ -744,6 +763,9 @@
   nodesAPI.getNodeBarD = function (d) {
     return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h " + -d.nodeBar.connectorLength;
   };
+  // nodesAPI.getNodeBarDReduced = (d, r) => 
+  //   `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength - r}`;
+
   nodesAPI.getXNodeBarRect = function (d) {
     return options$1.nodeBarNeg ? d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField])) : d.nodeBar.anchor;
   };
@@ -1075,7 +1097,9 @@
     var linkMerge = link.merge(linkEnter);
     linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above")
     //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("dy", l.getInitialDy).text(function (d) {
+    .attr("dy", l.getInitialDy).attr("id", function (d) {
+      return "link-label-" + d.id;
+    }).text(function (d) {
       return l.getLinkLabelFormatted(d);
     }).style("fill", l.getLinkLabelColor);
 

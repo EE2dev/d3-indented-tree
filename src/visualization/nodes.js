@@ -233,6 +233,9 @@ nodesAPI.getNodeBarLabelTween = function(d) {
 */
 
 nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
+// nodesAPI.getNodeBarDReduced = (d, r) => 
+//   `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength - r}`;
+
 nodesAPI.getXNodeBarRect = d => options.nodeBarNeg ?
   d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]))
   : d.nodeBar.anchor;

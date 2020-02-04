@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+// import { nodesAPI } from "./nodes.js";
 
 export let linksAPI = {};
 let options;
@@ -215,11 +216,23 @@ function storeLinkLabelAnchor(sel, dimArray) {
       } else { // link to the right
         d.linkLabelPos =  (d.y - d.parent.y) + 10;
         d.linkLabelAnchor = "start";
+        /*
+        d3.select("svg g")
+          .append("g")
+          //.attr("transform", d3.select(this.parentNode).attr("transform"))
+          .attr("transform", "translate(" + d.parent.y + " " + d.parent.x + ")")
+          .append("use")
+          .attr("xlink:href", "#link-label-" + d.id);
+          */
+        /*
         // shorted nodeBar connectors to avoid overlap
         d3.selectAll(".node-bar.connector")
           .filter(df => df.id === d.id)
-          // .atttr("d", )
-        ;
+          .attr("d", d => { 
+            d.connectorLength = d.connectorLength - (width + 5); 
+            return nodesAPI.getNodeBarDReduced(d, width + 5);
+          });
+        */
       }
     }
   });
