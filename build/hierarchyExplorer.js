@@ -463,7 +463,7 @@
       var text = d3.select(this).text();
 
       dims = d.y >= d.parent.y ? dimsPositive : dimsNegative;
-      if (width <= Math.abs(d.y - d.parent.y) - 5) {
+      if (width <= Math.abs(d.y - d.parent.y) - 15) {
         if (!dims.get(d.parent.id)) {
           dimProperties.maxX = width;
           dimProperties.minX = width;
@@ -504,7 +504,7 @@
       d.linkLabel = {};
       d.linkLabel.anchor = "end";
       d.linkLabel.always = true;
-      if (width <= Math.abs(d.y - d.parent.y) - 5) {
+      if (width <= Math.abs(d.y - d.parent.y) - 15) {
         d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
       } else {
         // label too short to fit on link
@@ -689,6 +689,7 @@
     }
     var numberStart = oldLabelField$1 ? d.data[oldLabelField$1] : d.data[newLabelField$1];
     var numberEnd = d.data[newLabelField$1];
+
     selection.style("text-anchor", function () {
       return numberStart < 0 ? "end" : "start";
     });
@@ -708,6 +709,7 @@
     var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
       return d2.id === d.id;
     });
+    var checkSign = true;
 
     if (!numberStart) {
       // if numberStart === null or 0
@@ -717,13 +719,14 @@
     }
     return function (t) {
       var num = i(t);
-      if (numberStart * num <= 0) {
+      if (checkSign && numberStart * num <= 0) {
         correspondingBar.attr("class", function () {
           return num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
         });
         selection.style("text-anchor", function () {
           return num < 0 ? "end" : "start";
         });
+        checkSign = false;
       }
       selection.text(options$1.nodeBarFormat(num) + options$1.nodeBarUnit);
     };
@@ -989,7 +992,8 @@
       return "link-label-" + d.id;
     }).text(function (d) {
       return l.getLinkLabelFormatted(d);
-    }).style("fill", l.getLinkLabelColor);
+    }) // remove line!
+    .style("fill", l.getLinkLabelColor);
 
     // Transition links to their new position.
     var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
@@ -1015,7 +1019,8 @@
 
     linkUpdate.select("text").attr("dy", l.getDy)
     //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("text-anchor", l.getLinkLabelAnchor).attr("x", l.getLinkTextPositionX).attr("y", function (d) {
+    .attr("text-anchor", l.getLinkLabelAnchor) // remove and handle in tween
+    .attr("x", l.getLinkTextPositionX).attr("y", function (d) {
       return d.x - d.parent.x;
     }).call(function (sel) {
       return sel.tween("text", l.getLinkTextTween);
@@ -1441,7 +1446,7 @@
 
       var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      if (!arguments.length) return options.linkWidthValue;
+      if (!arguments.length) return options.linkWidthStatic ? options.linkWidthValue : options.linkWidthField;
       if (typeof _ === "number") {
         options.linkWidthStatic = true;
         options.linkWidthValue = _;

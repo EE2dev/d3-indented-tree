@@ -276,7 +276,7 @@ export default function (_dataSpec) {
   };
 
   chartAPI.linkWidth = function(_ = options.linkWidthField, _options = {}) {
-    if (!arguments.length) return options.linkWidthValue;
+    if (!arguments.length) return options.linkWidthStatic ? options.linkWidthValue : options.linkWidthField;
     if (typeof (_) === "number") { 
       options.linkWidthStatic = true;
       options.linkWidthValue = _;

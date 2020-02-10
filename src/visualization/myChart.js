@@ -201,7 +201,7 @@ function update(source, options, config){
     //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
     .attr("dy", l.getInitialDy)
     .attr("id", d => "link-label-" + d.id)
-    .text(d => l.getLinkLabelFormatted(d))
+    .text(d => l.getLinkLabelFormatted(d)) // remove line!
     .style("fill", l.getLinkLabelColor); 
 
   // Transition links to their new position.
@@ -229,7 +229,7 @@ function update(source, options, config){
     .select("text")  
     .attr("dy", l.getDy)
     //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("text-anchor", l.getLinkLabelAnchor)
+    .attr("text-anchor", l.getLinkLabelAnchor) // remove and handle in tween
     .attr("x", l.getLinkTextPositionX)
     .attr("y", d => d.x - d.parent.x)
     .call(sel => sel.tween("text", l.getLinkTextTween))

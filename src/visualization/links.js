@@ -105,7 +105,9 @@ linksAPI.getLinkTextTween = function(d) {
     return function() { selection.text(numberEnd); };
   }
   const i = d3.interpolateNumber(numberStart, numberEnd);
-  return function(t) { selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); };
+  return function(t) { 
+    selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); 
+  };
 };
 
 function isNumber(num) {
@@ -167,7 +169,7 @@ function computeLabelDimensions(sel) {
       const text = d3.select(this).text();
       
       dims = (d.y >= d.parent.y) ? dimsPositive : dimsNegative;
-      if (width <= Math.abs(d.y - d.parent.y) - 5) {
+      if (width <= Math.abs(d.y - d.parent.y) - 15) {
         if (!dims.get(d.parent.id)) {
           dimProperties.maxX = width;
           dimProperties.minX = width;
@@ -208,7 +210,7 @@ function storeLinkLabelAnchor(sel, dimArray) {
     d.linkLabel = {};
     d.linkLabel.anchor = "end";
     d.linkLabel.always = true;
-    if (width <= Math.abs(d.y - d.parent.y) - 5) {
+    if (width <= Math.abs(d.y - d.parent.y) - 15) {
       d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
     } else { // label too short to fit on link
       d.linkLabel.always = false;

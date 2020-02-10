@@ -107,11 +107,15 @@ https://gitlab.com/snippets/1703535
   [ok] refactored d.linkLabel to be an object
   [ok] swapped creating links with creating nodes to compute linkLabel.width
   [ok] fixed impact of linkLabel.width on nodeBarTranslateX
+  [ok] linkLabel does not overlap any more with nodeImage (with width 15)
+  [ok] linkWidth neg values () use d.linkLabelAnchor
+  [ok] option to turn off link labels when link width is too short: always: true/false
+  [ok] add checkSign condition to nodeBarTween
 
-- linkWidth neg values ()use d.linkLabelAnchor
-- option to turn off link labels when link width is too short: always: true/false
+- linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 - linkLabelAlignment: start, aligned, middle, end
 - implement labelAlignment
+- nodeLabels draw like link label (background)
 
 [bug] if link label is neg and longer than link width it is display under the node bar line instead of on top (Workaround: onTop: false)
 - update blcoks with linkLabel align
