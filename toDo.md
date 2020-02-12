@@ -111,7 +111,10 @@ https://gitlab.com/snippets/1703535
   [ok] linkWidth neg values () use d.linkLabelAnchor
   [ok] option to turn off link labels when link width is too short: always: true/false
   [ok] add checkSign condition to nodeBarTween
+  [ok] fixed nodeBar connectorStart for linkLabels, when links go to the left and don't fit on link
 
+[bug] transition of linkWidth does not shift node labels to left/right: [ok] but connectors of nodebars not correct:
+  nodesAPI.computeNodeExtend: compute nodeEnd based on final destination afer transition
 - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 - linkLabelAlignment: start, aligned, middle, end
 - implement labelAlignment

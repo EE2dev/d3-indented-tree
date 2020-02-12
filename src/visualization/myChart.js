@@ -275,8 +275,8 @@ function update(source, options, config){
 
   nodeEnter.append("text")
     .attr("class", "node-label")
-    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
     .attr("dy", ".35em")
+    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
     .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end")
     .text(function (d) {
       if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
@@ -335,12 +335,11 @@ function update(source, options, config){
 
   nodeUpdate.call(n.updateNode);
 
-  /*
+  
   nodeUpdate.selectAll(".node-label")
-    .call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
+    //.call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
     .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
     .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
-    */
   
   nodeUpdate.selectAll("g.node-bar")
     .attr("display", options.nodeBarOn ? "inline" : "none");

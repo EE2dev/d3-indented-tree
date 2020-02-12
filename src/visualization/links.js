@@ -214,13 +214,14 @@ function storeLinkLabelAnchor(sel, dimArray) {
       d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
     } else { // label too short to fit on link
       d.linkLabel.always = false;
-      if (d.y >= d.parent.y) { // link to the left
+      if (d.y >= d.parent.y) { // link to the right
         d.linkLabel.pos = (d.y - d.parent.y) - 10;
-      } else { // link to the right
+      } else { // link to the left
         d.linkLabel.pos =  (d.y - d.parent.y) + 10;
         d.linkLabel.anchor = "start";
         d.linkLabel.width = (options.linkLabelAlways && options.linkLabelOnTop && options.linkLabelAlignment === "aligned")
           ? width : 0;
+        d.linkLabel.overlap = d.linkLabel.width ? d.linkLabel.pos + d.linkLabel.width : 0;
       }
     }
   });

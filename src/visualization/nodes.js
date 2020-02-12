@@ -197,6 +197,7 @@ nodesAPI.getNodeBarLabelTween = function(d) {
   if (isNaN(numberStart) || isNaN(numberEnd)) { // typeof NumberStart or numberEnd == "string"
     return function() { selection.text(numberEnd); };
   }
+  
   if (nodesAPI.sameBarLabel()) {
     return function() { selection.text(options.nodeBarFormat(numberEnd) + options.nodeBarUnit); };
   }
@@ -239,9 +240,12 @@ nodesAPI.getNodeBarLabelTween = function(d) {
 */
 
 // nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
+/*
 nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
   ${(d.linkLabel && d.linkLabel.width) ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength}`;
-
+  */
+nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
+ ${(d.linkLabel && d.linkLabel.overlap) ? -d.nodeBar.connectorLength + d.linkLabel.overlap : -d.nodeBar.connectorLength}`;
 
 nodesAPI.getXNodeBarRect = d => options.nodeBarNeg ?
   d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]))

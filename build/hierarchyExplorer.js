@@ -510,13 +510,14 @@
         // label too short to fit on link
         d.linkLabel.always = false;
         if (d.y >= d.parent.y) {
-          // link to the left
+          // link to the right
           d.linkLabel.pos = d.y - d.parent.y - 10;
         } else {
-          // link to the right
+          // link to the left
           d.linkLabel.pos = d.y - d.parent.y + 10;
           d.linkLabel.anchor = "start";
           d.linkLabel.width = options.linkLabelAlways && options.linkLabelOnTop && options.linkLabelAlignment === "aligned" ? width : 0;
+          d.linkLabel.overlap = d.linkLabel.width ? d.linkLabel.pos + d.linkLabel.width : 0;
         }
       }
     });
@@ -699,11 +700,11 @@
         selection.text(numberEnd);
       };
     }
+    /*
     if (nodesAPI.sameBarLabel()) {
-      return function () {
-        selection.text(options$1.nodeBarFormat(numberEnd) + options$1.nodeBarUnit);
-      };
+      return function() { selection.text(options.nodeBarFormat(numberEnd) + options.nodeBarUnit); };
     }
+    */
 
     var i = d3.interpolateNumber(numberStart, numberEnd);
     var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
@@ -752,8 +753,12 @@
   */
 
   // nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
+  /*
+  nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
+    ${(d.linkLabel && d.linkLabel.width) ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength}`;
+    */
   nodesAPI.getNodeBarD = function (d) {
-    return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h \n  " + (d.linkLabel && d.linkLabel.width ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength);
+    return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h \n " + (d.linkLabel && d.linkLabel.overlap ? -d.nodeBar.connectorLength + d.linkLabel.overlap : -d.nodeBar.connectorLength);
   };
 
   nodesAPI.getXNodeBarRect = function (d) {
@@ -1059,9 +1064,9 @@
 
     nodeEnter.call(n.appendNode);
 
-    nodeEnter.append("text").attr("class", "node-label").attr("x", function (d) {
+    nodeEnter.append("text").attr("class", "node-label").attr("dy", ".35em").attr("x", function (d) {
       return !d.parent || d.y >= d.parent.y ? options.nodeLabelPadding : -options.nodeLabelPadding;
-    }).attr("dy", ".35em").attr("text-anchor", function (d) {
+    }).attr("text-anchor", function (d) {
       return !d.parent || d.y >= d.parent.y ? "start" : "end";
     }).text(function (d) {
       if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
@@ -1113,12 +1118,13 @@
 
     nodeUpdate.call(n.updateNode);
 
-    /*
     nodeUpdate.selectAll(".node-label")
-      .call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
-      .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
-      .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
-      */
+    //.call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
+    .attr("x", function (d) {
+      return !d.parent || d.y >= d.parent.y ? options.nodeLabelPadding : -options.nodeLabelPadding;
+    }).attr("text-anchor", function (d) {
+      return !d.parent || d.y >= d.parent.y ? "start" : "end";
+    });
 
     nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
 
