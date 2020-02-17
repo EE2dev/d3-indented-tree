@@ -368,7 +368,7 @@
   linksAPI.getLinkLabel = function (d) {
     var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.linkLabelField;
 
-    return !options.linkLabelOn || typeof d.data[labelField] === "undefined" ? "" : d.data[labelField];
+    return !options.linkLabelOn || typeof d.data[labelField] === "undefined" || d.data[labelField] === null ? "" : d.data[labelField];
   };
 
   linksAPI.getLinkLabelFormatted = function (d) {
@@ -386,7 +386,7 @@
 
   linksAPI.getLinkTextTween = function (d) {
     var selection = d3.select(this);
-    if (!options.linkLabelOn) {
+    if (!options.linkLabelOn || d.data[newLabelField] === null) {
       return function () {
         selection.text("");
       };
@@ -593,17 +593,26 @@
     var maxLinkLabel = 0;
 
     var l = linksAPI;
-    l.initialize(options$1);
+    // l.initialize(options);
 
     var filteredSel = sel.filter(function (d) {
       return typeof d.data[newLabelField$1] !== "undefined";
     });
     filteredSel.each(function (d) {
-      var labelBBox = d3.select(this).select(".node-label").node().getBBox();
-      var imageBBox = d3.select(this).select(".node-image").node().getBBox();
-      var nodeEnd = labelBBox.width !== 0 ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
       d.nodeBar = {};
-      d.nodeBar.connectorStart = !d.parent || d.y >= d.parent.y ? nodeEnd + 5 : d.parent.y - d.y + l.getLinkStrength(d.parent, options$1) / 2 + 5;
+      /*
+      const labelBBox = d3.select(this).select(".node-label").node().getBBox();
+      const imageBBox = d3.select(this).select(".node-image").node().getBBox();
+      const nodeEnd = (labelBBox.width !== 0) ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
+      
+      d.nodeBar.connectorStart2 = (!d.parent || d.y >= d.parent.y) ? 
+        nodeEnd + 5 
+        : (d.parent.y - d.y) + l.getLinkStrength(d.parent, options) / 2 + 5;
+        */
+      d.nodeBar.connectorStart = getConnectorStart(d3.select(this), d, l);
+      // console.log(d.name + ": " + (d.nodeBar.connectorStart === d.nodeBar.connectorStart2) 
+      //  + " " + d.nodeBar.connectorStart + " = " + d.nodeBar.connectorStart2);
+
       d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField$1]);
       alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
       maxLinkLabel = d.linkLabel && d.linkLabel.width > maxLinkLabel ? d.linkLabel.width : maxLinkLabel;
@@ -654,6 +663,31 @@
     });
   };
 
+  var getConnectorStart = function getConnectorStart(sel, d, linkAPI) {
+    var labelBBox = sel.select(".node-label").node().getBBox();
+    var imageBBox = sel.select(".node-image").node().getBBox();
+    var cs = 0;
+    if (!d.parent || d.y >= d.parent.y) {
+      // 1 node to the right
+      if (labelBBox.width !== 0) {
+        // 1.1 nodeImage + nodeLabel
+        cs = options$1.nodeLabelPadding + labelBBox.width;
+      } else {
+        // 1.2 nodeImage - no nodeLabel
+        cs = imageBBox.width / 2;
+      }
+    } else {
+      // 2 node to the left
+      if (d.linkLabel && d.linkLabel.overlap) {
+        // 2.1 linkLabel to the right of node
+        cs = imageBBox.width / 2 + 5 + d.linkLabel.width;
+      } else {
+        cs = d.parent.y - d.y + linkAPI.getLinkStrength(d.parent, options$1) / 2;
+      }
+    }
+    return cs + 5;
+  };
+
   var labelLargerThanNegBar = function labelLargerThanNegBar(d) {
     return d.nodeBar.labelWidth + 5 > nodesAPI.getWidthNodeBarRect(d);
   };
@@ -700,11 +734,12 @@
         selection.text(numberEnd);
       };
     }
-    /*
+
     if (nodesAPI.sameBarLabel()) {
-      return function() { selection.text(options.nodeBarFormat(numberEnd) + options.nodeBarUnit); };
+      return function () {
+        selection.text(options$1.nodeBarFormat(numberEnd) + options$1.nodeBarUnit);
+      };
     }
-    */
 
     var i = d3.interpolateNumber(numberStart, numberEnd);
     var correspondingBar = d3.selectAll(".node-bar.box").filter(function (d2) {
@@ -757,8 +792,12 @@
   nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
     ${(d.linkLabel && d.linkLabel.width) ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength}`;
     */
+  /*
+    nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
+   ${(d.linkLabel && d.linkLabel.overlap) ? -d.nodeBar.connectorLength + d.linkLabel.overlap : -d.nodeBar.connectorLength}`;
+  */
   nodesAPI.getNodeBarD = function (d) {
-    return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h \n " + (d.linkLabel && d.linkLabel.overlap ? -d.nodeBar.connectorLength + d.linkLabel.overlap : -d.nodeBar.connectorLength);
+    return "M " + (d.nodeBar.connectorLength + d.nodeBar.connectorStart) + " 0 h " + -d.nodeBar.connectorLength;
   };
 
   nodesAPI.getXNodeBarRect = function (d) {

@@ -4,7 +4,7 @@ import babel from "rollup-plugin-babel";
 
 export default {
   entry: "index.js",
-  dest: "build/hierarchyExplorer.js",
+  dest: "build/d3-hierarchy-explorer.js",
   format: "umd",
   // moduleName: "reusableChart",
   moduleName: "hierarchyExplorer",

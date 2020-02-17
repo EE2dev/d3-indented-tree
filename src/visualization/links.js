@@ -79,7 +79,8 @@ linksAPI.getLinkStrokeWidth = function (d) {
 };
 
 linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
-  return (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") ? "" : d.data[labelField]; 
+  return (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined" || d.data[labelField] === null)
+    ? "" : d.data[labelField]; 
 };
 
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
@@ -95,7 +96,7 @@ linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField
 
 linksAPI.getLinkTextTween = function(d) { 
   const selection = d3.select(this);
-  if (!options.linkLabelOn) {
+  if (!options.linkLabelOn || d.data[newLabelField] === null) {
     return function() { selection.text(""); };
   } 
   const numberStart = linksAPI.getLinkLabel(d, oldLabelField);

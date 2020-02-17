@@ -9,7 +9,7 @@
   "scripts": {
     "b-clean-build": "rm -rf build && mkdir build",
     "b-rollup": "rollup -c",
-    "b-uglify": "uglifyjs build/hierarchyExplorer.js -c -m -o build/hierarchyExplorer.min.js",
+    "b-uglify": "uglifyjs build/d3-hierarchy-explorer.js -c -m -o build/d3-hierarchy-explorer.min.js",
     "b-eslint": "eslint index.js src",
     "b-tape": "node test/reusableChart-test.js | tap-spec",
     "build": "npm run -s b-rollup & npm run -s b-eslint & npm run -s b-uglify",

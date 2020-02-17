@@ -94,17 +94,24 @@ nodesAPI.computeNodeExtend = function(sel) {
   let maxLinkLabel = 0;
 
   const l = linksAPI;
-  l.initialize(options);
+  // l.initialize(options);
 
   const filteredSel = sel.filter(d => typeof(d.data[newLabelField]) !== "undefined" );
   filteredSel.each(function(d) {
+    d.nodeBar = {};
+    /*
     const labelBBox = d3.select(this).select(".node-label").node().getBBox();
     const imageBBox = d3.select(this).select(".node-image").node().getBBox();
     const nodeEnd = (labelBBox.width !== 0) ? labelBBox.x + labelBBox.width : imageBBox.x + imageBBox.width;
-    d.nodeBar = {};
-    d.nodeBar.connectorStart = (!d.parent || d.y >= d.parent.y) ? 
+    
+    d.nodeBar.connectorStart2 = (!d.parent || d.y >= d.parent.y) ? 
       nodeEnd + 5 
       : (d.parent.y - d.y) + l.getLinkStrength(d.parent, options) / 2 + 5;
+      */
+    d.nodeBar.connectorStart = getConnectorStart(d3.select(this), d, l);
+    // console.log(d.name + ": " + (d.nodeBar.connectorStart === d.nodeBar.connectorStart2) 
+    //  + " " + d.nodeBar.connectorStart + " = " + d.nodeBar.connectorStart2);
+
     d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField]);
     alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
     maxLinkLabel = (d.linkLabel && d.linkLabel.width > maxLinkLabel) ? d.linkLabel.width : maxLinkLabel;
@@ -154,6 +161,26 @@ nodesAPI.computeNodeExtend = function(sel) {
       console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
     }
   });
+};
+
+const getConnectorStart = function(sel, d, linkAPI){
+  const labelBBox = sel.select(".node-label").node().getBBox();
+  const imageBBox = sel.select(".node-image").node().getBBox();
+  let cs = 0;
+  if (!d.parent || d.y >= d.parent.y) { // 1 node to the right
+    if (labelBBox.width !== 0) { // 1.1 nodeImage + nodeLabel
+      cs = options.nodeLabelPadding + labelBBox.width;
+    } else { // 1.2 nodeImage - no nodeLabel
+      cs = imageBBox.width / 2;
+    }
+  } else { // 2 node to the left
+    if (d.linkLabel && d.linkLabel.overlap) { // 2.1 linkLabel to the right of node
+      cs = (imageBBox.width / 2) + 5 + d.linkLabel.width;
+    } else {
+      cs = (d.parent.y - d.y) + linkAPI.getLinkStrength(d.parent, options) / 2;
+    }
+  }
+  return cs + 5;
 };
 
 const labelLargerThanNegBar = d => d.nodeBar.labelWidth + 5 > nodesAPI.getWidthNodeBarRect(d);
@@ -244,8 +271,11 @@ nodesAPI.getNodeBarLabelTween = function(d) {
 nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
   ${(d.linkLabel && d.linkLabel.width) ? -d.nodeBar.connectorLength + d.linkLabel.width : -d.nodeBar.connectorLength}`;
   */
-nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
+/*
+  nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
  ${(d.linkLabel && d.linkLabel.overlap) ? -d.nodeBar.connectorLength + d.linkLabel.overlap : -d.nodeBar.connectorLength}`;
+*/
+nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
 
 nodesAPI.getXNodeBarRect = d => options.nodeBarNeg ?
   d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField]))
