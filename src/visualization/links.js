@@ -133,7 +133,26 @@ linksAPI.getLinkLabelColor = function (d) {
 };
 
 /* aligned: x center position of the shortest link + half the extent of the longest label of siblings */
-linksAPI.getLinkTextPositionX = d => (options.linkLabelAlignment === "aligned")? d.linkLabel.pos : (d.y - d.parent.y) / 2;
+// linksAPI.getLinkTextPositionX = d => (options.linkLabelAlignment === "aligned")? d.linkLabel.pos : (d.y - d.parent.y) / 2;
+linksAPI.getLinkTextPositionX = d => {
+  let ret;
+  switch(options.linkLabelAlignment) {
+  case "aligned":
+    ret = d.linkLabel.pos;
+    break;
+  case "start":
+    ret = (d.y >= d.parent.y) ? 10 : (d.y - d.parent.y) + 10;
+    break;
+  case "middle":
+    ret = (d.y - d.parent.y) / 2;
+    break;
+  case "end":
+    ret = (d.y >= d.parent.y) ? (d.y - d.parent.y) - 10 : - 10;
+    break;
+  }
+  return ret;
+};
+
 /*
   const shiftAlign = options.linkLabelAligned ? d.linkLabelAnchor : (d.y - d.parent.y) / 2;
   return shiftAlign;
@@ -213,7 +232,7 @@ function storeLinkLabelAnchor(sel, dimArray) {
     d.linkLabel.always = true;
     if (width <= Math.abs(d.y - d.parent.y) - 15) {
       d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
-    } else { // label too short to fit on link
+    } else { // label too long to fit on link
       d.linkLabel.always = false;
       if (d.y >= d.parent.y) { // link to the right
         d.linkLabel.pos = (d.y - d.parent.y) - 10;

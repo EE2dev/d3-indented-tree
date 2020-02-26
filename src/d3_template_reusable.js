@@ -200,8 +200,11 @@ export default function (_dataSpec) {
       options.nodeBarTranslateX = _options.translateX || options.nodeBarTranslateX;
       options.nodeBarScale  = _options.scale || options.nodeBarScale;
       //options.nodeBarRange = _options.range || options.nodeBarRange;
-      if (_options.range) { options.nodeBarRange = _options.range; options.nodeBarRangeAdjusted = false;}
-      if (_options.range) { options.nodeBarRangeUpperBound = options.nodeBarRange[1]; }
+      if (_options.range) { 
+        options.nodeBarRange = _options.range; 
+        options.nodeBarRangeAdjusted = false;
+        options.nodeBarRangeUpperBound = options.nodeBarRange[1]; 
+      }
       options.nodeBarDomain = _options.domain || options.nodeBarDomain;
       if (typeof (_options.updateScale) !== "undefined") {
         options.nodeBarUpdateScale = _options.updateScale;

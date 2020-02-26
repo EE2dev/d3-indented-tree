@@ -1,4 +1,4 @@
-# Hierarchy explorer 
+# d3-hierarchy-explorer 
 
 Visualizing a hierarchy with an expandable/collapsable tree.
 
@@ -7,7 +7,7 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 
 ## Examples
 
-- [hierarchy explorer - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
+- [d3-hierarchy-explorer - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
 
 More examples demonstrating specific API calls:
 
@@ -66,7 +66,7 @@ More examples demonstrating specific API calls:
 - [myChart.propagateValue()](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
 
 
-## 1. How to use Hierarchy explorer
+## 1. How to use d3-hierarchy-explorer
 
 Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object* property. 
 
@@ -76,8 +76,8 @@ Here is a minimal template sufficient to call hierarchy explorer. A reference to
   <head>
     <meta charset="utf-8">
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/d3-hierarchy-explorer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/d3-hierarchy-explorer.css">
   </head>
   <body>  
     <script>
@@ -342,7 +342,7 @@ Transitions to the new number label on top of the links.
         The locale is affecting the display of the link label if the `format` property is specified. See also <a href="#other_formatDefaultLocale"><i>myChart</i>.<b>formatDefaultLocale</b>()</a>.
 
         * `onTop` specifies a *boolean* property denoting whether to place the label on top of (and overlaying) the link (`onTop: true`) or to place the label (horizontally) above the label. The default value is `true`. If `onTop` is set to false and the label overlaps with the previous link due to increased font size, the *linkHeight* can be increased. 
-        * `align` specifies a *string* property denoting how to align the label horizontally and how to set the text-anchor. Passing `"start"`, `"middle"` or `"end"` aligns the label horizontally at the beginning, centered or at the end on the link.  `aligned` right-aligns the labels of the siblings (centers the longest label per branch on the shortest link). Default is `"aligned"`.
+        * `align` specifies a *string* property denoting how to align the label horizontally and how to set the text-anchor. Passing `"start"`, `"middle"` or `"end"` aligns the label horizontally at the beginning, centered or at the end on the link.  `"aligned"` right-aligns the labels of the siblings (centers the longest label per branch on the shortest link). Default is `"aligned"`.
         * `always` specifies a *boolean* property denoting whether to to always display the label. If this property is set to `false` then the link label is not displayed if it is longer than the link width. The default value is `false`. 
         * `color` is a *function* that sets the color of the link label. This callback function is called for each link by passing an object with its fields to it. (default is `() => "black"`). 
 

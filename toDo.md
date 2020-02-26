@@ -118,17 +118,20 @@ https://gitlab.com/snippets/1703535
   [ok] nodesAPI.computeNodeExtend: compute nodeEnd based on final destination after transition
   [ok] implement labelAlignment
   [ok] linkLabel transition jumps for 2 cust, (because of string -> change to number + unit)
+  [ok] linkLabelAlignment: start, aligned, middle, end
 
 - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
-- linkLabelAlignment: start, aligned, middle, end
+- set range + domain of scale of linkWidth like nodeBar
+[bug] setting range for nodebars whn extent from - to +.
+
 - nodeLabels draw like link label (background)
 
 [bug] if link label is neg and longer than link width it is display under the node bar line instead of on top (Workaround: onTop: false)
-- update blcoks with linkLabel align
+- update blocks with linkLabel align
 - update blocks with nodeImage
 - update blocks+readme with d3-hierarchy-explorer
 - change html of examples to <html> and <meta charset="utf-8">
-- clean up old hierarchy-explorer .js .min.js .css
+- clean up old hierarchy-explorer .js .min.js .css  
 
 - update nodeBars for neg linkWidth
 - update Label placement linkLabel
