@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import * as d3 from "d3-js";
 import { linksAPI } from "./links.js";
 import { nodesAPI } from "./nodes.js";
 

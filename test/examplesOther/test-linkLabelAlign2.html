@@ -18,7 +18,8 @@
         source: "../data/flare.json",
         key: "name",
       };
-      const myChart = hierarchyExplorer.chart(dataSpec)
+      // const myChart = hierarchyExplorer.chart(dataSpec)
+      const myChart = d4.hierarchyExplorer(dataSpec)
         .debugOn(true)
         .propagateValue("size")
         .linkWidth("size", {range: [100, 300]})

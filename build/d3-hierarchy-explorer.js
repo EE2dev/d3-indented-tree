@@ -1,7 +1,7 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) :
-  (factory((global.hierarchyExplorer = {}),global.d3));
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-js')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-js'], factory) :
+  (factory((global.d4 = {}),global.d3));
 }(this, (function (exports,d3) { 'use strict';
 
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -1413,9 +1413,8 @@
         options.nodeBarScale = _options.scale || options.nodeBarScale;
         //options.nodeBarRange = _options.range || options.nodeBarRange;
         if (_options.range) {
-          options.nodeBarRange = _options.range;options.nodeBarRangeAdjusted = false;
-        }
-        if (_options.range) {
+          options.nodeBarRange = _options.range;
+          options.nodeBarRangeAdjusted = false;
           options.nodeBarRangeUpperBound = options.nodeBarRange[1];
         }
         options.nodeBarDomain = _options.domain || options.nodeBarDomain;
@@ -1638,7 +1637,9 @@
     return chartAPI;
   }
 
-  exports.chart = d3_template_reusable;
+  // export {default as chart} from "./src/d3_template_reusable.js";
+
+  exports.hierarchyExplorer = d3_template_reusable;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
