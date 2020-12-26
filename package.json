@@ -28,6 +28,7 @@
     "rollup-plugin-node-resolve": "^3.4.0",
     "tap-spec": "^5.0.0",
     "tape": "^4.10.2",
+    "lodash": ">=4.17.19",
     "uglify-js": "^3.6.0"
   },
   "dependencies": {
