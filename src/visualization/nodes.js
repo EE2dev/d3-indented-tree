@@ -1,4 +1,4 @@
-import * as d3 from "d3-js";
+import * as d3 from "d3";
 import { linksAPI } from "./links.js";
 
 export let nodesAPI = {};

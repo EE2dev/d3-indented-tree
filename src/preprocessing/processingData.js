@@ -1,4 +1,4 @@
-import * as d3 from "d3-js";  
+import * as d3 from "d3";  
 
 ////////////////////////////////////////////////////
 // Processing data                                //

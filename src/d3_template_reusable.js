@@ -1,8 +1,8 @@
 
 import { readData } from "./preprocessing/processingData.js";
 import { myChart } from "./visualization/myChart.js";
-// import * as d3 from "d3";
-import * as d3 from "d3-js";
+import * as d3 from "d3";
+// import * as d3 from "d3-js";
 
 export default function (_dataSpec) {
     

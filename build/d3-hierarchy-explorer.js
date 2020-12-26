@@ -1,7 +1,7 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-js')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3-js'], factory) :
-  (factory((global.d4 = {}),global.d3));
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) :
+  (factory((global.hierarchyExplorer = {}),global.d3));
 }(this, (function (exports,d3) { 'use strict';
 
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -1212,6 +1212,8 @@
     });
   }
 
+  // import * as d3 from "d3-js";
+
   function d3_template_reusable (_dataSpec) {
 
     ///////////////////////////////////////////////////
@@ -1639,7 +1641,7 @@
 
   // export {default as chart} from "./src/d3_template_reusable.js";
 
-  exports.hierarchyExplorer = d3_template_reusable;
+  exports.chart = d3_template_reusable;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
