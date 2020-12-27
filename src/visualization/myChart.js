@@ -269,7 +269,7 @@ function update(source, options, config){
   const nodeEnter = node.enter().append("g")
     .attr("class", "node")
     .style("visibility", "hidden")
-    .on("click", (d) => { return click (d, options, config); });
+    .on("click", (event, d) => { return click (d, options, config); });
 
   nodeEnter.call(n.appendNode);
 

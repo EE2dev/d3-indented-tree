@@ -120,6 +120,11 @@ https://gitlab.com/snippets/1703535
   [ok] linkLabel transition jumps for 2 cust, (because of string -> change to number + unit)
   [ok] linkLabelAlignment: start, aligned, middle, end
 
+--- 27.12.2020
+- update to d3.v6 (events for expanding node)
+- update file to indentedTree.js
+
+
 [1] - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 [2] set range + domain of scale of linkWidth like nodeBar
 [bug] setting range for nodebars when extent from - to +.

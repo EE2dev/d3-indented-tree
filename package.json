@@ -1,15 +1,16 @@
 {
-  "name": "reusablechart",
-  "version": "1.0.0",
+  "name": "d3-indented-tree",
+  "version": "0.6.0",
   "description": "",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
+  "homepage": "https://github.com/EE2dev/d3-indented-tree",
   "scripts": {
     "b-clean-build": "rm -rf build && mkdir build",
     "b-rollup": "rollup -c",
-    "b-uglify": "uglifyjs build/d3-hierarchy-explorer.js -c -m -o build/d3-hierarchy-explorer.min.js",
+    "b-uglify": "terser build/d3-indented-tree.js -c -m -o build/d3-indented-tree.min.js",
     "b-eslint": "eslint index.js src",
     "b-tape": "node test/reusableChart-test.js | tap-spec",
     "build": "npm run -s b-rollup & npm run -s b-eslint & npm run -s b-uglify",
