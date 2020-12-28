@@ -1,13 +1,13 @@
-# d3-hierarchy-explorer 
+# d3-indented-tree 
 
-Visualizing a hierarchy with an expandable/collapsable tree.
+Visualizing a hierarchy with a configurable indented tree.
 
 ## Credits
 This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
 
 ## Examples
 
-- [d3-hierarchy-explorer - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
+- [d3-indented-tree - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
 
 More examples demonstrating specific API calls:
 
@@ -66,9 +66,9 @@ More examples demonstrating specific API calls:
 - [myChart.propagateValue()](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
 
 
-## 1. How to use d3-hierarchy-explorer
+## 1. How to use d3-indented-tree
 
-Here is a minimal template sufficient to call hierarchy explorer. A reference to the data is assigned to the `dataSpec.source` *object* property. 
+Here is a minimal template sufficient to call d3-indented-tree. A reference to the data is assigned to the `dataSpec.source` *object* property. 
 
 ```html
 <!DOCTYPE html>
@@ -76,13 +76,13 @@ Here is a minimal template sufficient to call hierarchy explorer. A reference to
   <head>
     <meta charset="utf-8">
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/d3-hierarchy-explorer.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/d3-hierarchy-explorer.css">
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
   </head>
   <body>  
     <script>
       const dataSpec = {source: "path/to/data/data.json"};
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree((dataSpec);
       showChart(); 
       
       function showChart() {
@@ -157,7 +157,7 @@ Then the javascript part would look like:
         source: "../data/data1.json",
         key: "name",
       };
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree(dataSpec);
       ...
 ``` 
 
@@ -170,7 +170,7 @@ Alternatively, the JSON source can also reference a JSON object which has been c
         source: myJSON,
         key: "name",
       };
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree(dataSpec);
       ...
 ``` 
 ### 2.2. CSV (hierarchical) format
@@ -195,7 +195,7 @@ Then the javascript part would look like:
       const dataSpec = {
         source: "../data/data3.csv",
       };
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree(dataSpec);
       ...
 ``` 
 ### 2.3. CSV (relational) format
@@ -222,12 +222,12 @@ Oceania,,38
         source: "../data/data2.csv",
         hierarchyLevels: ["World", "continent", "country"],
       };
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree(dataSpec);
       ...
 ``` 
 
 ### 2.4. Embedding data into a html node
-In case you want to run hierarchy explorer without a server, you can put your data into a html node. The format of the data can be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>. If the data is in JSON format you can also include it <a href="#21-json-format">inline</a>.
+In case you want to run d3-indented-tree without a server, you can put your data into a html node. The format of the data can be either <a href="#22-csv-hierarchical-format">CSV (hierarchical)</a> or <a href="#23-csv-relational-format">CSV (relational)</a>. If the data is in JSON format you can also include it <a href="#21-json-format">inline</a>.
 The data source is then referenced in the `dataSpec` object by assigning the `source` property to a *string* denoting the selector to the node with the data.
 
 An example for embedded hierarchical csv data:
@@ -255,7 +255,7 @@ Then the javascript part would look like:
       const dataSpec = {
         source: "aside#data",
       };
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree(dataSpec);
       ...
 ``` 
 
@@ -283,13 +283,13 @@ Oceania,,38
         source: "aside#data",
         hierarchyLevels: ["World", "continent", "country"],
       };
-      const myChart = hierarchyExplorer.chart(dataSpec);
+      const myChart = d3.indentedTree(dataSpec);
       ...
 ``` 
 
 ## 3.0 API reference
 
-The object (named *dataSpec* above) which is passed to the function ```hierarchyExplorer.chart()``` can have the following properties:
+The object (named *dataSpec* above) which is passed to the function ```d3.indentedTree()``` can have the following properties:
 * `source`: <i>string</i> containing the path/URL to the data or the selector referencing the DOM element containing the data.
 * `hierarchyLevels`: <i>array</i> containing columns of each level in its top-down traversal order when the refered data is in the csv relational format.
 * `separator`: <i>string</i> In case the data comes in the csv relational format, the separator is used internally to concatenate columns. The default is "$". If the data contains a "$", the separator has to be changed to another string/character not contained in the data.  
@@ -300,13 +300,13 @@ Alternatively, the <i>string</i> `"none"` can be assigned to `convertTypes` to p
 
 ### 3.1 Links
 
-<a name="link_alignLeaves" href="#link_alignLeaves">#</a> <i>myChart</i>.<b>alignLeaves</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="link_alignLeaves" href="#link_alignLeaves">#</a> <i>myChart</i>.<b>alignLeaves</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions the alignment of the leaves of the hierarchy. If leaves are aligned, all leaves start at the same horizontal position (cluster layout). If ```myChart.linkWidth()``` is set dynamically (by referencing a field), this function has no effect.  
 * the first argument is <i>boolean</i> referencing if all leaves are aligned at the same depth (default is ```false```).
 * with no argument returns if the leaves are aligned at the same depth.
 
-<a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="link_linkColor" href="#link_linkColor">#</a> <i>myChart</i>.<b>linkColor</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new color of the links. The horizontal link to is denoted by its color.
 
@@ -320,13 +320,13 @@ Transitions to the new color of the links. The horizontal link to is denoted by 
 
 * with no argument returns the field used for the color.
 
-<a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="link_linkHeight" href="#link_linkHeight">#</a> <i>myChart</i>.<b>linkHeight</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions the height (vertical length) of the links. 
 * the first argument is an <i>integer</i> referencing link height in pixels (default is ```20```).
 * with no argument returns the height of the links.
 
-<a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="link_linkLabel" href="#link_linkLabel">#</a> <i>myChart</i>.<b>linkLabel</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new number label on top of the links. 
 
@@ -349,7 +349,7 @@ Transitions to the new number label on top of the links.
 * No argument:
     * with no argument the function returns the name of the numeric field for the link labels.
 
-<a name="link_linkStrength" href="#link_linkStrength">#</a> <i>myChart</i>.<b>linkStrength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="link_linkStrength" href="#link_linkStrength">#</a> <i>myChart</i>.<b>linkStrength</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new strength (thickness) of the links. The horizontal link to and the vertical link from a node is denoting its strength.
 
@@ -365,7 +365,7 @@ Transitions to the new strength (thickness) of the links. The horizontal link to
 * No argument:
   * with no argument the function returns the static strength of the links.
 
-<a name="link_linkWidth" href="#link_linkWidth">#</a> <i>myChart</i>.<b>linkWidth</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="link_linkWidth" href="#link_linkWidth">#</a> <i>myChart</i>.<b>linkWidth</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Transitions to the new width (horizontal length) of the links. The horizontal link to a node is affected by its corresponding value. 
 
@@ -383,7 +383,7 @@ Transitions to the new width (horizontal length) of the links. The horizontal li
 
 ### 3.2 Nodes
 
-<a name="node_nodeBar" href="#node_nodeBar">#</a> <i>myChart</i>.<b>nodeBar</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="node_nodeBar" href="#node_nodeBar">#</a> <i>myChart</i>.<b>nodeBar</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Displays/ transitions the bar for each node to the new value. 
 1. argument:
@@ -410,7 +410,7 @@ Displays/ transitions the bar for each node to the new value.
 * No argument:
     * with no argument the function returns the name of the numeric field for the node bars.
 
-<a name="node_nodeImageFile" href="#node_nodeImageFile">#</a> <i>myChart</i>.<b>nodeImageFile</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="node_nodeImageFile" href="#node_nodeImageFile">#</a> <i>myChart</i>.<b>nodeImageFile</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the node images based on an image file.  
 1. argument:
@@ -427,7 +427,7 @@ Sets the node images based on an image file.
 
 With no arguments returns the callback *function* for the node images.
 
-<a name="node_nodeImageSelection" href="#node_nodeImageSelection">#</a> <i>myChart</i>.<b>nodeImageSelection</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="node_nodeImageSelection" href="#node_nodeImageSelection">#</a> <i>myChart</i>.<b>nodeImageSelection</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the node images based on a selection.  
 1. argument:
@@ -441,20 +441,20 @@ Sets the node images based on a selection.
 
 With no arguments returns the callback *function* for all newly entered `g.node`'s.
 
-<a name="node_nodeLabelLength" href="#node_nodeLabelLength">#</a> <i>myChart</i>.<b>nodeLabelLength</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="node_nodeLabelLength" href="#node_nodeLabelLength">#</a> <i>myChart</i>.<b>nodeLabelLength</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the maximum number of characters displayed as node label. All remaining characters are truncated and displayed as ```...```.  
 * the first argument is an <i>integer</i> referencing the maximum number of characters display as node label (default is ```50```).
 * with no argument returns the maximum number of characters displayed as node label.
 
 
-<a name="node_nodeLabelPadding" href="#node_nodeLabelPadding">#</a> <i>myChart</i>.<b>nodeLabelPadding</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="node_nodeLabelPadding" href="#node_nodeLabelPadding">#</a> <i>myChart</i>.<b>nodeLabelPadding</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Adjusts the left-alignment of the node label. 
 * the first argument is an <i>integer</i> referencing the number of pixels padded left to the start of the node label (default is ```10```).
 * with no argument returns the number of pixels padded left to the start of the node label.
 
-<a name="node_nodeSort" href="#node_nodeSort">#</a> <i>myChart</i>.<b>nodeSort</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="node_nodeSort" href="#node_nodeSort">#</a> <i>myChart</i>.<b>nodeSort</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sorts the nodes of the tree. The type conversion specified in [`dataSpec.convertTypes`](#30-api-reference) determines how the order is applied. 
 1. argument:
@@ -468,19 +468,19 @@ Sorts the nodes of the tree. The type conversion specified in [`dataSpec.convert
 With no arguments returns the name of the field based on which the nodes are sorted.
 
 ### 3.3 Other API calls
-<a name="other_debugOn" href="#other_debugOn">#</a> <i>myChart</i>.<b>debugOn</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_debugOn" href="#other_debugOn">#</a> <i>myChart</i>.<b>debugOn</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Enables/disables debugging info on the console. 
 * the first argument is <i>boolean</i> and references if the debug option is enabled (default is ```false```).
 * with no argument returns the boolean value indicating if the debug option is enabled.
 
-<a name="other_defaultColor" href="#other_defaultColor">#</a> <i>myChart</i>.<b>defaultColor</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_defaultColor" href="#other_defaultColor">#</a> <i>myChart</i>.<b>defaultColor</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the default color for the links and nodes. 
 * the first argument is a <i>string</i> referencing the color (default is ```"grey"```).
 * with no argument returns the default color.
 
-<a name="other_formatDefaultLocale" href="#other_formatDefaultLocale">#</a> <i>myChart</i>.<b>formatDefaultLocale</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_formatDefaultLocale" href="#other_formatDefaultLocale">#</a> <i>myChart</i>.<b>formatDefaultLocale</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Overrides the default locale format with the specified locale format. The locale is affecting the display of the values (e.g link label) if its `format` property is specified.
 * the first argument is an <i>object</i> referencing the locale format. E.g. the object for the German Locale would be (as a shortcut you can also pass the <i>string</i>```"DE"```):
@@ -493,25 +493,25 @@ Overrides the default locale format with the specified locale format. The locale
 }
 ```
 
-<a name="other_margin" href="#other_margin">#</a> <i>myChart</i>.<b>margin</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_margin" href="#other_margin">#</a> <i>myChart</i>.<b>margin</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the margins for the SVG. 
 * the first argument is an <i>object</i> referencing the four dimensions of the margin (default is ```{top: 20, right: 10, bottom: 20, left: 10}```).
 * with no argument returns the default margin.
 
-<a name="other_propagateValue" href="#other_propagateValue">#</a> <i>myChart</i>.<b>propagateValue</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_propagateValue" href="#other_propagateValue">#</a> <i>myChart</i>.<b>propagateValue</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Propagates a field (which may be just filled in the leaves) throughout all the nodes by summing up the values bottom up.
 * the first argument is a <i>string</i> referencing a field to be propagated (default is ```"value"```).
 * with no argument returns if a field is propagated and its name.
 
-<a name="other_svgDimensions" href="#other_svgDimensions">#</a> <i>myChart</i>.<b>svgDimensions</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_svgDimensions" href="#other_svgDimensions">#</a> <i>myChart</i>.<b>svgDimensions</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the dimensions for the SVG. 
 * the first argument is an <i>object</i> referencing the dimensions of the SVG (default is ```{width: 1400, height: 800}```).
 * with no argument returns the default SVG dimensions.
 
-<a name="other_transitionDuration" href="#other_transitionDuration">#</a> <i>myChart</i>.<b>transitionDuration</b>() [<>](https://github.com/ee2dev/hierarchy-explorer/blob/master/src/d3_template_reusable.js#L50 "Source")
+<a name="other_transitionDuration" href="#other_transitionDuration">#</a> <i>myChart</i>.<b>transitionDuration</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the transition duration for the transitions.
 * the first argument is an <i>integer</i> referencing the duration of a transition in milliseconds (default is ```750```).
@@ -568,7 +568,7 @@ Sets the transition duration for the transitions.
 ```
 
 ## 4. License  
-This code is released under the [BSD license](https://github.com/EE2dev/hierarchy-explorer//blob/master/LICENSE).
+This code is released under the [BSD license](https://github.com/EE2dev/d3-indented-tree//blob/master/LICENSE).
 
 
 

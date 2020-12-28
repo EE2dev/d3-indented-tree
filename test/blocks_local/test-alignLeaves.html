@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="../../build/d3-indented-tree.js"></script>
+    <link rel="stylesheet" href="../../build/d3-indented-tree.css">
+  </head>
+  
+  <body>
+  
+  <!-- paste data in aside tag -->
+  <aside id="data">
+</aside>
+  
+    <script>
+      const dataSpec = {
+        source: "../data/flare.json",
+        key: "name",
+      };
+      // const myChart = hierarchyExplorer.chart(dataSpec)
+      const myChart = d3.indentedTree(dataSpec)
+        .debugOn(true)
+        .propagateValue("size")
+      ;
+
+      showChart(); // for preprocessing data see below
+      
+      window.setTimeout(function() {
+          myChart.alignLeaves(true);
+      }, 2000);
+      
+      function showChart(_file, preprocessed) {
+        const selection = d3.select("body")
+          .append("div")
+            .attr("class", "chart");
+        if (preprocessed) {
+          selection.datum(_file);
+        }
+        selection.call(myChart);
+      }         
+    
+      /*
+      ////////////////////////////////////////////////////////////////
+      //  If data needs to be processed before passing it on        //
+      //  substitute showChart() with readData()                    //
+      ////////////////////////////////////////////////////////////////
+
+      readData(); // no parameter when data is embedded in <pre> tag, otherwise readData(file);
+      
+      function readData(csvFile) {
+        if (typeof csvFile !== 'undefined') {
+          d3.csv(csvFile, processData, function(error, file) {
+            showChart(file, true);
+          });
+        } 
+        else {
+          file = d3.csvParse(d3.select("aside#data").text()); 
+          file.forEach( function (row) {
+            processData(row);
+          });        
+          showChart(file, true);
+        }
+      } 
+      
+      ////////////////////////////////////////////////////////////////
+      //  This function converts each data element to a number.     //
+      //  Update this function to process data accordingly          //
+      ////////////////////////////////////////////////////////////////
+       
+      function processData(d) {
+        for (var perm in d) {
+          if (Object.prototype.hasOwnProperty.call(d, perm)) {
+            d[perm] = +d[perm];
+          }
+        }    
+        return d;
+      }  
+      */
+    </script>
+  </body>
+</html>  

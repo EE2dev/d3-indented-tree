@@ -121,9 +121,11 @@ https://gitlab.com/snippets/1703535
   [ok] linkLabelAlignment: start, aligned, middle, end
 
 --- 27.12.2020
-- update to d3.v6 (events for expanding node)
-- update file to indentedTree.js
-
+  [ok] update to d3.v6 (events for expanding node)
+  [ok] update file to indentedTree.js
+  [ok] update Readme
+  - update blocks
+  - update main example
 
 [1] - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 [2] set range + domain of scale of linkWidth like nodeBar
