@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <aside id="data">
+    </aside>
+  
+    <script>
+      const dataSpec = {
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/data/example3_flat.csv",
+        hierarchyLevels: ["ACCIPITRIFORMES", "Family", "Genus"],
+        delimiter: ",",
+      };
+      const myChart = d3.indentedTree(dataSpec);
+
+      showChart(myChart); 
+      
+      window.setTimeout(function() {
+        myChart.linkWidth(100);
+      }, 2000);
+      
+      function showChart(selection) {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(selection);
+      }         
+    </script>
+  </body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+</head>
+
+<body>
+  <!-- paste data in aside tag -->
+  <aside id="data">
+  </aside>
+
+  <script>
+    const myjson = getJson();
+    const dataSpec = {
+    source: myjson,
+        key: "name",
+    };
+    const myChart = d3.indentedTree(dataSpec);
+
+    showChart(myChart); 
+    
+    window.setTimeout(function() {
+      myChart.linkWidth("population");
+    }, 2000);
+    
+    function showChart(selection) {
+      d3.select("body")
+        .append("div")
+        .attr("class", "chart")
+        .call(selection);
+    }    
+    
+    function getJson() {
+        const json =
+        {
+            "name": "World",
+            "children": [
+                {
+                "name": "Asia",
+                "population": 4436,
+                "children": [
+                    {
+                    "name": "China",
+                    "population": 1420
+                    },
+                    {
+                    "name": "India",
+                    "population": 1369
+                    }
+                ]
+                },
+                {
+                "name": "Africa",
+                "population": 1216
+                },
+                {
+                "name": "Europe",
+                "population": 739
+                },
+                {
+                "name": "North America",
+                "population": 579,
+                "children": [
+                    {
+                    "name": "USA",
+                    "population": 329
+                    }
+                ]
+                },
+                {
+                "name": "South America",
+                "population": 423
+                },
+                {
+                "name": "Oceania",
+                "population": 38
+                }
+            ]
+            };
+        return json;
+      }         
+  </script>
+</body>
+</html>
