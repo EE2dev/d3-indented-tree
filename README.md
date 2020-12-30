@@ -85,11 +85,11 @@ Here is a minimal template sufficient to call d3-indented-tree. A reference to t
       const myChart = d3.indentedTree(dataSpec);
       showChart(myChart); 
       
-      function showChart(selection) {
+      function showChart(_chart) {
         d3.select("body")
           .append("div")
           .attr("class", "chart")
-          .call(selection);
+          .call(_chart);
       }            
     </script>
   </body>

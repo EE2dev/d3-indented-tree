@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <aside id="data">
+key,parent,size,weight,color,image1,image2
+Eve,,3.45,25,yellow,"../images/bK.svg","../images/wK.svg"
+Cain,Eve,4.647,20.3,black,"../images/bK.svg","../images/wK.svg"
+Seth,Eve,3,20.3,steelblue,"../images/bK.svg","../images/wK.svg"
+Enos,Seth,4,3000,orange,"../images/bK.svg","../images/wK.svg"
+Noam,Seth,50000,30,green,"../images/bK.svg","../images/wK.svg"
+Abel,Eve,4,30,brown,"../images/bK.svg","../images/wK.svg"
+Awan,Eve,3,30,deeppink,"../images/bK.svg","../images/wK.svg"
+Enoch,Awan,7,30,blue,"../images/bK.svg","../images/wK.svg"
+Azura,Eve,2,30,red,"../images/bK.svg","../images/wK.svg"
+    </aside>
+  
+    <script>
+      const url = "https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/blocks/";
+      const dataSpec = {
+        source: "aside#data",
+      };
+      const myChart = d3.indentedTree(dataSpec)
+        .margin({top: 50, right: 10, bottom: 20, left: 50})
+        .nodeImageFile(d => d._children ? url + d.data.image1 : url + d.data.image2 , { width: 20, height: 20})
+        .linkLabel("weight", {unit: " Euro", format: ",.2f", locale: "DE"})
+        .nodeLabelPadding(100)
+        .linkWidth("weight",{range: [150, 300]})
+        .linkHeight(50)
+        .nodeLabelPadding(20)
+      ;
+
+      showChart(myChart); 
+      
+      function showChart(_chart) {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(_chart);
+      }         
+    </script>
+  </body>
+</html>

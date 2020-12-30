@@ -9,30 +9,17 @@
   <body>
     <!-- paste data in aside tag -->
     <aside id="data">
-key,parent,size,weight,color
-Eve,,3.45,25,yellow
-Cain,Eve,4.647,20.3,black
-Seth,Eve,3,20.3,steelblue
-Enos,Seth,4,3000,orange
-Noam,Seth,50000,30,green
-Abel,Eve,4,30,brown
-Awan,Eve,3,30,deeppink
-Enoch,Awan,7,30,blue
-Azura,Eve,2,30,red
     </aside>
   
     <script>
       const dataSpec = {
-        source: "aside#data",
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/test/data/flare.json",
+        key: "name",
       };
+      const llc = value => value > 6000 ? "green" : "red";
       const myChart = d3.indentedTree(dataSpec)
-        .margin({top: 50, right: 10, bottom: 20, left: 50})
-        .nodeImageFile("https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/images/jcartier-box.png", { 
-          width: 20, height: 20, setBackground: true})
-        .linkLabel("color", {onTop: false, align: "middle"})
-        .linkWidth("weight",{range: [150, 300]})
-        .linkHeight(50)
-        .nodeLabelPadding(20)
+        .propagateValue("size")
+        .linkLabel("size", {color: llc})
       ;
 
       showChart(myChart); 

@@ -25,21 +25,21 @@ Azura,Eve,2,30,red
       const dataSpec = {
         source: "aside#data",
       };
+
+      const localeGerman = {
+        "decimal": ",",
+        "thousands": ".",
+        "grouping": [3],
+        "currency": ["", " €"]   
+      };
       const myChart = d3.indentedTree(dataSpec)
-        .margin({top: 50, right: 10, bottom: 20, left: 50})
-        .nodeImageFile("https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/images/jcartier-box.png", { 
-          width: 20, height: 20, setBackground: true})
-        .linkLabel("color", {onTop: false, align: "middle"})
-        .linkWidth("weight",{range: [150, 300]})
-        .linkHeight(50)
-        .nodeLabelPadding(20)
+        .propagateValue("size")
+        .formatDefaultLocale(localeGerman)
+        .linkLabel("weight",{unit: " Euro", onTop: true, format: ",.2f"})
+        .linkWidth(100)
       ;
 
       showChart(myChart); 
-      
-      window.setTimeout(function() {
-        myChart.linkWidth(100);
-      }, 2000);
       
       function showChart(selection) {
         d3.select("body")

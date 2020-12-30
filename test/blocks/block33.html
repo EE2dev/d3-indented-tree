@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+  </head>
+  
+  <body>
+    <!-- for local processing without web server, paste data inside the aside tag -->
+    <aside id="data">
+  	</aside>
+    
+    <script>
+      const dataSpec = {
+        source: "aside#data",
+        hierarchyLevels: ["$", "level1", "level2", "level3"],
+        delimiter: ";",
+        convertTypes: d => {
+          return {
+            level1: d.level1,
+            level2: d.level2,
+            level3: d.level3,
+            size1: +d.size1,
+            size2: +d.size2,
+            size3: +d.size3,
+            color: d.color,
+          };
+        },
+      };
+      const myChart = d3.indentedTree(dataSpec)
+        .linkLabel("size1")
+      ;
+      
+      showChart(myChart);
+      
+      window.setTimeout(function() {
+        myChart.nodeSort("size1");
+      }, 2000);
+
+      function showChart(_chart) {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(_chart);
+      }           
+    </script>
+  </body>
+</html>  
