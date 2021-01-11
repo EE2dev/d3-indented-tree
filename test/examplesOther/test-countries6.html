@@ -9,16 +9,19 @@
   <body>
     <script>
       const dataSpec = {
-        source: "../data/countries4.json",
-        key: "country",
+        source: "../data/countries7.csv",
+        hierarchyLevels: ["World", "region", "subregion", "country"],
       };
       const myChart = d3.indentedTree(dataSpec)
         .margin({top: 50, right: 10, bottom: 20, left: 300})
         .nodeImageFile(d => d.data.flag, {width: 23, height: 15})
         .nodeLabelPadding(15)
-        .linkWidth("change", {range: [-200,200]})
-        .linkLabel("change", {format: "+,.2%"})
-        // .nodeSort("change")
+        .propagateValue("density")
+        .linkWidth("population_2019")
+        .linkLabel("population_2019", {format: "+,.2%"})
+        .nodeSort("population_2019")
+        
+        .debugOn(true);
       ;
       
       showChart(myChart);

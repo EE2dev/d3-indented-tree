@@ -63,9 +63,12 @@ nodesAPI.updateNodeSVG = function (transition) {
 };
 
 nodesAPI.appendNodeImage = function (selection) {
+  const imageSelection = selection.filter(d => options.nodeImageFileAppend(d));
+  const noImageSelection = selection.filter(d => !options.nodeImageFileAppend(d));
+
   if (options.nodeImageSetBackground) {
     const col = d3.select("div.chart").style("background-color");
-    selection.append("rect")
+    imageSelection.append("rect")
       .attr("width", options.nodeImageWidth)
       .attr("height", options.nodeImageHeight)
       .attr("x", options.nodeImageX)
@@ -73,19 +76,30 @@ nodesAPI.appendNodeImage = function (selection) {
       .style("stroke", col)
       .style("fill", col);
   }
-  selection.append("image")
+  imageSelection.append("image")
     .attr("class", "node-image")
     .attr("xlink:href", options.nodeImageFileAppend)
     .attr("width", options.nodeImageWidth)
     .attr("height", options.nodeImageHeight)
     .attr("x", options.nodeImageX)
     .attr("y", options.nodeImageY);
+
+  if (options.nodeImageDefault && noImageSelection.size() > 0) {
+    nodesAPI.appendNodeSVG(noImageSelection);
+  }
+
+  if (options.debugOn) {
+    console.log("imageSelection.size: " + imageSelection.size());
+    console.log("noImageSelection.size: " + noImageSelection.size());
+  }
 };
 
 nodesAPI.updateNodeImage = function (transition) {
   transition
     .select(".node-image")
-    .attr("xlink:href", options.nodeImageFileAppend);    
+    .attr("xlink:href", options.nodeImageFileAppend);   
+    
+  nodesAPI.updateNodeSVG(transition); // in case there are fallback/default nodes with no images
 };
 
 nodesAPI.computeNodeExtend = function(sel) {

@@ -44,6 +44,7 @@ export default function (_dataSpec) {
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
   options.nodeImageSetBackground = false;
+  options.nodeImageDefault = true; // default selection is drawn when no image is provided
   options.nodeImageWidth = 10;
   options.nodeImageHeight = 10;
   options.nodeImageX = options.nodeImageWidth / 2;
@@ -224,7 +225,9 @@ export default function (_dataSpec) {
     options.nodeImageHeight = _options.height || options.nodeImageHeight;
     options.nodeImageX = _options.x || -1 * options.nodeImageWidth / 2;
     options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
-    options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
+    // options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
+    options.nodeImageSetBackground = (typeof (_options.setBackground) !== "undefined") ? _options.setBackground : options.nodeImageSetBackground;
+    options.nodeImageDefault = (typeof (_options.default) !== "undefined") ? _options.default : options.nodeImageDefault;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };

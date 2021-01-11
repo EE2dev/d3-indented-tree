@@ -423,7 +423,10 @@ Sets the node images based on an image file.
     * An *object* with the following properties can be used to further specify the mapping: 
         * `width` specifies the width of the image (default is `10`).
         * `height` specifies the height of the image (default is `10`).
+        * `x` specifies the `x` position of upper left corner of the image relative to the node (default is `-1 * width / 2`).
+        * `y` specifies the `y` position of upper left corner of the image relative to the node (default is `-1 * height / 2`).
         * `setBackground` determines if the background under the image should be fill with the background color first (e.g. in case the image has a transparant background) (default is `false`).
+        * `default` determines if the default node image should be used for nodes with no referenced images (default is `true`).
 
 With no arguments returns the callback *function* for the node images.
 

@@ -2,23 +2,28 @@
   <meta charset="utf-8">
   <head>
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.js"></script-->
+    <script src="../../build/d3-indented-tree.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
   </head>
   
   <body>
     <script>
       const dataSpec = {
-        source: "../data/countries4.json",
-        key: "country",
+        source: "../data/countries7.csv",
+        hierarchyLevels: ["World", "region", "subregion", "country"],
+        // hierarchyLevels: ["World", "country"],
       };
       const myChart = d3.indentedTree(dataSpec)
         .margin({top: 50, right: 10, bottom: 20, left: 300})
-        .nodeImageFile(d => d.data.flag, {width: 23, height: 15})
+        .nodeImageFile(d => d.data.flag, {width: 23, height: 15, })
         .nodeLabelPadding(15)
-        .linkWidth("change", {range: [-200,200]})
-        .linkLabel("change", {format: "+,.2%"})
-        // .nodeSort("change")
+        .propagateValue("density")
+        .linkWidth("population_2019")
+        .linkLabel("population_2019", {format: "+,.2%"})
+        .nodeSort("population_2019")
+        
+        .debugOn(true);
       ;
       
       showChart(myChart);
