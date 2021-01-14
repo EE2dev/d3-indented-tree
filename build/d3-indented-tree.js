@@ -493,8 +493,13 @@ nodesAPI.updateNodeSVG = function (transition) {
 };
 
 nodesAPI.appendNodeImage = function (selection) {
-  const imageSelection = selection.filter(d => options$1.nodeImageFileAppend(d));
-  const noImageSelection = selection.filter(d => !options$1.nodeImageFileAppend(d));
+  let imageSelection = selection;
+  let noImageSelection = selection.filter(() => false);
+
+  if (typeof options$1.nodeImageFileAppend === "function") {
+    imageSelection = selection.filter(d => options$1.nodeImageFileAppend(d));
+    noImageSelection = selection.filter(d => !options$1.nodeImageFileAppend(d));
+  }
 
   if (options$1.nodeImageSetBackground) {
     const col = d3.select("div.chart").style("background-color");
@@ -874,6 +879,63 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
+function collapseTree(options, root) {
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeCollapseProperty === "key" ? d.data[options.keyField] : d[options.nodeCollapseProperty];
+    if (options.nodeCollapseArray.includes(comparator)) {
+      d._collapse = true;
+    }
+  });
+
+  // 2.run: collapse nodes in post-order traversal
+  root.eachAfter(node => {
+    if (node._collapse) {
+      if (options.nodeCollapsePropagate) {
+        node.eachAfter(_node => collapse(_node));
+      } else {
+        collapse(node);
+      }
+      node._collapse = null;
+    }
+  });
+}
+
+function collapse(node) {
+  if (node.children) {
+    node._children = node.children;
+    node.children = null;
+  }
+}
+
+function expandTree(options, root) {
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeExpandProperty === "key" ? d.data[options.keyField] : d[options.nodeExpandProperty];
+    if (options.nodeExpandArray.includes(comparator)) {
+      d._expand = true;
+    }
+  });
+
+  // 2.run: expand nodes in pre-order traversal
+  root.eachAfter(node => {
+    if (node._expand) {
+      expand(node, options.nodeExpandPropagate);
+      node._expand = null;
+    }
+  });
+}
+
+function expand(node, propagate) {
+  if (!node.children) {
+    node.children = node._children;
+    node._children = null;
+  }
+  if (propagate && node.children) {
+    node.children.forEach(d => expand(d, true));
+  }
+}
+
 function click(d, options, config){
   if (d.children) {
     d._children = d.children;
@@ -889,6 +951,13 @@ function click(d, options, config){
 
 function update(source, options, config){
   if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
+  if (options.nodeCollapse) {
+    collapseTree(options, config.root);
+    options.nodeCollapse = false;
+  } else if (options.nodeExpand) {
+    expandTree(options, config.root);
+    options.nodeExpand = false;
+  }
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];
@@ -1199,6 +1268,16 @@ function d3_template_reusable (_dataSpec) {
       return ret;
     };
 
+  options.nodeCollapse = false;
+  options.nodeCollapseArray = [];
+  options.nodeCollapseProperty = "key"; // "height" , "depth", "id"
+  options.nodeCollapsePropagate = true;
+
+  options.nodeExpand = false;
+  options.nodeExpandArray = [];
+  options.nodeExpandProperty = "key"; // "height" , "depth", "id"
+  options.nodeExpandPropagate = true;
+
   options.linkHeight = 20;
 
   options.linkLabelField = "value";
@@ -1372,6 +1451,28 @@ function d3_template_reusable (_dataSpec) {
       options.nodeResortByHeight = (typeof (_options.sortByHeight) !== "undefined") ? _options.sortByHeight : options.nodeResortByHeight;
       options.nodeResortField = _;
     }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeCollapse = function(_ = options.nodeCollapseArray, _options = {}) {
+    if (!arguments.length) return options.nodeCollapseArray;
+    if (!Array.isArray(_))  { _ = [_];}
+    options.nodeCollapse = true;
+    options.nodeCollapseArray = _;
+    options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty; 
+    options.nodeCollapsePropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeCollapsePropagate;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeExpand = function(_ = options.nodeExpandArray, _options = {}) {
+    if (!arguments.length) return options.nodeExpandArray;
+    if (!Array.isArray(_))  { _ = [_];}
+    options.nodeExpand = true;
+    options.nodeExpandArray = _;
+    options.nodeExpandProperty = _options.property || options.nodeExpandProperty; 
+    options.nodeExpandPropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeExpandPropagate;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };

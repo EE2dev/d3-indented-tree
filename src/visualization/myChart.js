@@ -124,6 +124,63 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
+function collapseTree(options, root) {
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeCollapseProperty === "key" ? d.data[options.keyField] : d[options.nodeCollapseProperty];
+    if (options.nodeCollapseArray.includes(comparator)) {
+      d._collapse = true;
+    }
+  });
+
+  // 2.run: collapse nodes in post-order traversal
+  root.eachAfter(node => {
+    if (node._collapse) {
+      if (options.nodeCollapsePropagate) {
+        node.eachAfter(_node => collapse(_node));
+      } else {
+        collapse(node);
+      }
+      node._collapse = null;
+    }
+  });
+}
+
+function collapse(node) {
+  if (node.children) {
+    node._children = node.children;
+    node.children = null;
+  }
+}
+
+function expandTree(options, root) {
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeExpandProperty === "key" ? d.data[options.keyField] : d[options.nodeExpandProperty];
+    if (options.nodeExpandArray.includes(comparator)) {
+      d._expand = true;
+    }
+  });
+
+  // 2.run: expand nodes in pre-order traversal
+  root.eachAfter(node => {
+    if (node._expand) {
+      expand(node, options.nodeExpandPropagate);
+      node._expand = null;
+    }
+  });
+}
+
+function expand(node, propagate) {
+  if (!node.children) {
+    node.children = node._children;
+    node._children = null;
+  }
+  if (propagate && node.children) {
+    node.children.forEach(d => expand(d, true));
+  }
+}
+
 function click(d, options, config){
   if (d.children) {
     d._children = d.children;
@@ -139,6 +196,13 @@ function click(d, options, config){
 
 function update(source, options, config){
   if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
+  if (options.nodeCollapse) {
+    collapseTree(options, config.root);
+    options.nodeCollapse = false;
+  } else if (options.nodeExpand) {
+    expandTree(options, config.root);
+    options.nodeExpand = false;
+  }
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];

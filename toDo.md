@@ -127,10 +127,18 @@ https://gitlab.com/snippets/1703535
   [ok] update blocks
   [ok] update main example
 
-  [] nodeImageFile : if no image is provided, e.g. for internal nodes, fall back to default svg node
+  [ok] nodeImageFile : if no image is provided, e.g. for internal nodes, fall back to default svg node
   [] nodeImageFile : allow default size
   [] country example
   [] country correct percentages as decimal (also in readme)
+  [*] collapse/ expand - collapse() API: () .mode: bySize/byHeight/byID .nodes, .propagte (true/false)
+  nodeExpand
+  [bug] expand transitions from wrong position -> call update for each collapse/expand with node
+  [*] document + blocks 
+  // .location .collapseAll === true (default)
+  [] linkHeight
+  [] tooltip
+  [] themes
 
 [1] - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 [2] set range + domain of scale of linkWidth like nodeBar
@@ -166,7 +174,7 @@ https://gitlab.com/snippets/1703535
 - update nodeBar connector + linkLabels on collapse, expand
 - user can set dom of a scale
 
-- collapse() API: () .mode: bySize/byHeight/byID .location .collapseAll === true (default)
+
 
 - update on exit (if sel.exit.size() > 0) initialize new
  .domain .clamp for other (linkWidth)

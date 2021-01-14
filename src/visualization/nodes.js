@@ -63,8 +63,13 @@ nodesAPI.updateNodeSVG = function (transition) {
 };
 
 nodesAPI.appendNodeImage = function (selection) {
-  const imageSelection = selection.filter(d => options.nodeImageFileAppend(d));
-  const noImageSelection = selection.filter(d => !options.nodeImageFileAppend(d));
+  let imageSelection = selection;
+  let noImageSelection = selection.filter(() => false);
+
+  if (typeof options.nodeImageFileAppend === "function") {
+    imageSelection = selection.filter(d => options.nodeImageFileAppend(d));
+    noImageSelection = selection.filter(d => !options.nodeImageFileAppend(d));
+  }
 
   if (options.nodeImageSetBackground) {
     const col = d3.select("div.chart").style("background-color");

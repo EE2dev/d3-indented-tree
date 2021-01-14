@@ -410,6 +410,42 @@ Displays/ transitions the bar for each node to the new value.
 * No argument:
     * with no argument the function returns the name of the numeric field for the node bars.
 
+<a name="node_nodeCollapse" href="#node_nodeCollapse">#</a> <i>myChart</i>.<b>nodeCollapse</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Collapses the tree at the specified nodes.  
+1. argument:
+    * an *array* of nodes that specifies which nodes should be collapsed.
+    The domain of the *array* elements depends on the chosen node property. By default, the corresponding node property is `"key"`. Thus the argument `["a", "b", "c"]` would collapse the nodes with the keys `"a"`, `"b"`and `"c"`, respectively. Alternatively, the argument `[1, 2]` with `"depth"`being the corresponding node property would lead to all node of depth 1 or 2 to be collapsed.
+    * alternatively, a *string* or *number* denoting the *node(s)* to be collapsed. 
+
+2. argument: (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `property` specifies the node property node image (default is `"key"`). Note that `"key"` might deviate from the displayed node name. Other options are:
+          * `"id"`: the node id
+          * `"depth"`: the depth of the node. The depth is zero for the root node, and increasing by one for each descendant generation.
+          * `"height"`: the height of the node. The height is zero for leaf nodes, and the greatest distance from any descendant leaf for internal nodes.
+        * `propagate` specifies a *boolean* property denoting whether all descendant nodes should be collapsed as well. Default is `true`.
+
+With no arguments returns the *array* of the specified nodes to be collapsed.
+
+<a name="node_nodeExpand" href="#node_nodeExpand">#</a> <i>myChart</i>.<b>nodeExpand</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Expands the tree at the specified nodes.  
+1. argument:
+    * an *array* of nodes that specifies which nodes should be expanded.
+    The domain of the *array* elements depends on the chosen node property. By default, the corresponding node property is `"key"`. Thus the argument `["a", "b", "c"]` would expand the nodes with the keys `"a"`, `"b"`and `"c"`, respectively. Alternatively, the argument `[1, 2]` with `"depth"`being the corresponding node property would lead to all node of depth 1 or 2 to be expanded.
+    * alternatively, a *string* or *number* denoting the *node(s)* to be expanded. 
+
+2. argument: (optional):
+    * An *object* with the following properties can be used to further specify the mapping: 
+        * `property` specifies the node property node image (default is `"key"`). Note that `"key"` might deviate from the displayed node name. Other options are:
+          * `"id"`: the node id
+          * `"depth"`: the depth of the node. The depth is zero for the root node, and increasing by one for each descendant generation.
+          * `"height"`: the height of the node. The height is zero for leaf nodes, and the greatest distance from any descendant leaf for internal nodes.
+        * `propagate` specifies a *boolean* property denoting whether all descendant nodes should be expanded as well. Default is `true`.
+
+With no arguments returns the *array* of the specified nodes to be expanded.
+
 <a name="node_nodeImageFile" href="#node_nodeImageFile">#</a> <i>myChart</i>.<b>nodeImageFile</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 
 Sets the node images based on an image file.  

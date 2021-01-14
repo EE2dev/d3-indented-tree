@@ -75,6 +75,16 @@ export default function (_dataSpec) {
       return ret;
     };
 
+  options.nodeCollapse = false;
+  options.nodeCollapseArray = [];
+  options.nodeCollapseProperty = "key"; // "height" , "depth", "id"
+  options.nodeCollapsePropagate = true;
+
+  options.nodeExpand = false;
+  options.nodeExpandArray = [];
+  options.nodeExpandProperty = "key"; // "height" , "depth", "id"
+  options.nodeExpandPropagate = true;
+
   options.linkHeight = 20;
 
   options.linkLabelField = "value";
@@ -249,6 +259,28 @@ export default function (_dataSpec) {
       options.nodeResortByHeight = (typeof (_options.sortByHeight) !== "undefined") ? _options.sortByHeight : options.nodeResortByHeight;
       options.nodeResortField = _;
     }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeCollapse = function(_ = options.nodeCollapseArray, _options = {}) {
+    if (!arguments.length) return options.nodeCollapseArray;
+    if (!Array.isArray(_))  { _ = [_];}
+    options.nodeCollapse = true;
+    options.nodeCollapseArray = _;
+    options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty; 
+    options.nodeCollapsePropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeCollapsePropagate;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeExpand = function(_ = options.nodeExpandArray, _options = {}) {
+    if (!arguments.length) return options.nodeExpandArray;
+    if (!Array.isArray(_))  { _ = [_];}
+    options.nodeExpand = true;
+    options.nodeExpandArray = _;
+    options.nodeExpandProperty = _options.property || options.nodeExpandProperty; 
+    options.nodeExpandPropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeExpandPropagate;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };

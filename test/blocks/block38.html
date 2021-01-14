@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.js"></script-->
+    <script src="../../build/d3-indented-tree.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+  </head>
+  
+  <body>
+    <form>
+        <input type="radio" id="0" name="depth" value="depth0" onclick="collapse();">
+        <label for="depth0">depth 0</label><br>
+        <input type="radio" id="1" name="depth" value="depth1" onclick="collapse();">
+        <label for="depth1">depth 1</label><br>
+        <input type="radio" id="2" name="depth" value="depth2" onclick="collapse();">
+        <label for="depth2">depth 2</label><br>
+        <input type="radio" id="3" name="depth" value="depth3" onclick="collapse();">
+        <label for="depth3">depth 3</label><br>
+        <input type="radio" id="4" name="depth" value="depth4" onclick="collapse();" checked>
+        <label for="depth4">depth 4</label>
+    </form>
+    <script>
+      const dataSpec = {
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/data/flare.json",
+        key: "name",
+      };
+      const myChart = d3.indentedTree(dataSpec)
+      ;
+      
+      showChart(myChart);
+      
+      function showChart(_chart) {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(_chart);
+      }   
+      
+      function collapse() {
+        const ar = [0,1,2,3,4];
+        for (let i = 0; i < 5; i++) {
+            if (document.getElementById(i).checked) {
+                myChart.nodeExpand(ar.slice(0, i-1), { property: "depth", propagate: false});
+                myChart.nodeCollapse(i, { property: "depth", propagate: false});
+            }
+        }
+      }
+    </script>
+  </body>
+</html>  

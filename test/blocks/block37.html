@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.js"></script-->
+    <script src="../../build/d3-indented-tree.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+  </head>
+  
+  <body>
+    <script>
+      const dataSpec = {
+        source: "https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/data/flare.json",
+        key: "name",
+      };
+      const myChart = d3.indentedTree(dataSpec)
+        .nodeCollapse([1,2], { property: "depth", propagate: false})
+      ;
+      
+      showChart(myChart);
+
+      window.setTimeout(function() {
+        myChart
+        .nodeExpand([1], { property: "depth"})
+      }, 2000);
+      
+      function showChart(_chart) {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(_chart);
+      }           
+    </script>
+  </body>
+</html>  

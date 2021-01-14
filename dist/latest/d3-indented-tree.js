@@ -1,4 +1,4 @@
-// undefined v0.6.0 Copyright 2020 Mihael Ankerst
+// https://github.com/EE2dev/d3-indented-tree v0.6.0 Copyright 2021 Mihael Ankerst
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3')) :
 typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) :
@@ -493,9 +493,17 @@ nodesAPI.updateNodeSVG = function (transition) {
 };
 
 nodesAPI.appendNodeImage = function (selection) {
+  let imageSelection = selection;
+  let noImageSelection = selection.filter(() => false);
+
+  if (typeof options$1.nodeImageFileAppend === "function") {
+    imageSelection = selection.filter(d => options$1.nodeImageFileAppend(d));
+    noImageSelection = selection.filter(d => !options$1.nodeImageFileAppend(d));
+  }
+
   if (options$1.nodeImageSetBackground) {
     const col = d3.select("div.chart").style("background-color");
-    selection.append("rect")
+    imageSelection.append("rect")
       .attr("width", options$1.nodeImageWidth)
       .attr("height", options$1.nodeImageHeight)
       .attr("x", options$1.nodeImageX)
@@ -503,19 +511,30 @@ nodesAPI.appendNodeImage = function (selection) {
       .style("stroke", col)
       .style("fill", col);
   }
-  selection.append("image")
+  imageSelection.append("image")
     .attr("class", "node-image")
     .attr("xlink:href", options$1.nodeImageFileAppend)
     .attr("width", options$1.nodeImageWidth)
     .attr("height", options$1.nodeImageHeight)
     .attr("x", options$1.nodeImageX)
     .attr("y", options$1.nodeImageY);
+
+  if (options$1.nodeImageDefault && noImageSelection.size() > 0) {
+    nodesAPI.appendNodeSVG(noImageSelection);
+  }
+
+  if (options$1.debugOn) {
+    console.log("imageSelection.size: " + imageSelection.size());
+    console.log("noImageSelection.size: " + noImageSelection.size());
+  }
 };
 
 nodesAPI.updateNodeImage = function (transition) {
   transition
     .select(".node-image")
-    .attr("xlink:href", options$1.nodeImageFileAppend);    
+    .attr("xlink:href", options$1.nodeImageFileAppend);   
+    
+  nodesAPI.updateNodeSVG(transition); // in case there are fallback/default nodes with no images
 };
 
 nodesAPI.computeNodeExtend = function(sel) {
@@ -860,6 +879,63 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
+function collapseTree(options, root) {
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeCollapseProperty === "key" ? d.data[options.keyField] : d[options.nodeCollapseProperty];
+    if (options.nodeCollapseArray.includes(comparator)) {
+      d._collapse = true;
+    }
+  });
+
+  // 2.run: collapse nodes in post-order traversal
+  root.eachAfter(node => {
+    if (node._collapse) {
+      if (options.nodeCollapsePropagate) {
+        node.eachAfter(_node => collapse(_node));
+      } else {
+        collapse(node);
+      }
+      node._collapse = null;
+    }
+  });
+}
+
+function collapse(node) {
+  if (node.children) {
+    node._children = node.children;
+    node.children = null;
+  }
+}
+
+function expandTree(options, root) {
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeExpandProperty === "key" ? d.data[options.keyField] : d[options.nodeExpandProperty];
+    if (options.nodeExpandArray.includes(comparator)) {
+      d._expand = true;
+    }
+  });
+
+  // 2.run: expand nodes in pre-order traversal
+  root.eachAfter(node => {
+    if (node._expand) {
+      expand(node, options.nodeExpandPropagate);
+      node._expand = null;
+    }
+  });
+}
+
+function expand(node, propagate) {
+  if (!node.children) {
+    node.children = node._children;
+    node._children = null;
+  }
+  if (propagate && node.children) {
+    node.children.forEach(d => expand(d, true));
+  }
+}
+
 function click(d, options, config){
   if (d.children) {
     d._children = d.children;
@@ -875,6 +951,13 @@ function click(d, options, config){
 
 function update(source, options, config){
   if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
+  if (options.nodeCollapse) {
+    collapseTree(options, config.root);
+    options.nodeCollapse = false;
+  } else if (options.nodeExpand) {
+    expandTree(options, config.root);
+    options.nodeExpand = false;
+  }
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];
@@ -1154,6 +1237,7 @@ function d3_template_reusable (_dataSpec) {
   options.nodeImageFile = false; // node image from file or selection
   options.nodeImageFileAppend = undefined; //callback function which returns a image URL
   options.nodeImageSetBackground = false;
+  options.nodeImageDefault = true; // default selection is drawn when no image is provided
   options.nodeImageWidth = 10;
   options.nodeImageHeight = 10;
   options.nodeImageX = options.nodeImageWidth / 2;
@@ -1183,6 +1267,16 @@ function d3_template_reusable (_dataSpec) {
       if (options.nodeResortAscending) { ret *= -1; }
       return ret;
     };
+
+  options.nodeCollapse = false;
+  options.nodeCollapseArray = [];
+  options.nodeCollapseProperty = "key"; // "height" , "depth", "id"
+  options.nodeCollapsePropagate = true;
+
+  options.nodeExpand = false;
+  options.nodeExpandArray = [];
+  options.nodeExpandProperty = "key"; // "height" , "depth", "id"
+  options.nodeExpandPropagate = true;
 
   options.linkHeight = 20;
 
@@ -1333,7 +1427,9 @@ function d3_template_reusable (_dataSpec) {
     options.nodeImageHeight = _options.height || options.nodeImageHeight;
     options.nodeImageX = _options.x || -1 * options.nodeImageWidth / 2;
     options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
-    options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
+    // options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
+    options.nodeImageSetBackground = (typeof (_options.setBackground) !== "undefined") ? _options.setBackground : options.nodeImageSetBackground;
+    options.nodeImageDefault = (typeof (_options.default) !== "undefined") ? _options.default : options.nodeImageDefault;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
@@ -1355,6 +1451,28 @@ function d3_template_reusable (_dataSpec) {
       options.nodeResortByHeight = (typeof (_options.sortByHeight) !== "undefined") ? _options.sortByHeight : options.nodeResortByHeight;
       options.nodeResortField = _;
     }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeCollapse = function(_ = options.nodeCollapseArray, _options = {}) {
+    if (!arguments.length) return options.nodeCollapseArray;
+    if (!Array.isArray(_))  { _ = [_];}
+    options.nodeCollapse = true;
+    options.nodeCollapseArray = _;
+    options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty; 
+    options.nodeCollapsePropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeCollapsePropagate;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  };
+
+  chartAPI.nodeExpand = function(_ = options.nodeExpandArray, _options = {}) {
+    if (!arguments.length) return options.nodeExpandArray;
+    if (!Array.isArray(_))  { _ = [_];}
+    options.nodeExpand = true;
+    options.nodeExpandArray = _;
+    options.nodeExpandProperty = _options.property || options.nodeExpandProperty; 
+    options.nodeExpandPropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeExpandPropagate;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
@@ -1512,8 +1630,6 @@ function d3_template_reusable (_dataSpec) {
   
   return chartAPI;
 }
-
-// export {default as chart} from "./src/d3_template_reusable.js";
 
 exports.indentedTree = d3_template_reusable;
 
