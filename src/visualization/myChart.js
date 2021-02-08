@@ -29,6 +29,9 @@ export function myChart(selection, data, options){
   createScales(options, config);
   createUpdateFunctions(options, config, data);
   // root.children.forEach(collapse);
+  if (options.nodeCollapse) {
+    options.updateCollapse();
+  }
   update(config.root, options, config);
 }
 
@@ -119,11 +122,47 @@ function createUpdateFunctions(options, config, data){
     update(config.root, options, config);
   };
 
+  // 1
+  options.updateCollapse = function() {
+    collapseTree2(options, config);
+  };
+
+  options.updateExpand = function() {
+    expandTree2(options, config);
+  };
+  // end 1
+
   options.updateDefault = function() {
     update(config.root, options, config);
   };
 }
 
+function collapseTree2(options, config) {
+  const root = config.root;
+  // 1. run: flag affected nodes
+  root.each(d => { 
+    const comparator = options.nodeCollapseProperty === "key" ? d.data[options.keyField] : d[options.nodeCollapseProperty];
+    if (options.nodeCollapseArray.includes(comparator)) {
+      d._collapse = true;
+    }
+  });
+
+  // 2.run: collapse nodes in post-order traversal
+  root.eachAfter(node => {
+    if (node._collapse) {
+      if (options.nodeCollapsePropagate) {
+        node.eachAfter(_node => collapse(_node));
+      } else {
+        collapse(node);
+      }
+      node._collapse = null;
+      // update(root, options, config);
+    }
+  });
+  update(root, options, config);
+}
+
+/*
 function collapseTree(options, root) {
   // 1. run: flag affected nodes
   root.each(d => { 
@@ -145,6 +184,7 @@ function collapseTree(options, root) {
     }
   });
 }
+*/
 
 function collapse(node) {
   if (node.children) {
@@ -153,6 +193,23 @@ function collapse(node) {
   }
 }
 
+function expandTree2(options, config) {
+  const root = config.root;
+  root.eachBefore(node => {
+    if (expandNode(node, options)) {
+      expand(node, options);
+      // update(root, options, config);
+    }
+  });
+  update(root, options, config);
+}
+
+function expandNode(node, options) {
+  const comparator = options.nodeExpandProperty === "key" ? node.data[options.keyField] : node[options.nodeExpandProperty];
+  return (options.nodeExpandArray.includes(comparator));
+}
+
+/*
 function expandTree(options, root) {
   // 1. run: flag affected nodes
   root.each(d => { 
@@ -170,15 +227,16 @@ function expandTree(options, root) {
     }
   });
 }
+*/
 
-function expand(node, propagate) {
+function expand(node, options) {
   if (!node.children) {
     node.children = node._children;
     node._children = null;
   }
-  if (propagate && node.children) {
-    node.children.forEach(d => expand(d, true));
-  }
+  if (node.children && (options.nodeExpandPropagate || expandNode(node.children, options))) {
+    node.children.forEach(d => expand(d, options));
+  } 
 }
 
 function click(d, options, config){
@@ -196,6 +254,7 @@ function click(d, options, config){
 
 function update(source, options, config){
   if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
+  /** 3
   if (options.nodeCollapse) {
     collapseTree(options, config.root);
     options.nodeCollapse = false;
@@ -203,6 +262,8 @@ function update(source, options, config){
     expandTree(options, config.root);
     options.nodeExpand = false;
   }
+  3 **/
+
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];
@@ -391,8 +452,10 @@ function update(source, options, config){
     .transition(trans)
     .duration(options.transitionDuration);
   
-  console.log("transition: " + trans);
-  console.log("nodeUpdate.size: " + nodeUpdate.size());
+  if (options.debugOn) {
+    console.log("transition: " + trans);
+    console.log("nodeUpdate.size: " + nodeUpdate.size());
+  }
 
   nodeUpdate
     .attr("transform", d => "translate(" + d.y + "," + d.x + ") scale(1,1)");

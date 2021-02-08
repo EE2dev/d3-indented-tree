@@ -37,12 +37,20 @@
           .call(_chart);
       }   
       
+      let level = 4;
+
       function collapse() {
         const ar = [0,1,2,3,4];
         for (let i = 0; i < 5; i++) {
             if (document.getElementById(i).checked) {
-                myChart.nodeExpand(ar.slice(0, i-1), { property: "depth", propagate: false});
-                myChart.nodeCollapse(i, { property: "depth", propagate: false});
+                if (i <= level) {
+                  // myChart.nodeExpand(ar.slice(0, i-1), { property: "depth", propagate: false});
+                  myChart.nodeCollapse(i, { property: "depth", propagate: false});
+                } else {
+                  // myChart.nodeCollapse(i, { property: "depth", propagate: false});
+                  myChart.nodeExpand(i, { property: "depth", propagate: false});
+                }
+                level = i;
             }
         }
       }

@@ -270,7 +270,8 @@ export default function (_dataSpec) {
     options.nodeCollapseArray = _;
     options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty; 
     options.nodeCollapsePropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeCollapsePropagate;
-    if (typeof options.updateDefault === "function") options.updateDefault();
+    // if (typeof options.updateDefault === "function") options.updateDefault();
+    if (typeof options.updateCollapse === "function") options.updateCollapse();
     return chartAPI;
   };
 
@@ -281,7 +282,8 @@ export default function (_dataSpec) {
     options.nodeExpandArray = _;
     options.nodeExpandProperty = _options.property || options.nodeExpandProperty; 
     options.nodeExpandPropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeExpandPropagate;
-    if (typeof options.updateDefault === "function") options.updateDefault();
+    // if (typeof options.updateDefault === "function") options.updateDefault();
+    if (typeof options.updateExpand === "function") options.updateExpand();
     return chartAPI;
   };
 

@@ -139,6 +139,17 @@ https://gitlab.com/snippets/1703535
   [] linkHeight
   [] tooltip
   [] themes
+  [] applications:
+  - list with two values (nodeBar)
+  - racing hierarchy chart
+  - running example 10 countries
+  - https://en.wikipedia.org/wiki/Hierarchy
+    - planets of solar system (size, distance from sun) demo for flat list
+  - countries 
+  - chess games
+  - nfl super bowl
+  - luka doncics playoff run
+  - Bayern Munich
 
 [1] - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 [2] set range + domain of scale of linkWidth like nodeBar

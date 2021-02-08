@@ -25,15 +25,17 @@
         //.nodeCollapse(["World$Asia","World$Europe"])
         .nodeCollapse([2,1], { property: "depth", propagate: false})
         // .nodeCollapse(["World"])//, { property: "key", propagate: false})
-        .debugOn(true);
+        //.debugOn(true);
       ;
       
       showChart(myChart);
 
+      /*
       window.setTimeout(function() {
         myChart
         .nodeExpand([1,2,3], { property: "depth", propagate: false})// { property: "depth", propagate: false})
       }, 2000);
+      */
       
       function showChart(_chart) {
         d3.select("body")
