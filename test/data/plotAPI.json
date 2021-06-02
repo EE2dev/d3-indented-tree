@@ -1,0 +1,866 @@
+{
+  "name": "marks: []",
+  "type": "array",
+  "children": [
+    {
+      "name": "Plot.barX()",
+      "type": "function",
+      "children": [
+        {
+          "name": "data",
+          "type": "data"
+        },
+        {
+          "name": "{}",
+          "type": "options",
+          "children": [
+            {
+              "name": "x",
+              "type": "channel"
+            },
+            {
+              "name": "x1",
+              "type": "channel"
+            },
+            {
+              "name": "x2",
+              "type": "channel"
+            },
+            {
+              "name": "y",
+              "type": "channel"
+            },
+            {
+              "name": "fill",
+              "type": "channel"
+            },
+            {
+              "name": "fillOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "stroke",
+              "type": "channel"
+            },
+            {
+              "name": "strokeOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "title",
+              "type": "channel"
+            },
+            {
+              "name": "strokeWidth",
+              "type": "constant number"
+            },
+            {
+              "name": "strokeLinejoin",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "arcs",
+                  "type": "string literal"
+                },
+                {
+                  "name": "bevel",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter-clip",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the corners of paths when they are stroked"
+            },
+            {
+              "name": "strokeLinecap",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "butt",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                },
+                {
+                  "name": "square",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the end of open subpaths when they are stroked"
+            },
+            {
+              "name": "strokeMiterlimit",
+              "type": "constant number",
+              "info": "A limit on the ratio of the miter length to the stroke-width used to draw a miter join. When the limit is exceeded, the join is converted from a miter to a bevel"
+            },
+            {
+              "name": "strokeDasharray",
+              "type": "constant string",
+              "info": "The pattern of dashes and gaps used to paint the outline of the shape"
+            },
+            {
+              "name": "mixBlendMode",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "'normal'",
+                  "type": "string literal"
+                },
+                {
+                  "name": "multiply",
+                  "type": "string literal"
+                },
+                {
+                  "name": "screen",
+                  "type": "string literal"
+                },
+                {
+                  "name": "overlay",
+                  "type": "string literal"
+                },
+                {
+                  "name": "darken",
+                  "type": "string literal"
+                },
+                {
+                  "name": "lighten",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-dodge",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-burn",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hard-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "soft-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "difference",
+                  "type": "string literal"
+                },
+                {
+                  "name": "exclusion",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hue",
+                  "type": "string literal"
+                },
+                {
+                  "name": "saturation",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color",
+                  "type": "string literal"
+                },
+                {
+                  "name": "luminosity",
+                  "type": "string literal"
+                }
+              ]
+            },
+            {
+              "name": "insetTop",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the top for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetRight",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the right for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetBottom",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the bottom for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetLeft",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left for each element. Shorthand: inset"
+            },
+            {
+              "name": "inset",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left, right, top and bottom. shorthand for insetLeft, insetRight, insetTop, insetBottom"
+            },
+            {
+              "name": "rx",
+              "type": "constant number"
+            },
+            {
+              "name": "ry",
+              "type": "constant number"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Plot.barY()",
+      "type": "function",
+      "children": [
+        {
+          "name": "data",
+          "type": "data"
+        },
+        {
+          "name": "{}",
+          "type": "options",
+          "children": [
+            {
+              "name": "y",
+              "type": "channel"
+            },
+            {
+              "name": "y1",
+              "type": "channel"
+            },
+            {
+              "name": "y2",
+              "type": "channel"
+            },
+            {
+              "name": "x",
+              "type": "channel"
+            },
+            {
+              "name": "fill",
+              "type": "channel"
+            },
+            {
+              "name": "fillOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "stroke",
+              "type": "channel"
+            },
+            {
+              "name": "strokeOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "title",
+              "type": "channel"
+            },
+            {
+              "name": "strokeWidth",
+              "type": "constant number"
+            },
+            {
+              "name": "strokeLinejoin",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "arcs",
+                  "type": "string literal"
+                },
+                {
+                  "name": "bevel",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter-clip",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the corners of paths when they are stroked"
+            },
+            {
+              "name": "strokeLinecap",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "butt",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                },
+                {
+                  "name": "square",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the end of open subpaths when they are stroked"
+            },
+            {
+              "name": "strokeMiterlimit",
+              "type": "constant number",
+              "info": "A limit on the ratio of the miter length to the stroke-width used to draw a miter join. When the limit is exceeded, the join is converted from a miter to a bevel"
+            },
+            {
+              "name": "strokeDasharray",
+              "type": "constant string",
+              "info": "The pattern of dashes and gaps used to paint the outline of the shape"
+            },
+            {
+              "name": "mixBlendMode",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "normal",
+                  "type": "string literal"
+                },
+                {
+                  "name": "multiply",
+                  "type": "string literal"
+                },
+                {
+                  "name": "screen",
+                  "type": "string literal"
+                },
+                {
+                  "name": "overlay",
+                  "type": "string literal"
+                },
+                {
+                  "name": "darken",
+                  "type": "string literal"
+                },
+                {
+                  "name": "lighten",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-dodge",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-burn",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hard-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "soft-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "difference",
+                  "type": "string literal"
+                },
+                {
+                  "name": "exclusion",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hue",
+                  "type": "string literal"
+                },
+                {
+                  "name": "saturation",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color",
+                  "type": "string literal"
+                },
+                {
+                  "name": "luminosity",
+                  "type": "string literal"
+                }
+              ]
+            },
+            {
+              "name": "insetTop",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the top for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetRight",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the right for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetBottom",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the bottom for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetLeft",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left for each element. Shorthand: inset"
+            },
+            {
+              "name": "inset",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left, right, top and bottom. shorthand for insetLeft, insetRight, insetTop, insetBottom"
+            },
+            {
+              "name": "rx",
+              "type": "constant number"
+            },
+            {
+              "name": "ry",
+              "type": "constant number"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Plot.rectX()",
+      "type": "function",
+      "children": [
+        {
+          "name": "data",
+          "type": "data"
+        },
+        {
+          "name": "{}",
+          "type": "options",
+          "children": [
+            {
+              "name": "y",
+              "type": "channel"
+            },
+            {
+              "name": "y1",
+              "type": "channel"
+            },
+            {
+              "name": "y2",
+              "type": "channel"
+            },
+            {
+              "name": "x",
+              "type": "channel"
+            },
+            {
+              "name": "fill",
+              "type": "channel"
+            },
+            {
+              "name": "fillOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "stroke",
+              "type": "channel"
+            },
+            {
+              "name": "strokeOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "title",
+              "type": "channel"
+            },
+            {
+              "name": "strokeWidth",
+              "type": "constant number"
+            },
+            {
+              "name": "strokeLinejoin",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "arcs",
+                  "type": "string literal"
+                },
+                {
+                  "name": "bevel",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter-clip",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the corners of paths when they are stroked"
+            },
+            {
+              "name": "strokeLinecap",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "butt",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                },
+                {
+                  "name": "square",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the end of open subpaths when they are stroked"
+            },
+            {
+              "name": "strokeMiterlimit",
+              "type": "constant number",
+              "info": "A limit on the ratio of the miter length to the stroke-width used to draw a miter join. When the limit is exceeded, the join is converted from a miter to a bevel"
+            },
+            {
+              "name": "strokeDasharray",
+              "type": "constant string",
+              "info": "The pattern of dashes and gaps used to paint the outline of the shape"
+            },
+            {
+              "name": "mixBlendMode",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "normal",
+                  "type": "string literal"
+                },
+                {
+                  "name": "multiply",
+                  "type": "string literal"
+                },
+                {
+                  "name": "screen",
+                  "type": "string literal"
+                },
+                {
+                  "name": "overlay",
+                  "type": "string literal"
+                },
+                {
+                  "name": "darken",
+                  "type": "string literal"
+                },
+                {
+                  "name": "lighten",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-dodge",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-burn",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hard-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "soft-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "difference",
+                  "type": "string literal"
+                },
+                {
+                  "name": "exclusion",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hue",
+                  "type": "string literal"
+                },
+                {
+                  "name": "saturation",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color",
+                  "type": "string literal"
+                },
+                {
+                  "name": "luminosity",
+                  "type": "string literal"
+                }
+              ]
+            },
+            {
+              "name": "insetTop",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the top for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetRight",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the right for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetBottom",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the bottom for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetLeft",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left for each element. Shorthand: inset"
+            },
+            {
+              "name": "inset",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left, right, top and bottom. shorthand for insetLeft, insetRight, insetTop, insetBottom"
+            },
+            {
+              "name": "rx",
+              "type": "constant number"
+            },
+            {
+              "name": "ry",
+              "type": "constant number"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Plot.rectY()",
+      "type": "function",
+      "children": [
+        {
+          "name": "data",
+          "type": "data"
+        },
+        {
+          "name": "{}",
+          "type": "options",
+          "children": [
+            {
+              "name": "y",
+              "type": "channel"
+            },
+            {
+              "name": "y1",
+              "type": "channel"
+            },
+            {
+              "name": "y2",
+              "type": "channel"
+            },
+            {
+              "name": "x",
+              "type": "channel"
+            },
+            {
+              "name": "fill",
+              "type": "channel"
+            },
+            {
+              "name": "fillOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "stroke",
+              "type": "channel"
+            },
+            {
+              "name": "strokeOpacity",
+              "type": "channel"
+            },
+            {
+              "name": "title",
+              "type": "channel"
+            },
+            {
+              "name": "strokeWidth",
+              "type": "constant number"
+            },
+            {
+              "name": "strokeLinejoin",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "arcs",
+                  "type": "string literal"
+                },
+                {
+                  "name": "bevel",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter",
+                  "type": "string literal"
+                },
+                {
+                  "name": "miter-clip",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the corners of paths when they are stroked"
+            },
+            {
+              "name": "strokeLinecap",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "butt",
+                  "type": "string literal"
+                },
+                {
+                  "name": "round",
+                  "type": "string literal"
+                },
+                {
+                  "name": "square",
+                  "type": "string literal"
+                }
+              ],
+              "info": "The shape to be used at the end of open subpaths when they are stroked"
+            },
+            {
+              "name": "strokeMiterlimit",
+              "type": "constant number",
+              "info": "A limit on the ratio of the miter length to the stroke-width used to draw a miter join. When the limit is exceeded, the join is converted from a miter to a bevel"
+            },
+            {
+              "name": "strokeDasharray",
+              "type": "constant string",
+              "info": "The pattern of dashes and gaps used to paint the outline of the shape"
+            },
+            {
+              "name": "mixBlendMode",
+              "type": "constant string",
+              "children": [
+                {
+                  "name": "normal",
+                  "type": "string literal"
+                },
+                {
+                  "name": "multiply",
+                  "type": "string literal"
+                },
+                {
+                  "name": "screen",
+                  "type": "string literal"
+                },
+                {
+                  "name": "overlay",
+                  "type": "string literal"
+                },
+                {
+                  "name": "darken",
+                  "type": "string literal"
+                },
+                {
+                  "name": "lighten",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-dodge",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color-burn",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hard-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "soft-light",
+                  "type": "string literal"
+                },
+                {
+                  "name": "difference",
+                  "type": "string literal"
+                },
+                {
+                  "name": "exclusion",
+                  "type": "string literal"
+                },
+                {
+                  "name": "hue",
+                  "type": "string literal"
+                },
+                {
+                  "name": "saturation",
+                  "type": "string literal"
+                },
+                {
+                  "name": "color",
+                  "type": "string literal"
+                },
+                {
+                  "name": "luminosity",
+                  "type": "string literal"
+                }
+              ]
+            },
+            {
+              "name": "insetTop",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the top for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetRight",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the right for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetBottom",
+              "type": "constant number",
+              "info": "Adds spacing in pixels at the bottom for each element. Shorthand: inset"
+            },
+            {
+              "name": "insetLeft",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left for each element. Shorthand: inset"
+            },
+            {
+              "name": "inset",
+              "type": "constant number",
+              "info": "Adds spacing in pixels on the left, right, top and bottom. shorthand for insetLeft, insetRight, insetTop, insetBottom"
+            },
+            {
+              "name": "rx",
+              "type": "constant number"
+            },
+            {
+              "name": "ry",
+              "type": "constant number"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

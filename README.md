@@ -506,6 +506,16 @@ Sorts the nodes of the tree. The type conversion specified in [`dataSpec.convert
 
 With no arguments returns the name of the field based on which the nodes are sorted.
 
+<a name="node_nodeTitle" href="#node_nodeTitle">#</a> <i>myChart</i>.<b>nodeTitle</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
+
+Sets the default tooltip for the nodes. 
+
+1. argument:
+    * to set the tooltip title dynamically, provide the name of a field as a *string*. Default is the node name. 
+    * to switch the tooltip title on or off provide a <i>boolean</i>. Default is `true`.
+
+With no arguments returns a boolean indicating if a tooltip title is shown.
+
 ### 3.3 Other API calls
 <a name="other_debugOn" href="#other_debugOn">#</a> <i>myChart</i>.<b>debugOn</b>() [<>](https://github.com/ee2dev/d3-indented-tree/blob/master/src/d3_template_reusable.js#L50 "Source")
 

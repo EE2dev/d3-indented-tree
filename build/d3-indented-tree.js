@@ -1123,9 +1123,10 @@ function update(source, options, config){
       }
     });
 
-  nodeEnter.append("svg:title").text(function (d) {
-    return d.data[options.nodeLabelField];
-  });
+  if (options.nodeTitleOn)
+    nodeEnter.append("svg:title").text(function (d) {
+      return (options.nodeTitleField === "" || !d.data[options.nodeTitleField]) ? d.data[options.nodeLabelField] : d.data[options.nodeTitleField];
+    });
 
   nodeEnter.style("visibility", "hidden");
 
@@ -1297,6 +1298,9 @@ function d3_template_reusable (_dataSpec) {
   options.nodeExpandArray = [];
   options.nodeExpandProperty = "key"; // "height" , "depth", "id"
   options.nodeExpandPropagate = true;
+
+  options.nodeTitleOn = true;
+  options.nodeTitleField = ""; // default: options.nodeLabelField which will be set later
 
   options.linkHeight = 20;
 
@@ -1568,6 +1572,20 @@ function d3_template_reusable (_dataSpec) {
     options.linkColorField = _;
     options.linkColorScale = _options.scale || options.linkColorScale;
     options.linkColorInherit = (typeof (_options.inherit) !== "undefined") ? _options.inherit : options.linkColorInherit;
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  }; 
+
+  chartAPI.nodeTitle = function(_ = options.nodeTitleOn) {
+    if (!arguments.length) return options.nodeTitleOn;
+    options.nodeTitleField = false;
+
+    if (typeof(_)  === "string")  {
+      options.nodeTitleField = _; 
+      options.nodeTitleOn = true;
+    } else if (typeof(_)  === "boolean") {
+      options.nodeTitleOn = _;
+    }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   }; 

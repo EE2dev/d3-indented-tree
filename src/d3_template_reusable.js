@@ -85,6 +85,9 @@ export default function (_dataSpec) {
   options.nodeExpandProperty = "key"; // "height" , "depth", "id"
   options.nodeExpandPropagate = true;
 
+  options.nodeTitleOn = true;
+  options.nodeTitleField = ""; // default: options.nodeLabelField which will be set later
+
   options.linkHeight = 20;
 
   options.linkLabelField = "value";
@@ -286,6 +289,20 @@ export default function (_dataSpec) {
     if (typeof options.updateExpand === "function") options.updateExpand();
     return chartAPI;
   };
+  
+  chartAPI.nodeTitle = function(_ = options.nodeTitleOn) {
+    if (!arguments.length) return options.nodeTitleOn;
+    options.nodeTitleField = false;
+
+    if (typeof(_)  === "string")  {
+      options.nodeTitleField = _; 
+      options.nodeTitleOn = true;
+    } else if (typeof(_)  === "boolean") {
+      options.nodeTitleOn = _;
+    }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  }; 
 
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;

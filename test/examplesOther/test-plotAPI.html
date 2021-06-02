@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.js"></script-->
+    <script src="../../build/d3-indented-tree.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
+  </head>
+  
+  <body>
+    <script>
+      const dataSpec = {
+        source: "../data/plotAPI.json",
+        key: "name",
+      };
+      const myChart = d3.indentedTree(dataSpec)
+        .nodeImageFile(d => { // icons from https://github.com/twitter/twemoji
+          switch (d.data.name) {
+            case "Plot.barX()":
+              return "../images/plot/barX.png";
+              break;
+            case "Plot.barY()":
+              return "../images/plot/barY.png";
+              break;
+            case "Plot.rectX()":
+              return "../images/plot/rectX.png";
+              break;
+            case "Plot.rectY()":
+              return "../images/plot/rectY.png";
+              break;
+            case "Plot.dot()":
+              return "../images/plot/dot.png";
+              break;
+            case "Plot.line()":
+              return "../images/plot/line.png";
+              break;
+            case "Plot.area()":
+              return "../images/plot/area.png";
+              break;
+            case "Plot.frame()":
+              return "../images/plot/frame.png";
+              break;
+            case "Plot.cell()":
+              return "../images/plot/cell.png";
+              break;
+            case "Plot.text()":
+              return "../images/plot/text.png";
+              break;
+            case "Plot.ruleX()":
+              return "../images/plot/ruleX.png";
+              break;
+            case "Plot.ruleY()":
+              return "../images/plot/ruleY.png";
+              break;
+            case "Plot.link()":
+              return "../images/plot/link.png";
+              break;
+            case "Plot.tickY()":
+              return "../images/plot/tickY.png";
+              break;
+            case "Plot.tickX()":
+              return "../images/plot/tickX.png";
+              break;
+            default:
+              return ""; 
+          }
+        }, { width: 16, height: 16})
+        .linkLabel("type")
+        .linkWidth(150)
+        .nodeTitle("info")
+        .nodeCollapse(["Plot.barY()"], { property: "key", propagate: true})
+      /*  
+        .margin({top: 50, right: 10, bottom: 20, left: 300})
+        .nodeImageFile(d => d.data.flag, {width: 23, height: 15, })
+        .nodeLabelPadding(15)
+        .propagateValue("density")
+        .linkWidth("population_2019")
+        .linkLabel("population_2019", {format: "+,.2%"})
+        .nodeSort("population_2019")
+        //.nodeCollapse(["World$Asia","World$Europe"])
+        // .nodeCollapse([2,1], { property: "depth", propagate: false})
+        .nodeCollapse(["World"])//, { property: "key", propagate: false})
+        //.debugOn(true);
+        */
+      ;
+      
+      showChart(myChart);
+
+      /*
+      for (let i = 0; i < 3; i++) {
+        window.setTimeout(function() {
+          myChart
+          .nodeExpand([i], { property: "depth", propagate: false})
+        }, ((i + 1) * 2000));
+      }
+      */
+      
+      function showChart(_chart) {
+        d3.select("body")
+          .append("div")
+          .attr("class", "chart")
+          .call(_chart);
+      }           
+    </script>
+  </body>
+</html>  

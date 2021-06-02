@@ -368,9 +368,10 @@ function update(source, options, config){
       }
     });
 
-  nodeEnter.append("svg:title").text(function (d) {
-    return d.data[options.nodeLabelField];
-  });
+  if (options.nodeTitleOn)
+    nodeEnter.append("svg:title").text(function (d) {
+      return (options.nodeTitleField === "" || !d.data[options.nodeTitleField]) ? d.data[options.nodeLabelField] : d.data[options.nodeTitleField];
+    });
 
   nodeEnter.style("visibility", "hidden");
 
