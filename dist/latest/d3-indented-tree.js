@@ -270,8 +270,8 @@ linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
   if (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") {
     return "";
-  } // else if (typeof d.data[labelField] === "string") {
-  else if (isNaN(d.data[labelField])) {
+  } 
+  else if (isNaN(d.data[labelField]) || typeof d.data[labelField] === "string") {
     return d.data[labelField];
   } else {
     return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
@@ -296,8 +296,9 @@ linksAPI.getLinkTextTween = function(d) {
 };
 
 function isNumber(num) {
-  // return typeof(num) === "number";
-  return !isNaN(num);
+  // return !isNaN(num);
+  return !isNaN(num) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(num)); // ...and ensure strings of whitespace fail
 }
 
 linksAPI.getLinkRTranslate = function (d) {
@@ -784,6 +785,10 @@ function myChart(selection, data, options){
   createScales(options, config);
   createUpdateFunctions(options, config, data);
   // root.children.forEach(collapse);
+  if (options.nodeCollapse) {
+    // options.updateCollapse();
+    collapseTree2(options, config, true);
+  }
   update(config.root, options, config);
 }
 
@@ -874,31 +879,39 @@ function createUpdateFunctions(options, config, data){
     update(config.root, options, config);
   };
 
+  // 1
+  options.updateCollapse = function() {
+    collapseTree2(options, config, false);
+  };
+
+  options.updateExpand = function() {
+    expandTree2(options, config);
+  };
+  // end 1
+
   options.updateDefault = function() {
     update(config.root, options, config);
   };
 }
 
-function collapseTree(options, root) {
-  // 1. run: flag affected nodes
-  root.each(d => { 
-    const comparator = options.nodeCollapseProperty === "key" ? d.data[options.keyField] : d[options.nodeCollapseProperty];
-    if (options.nodeCollapseArray.includes(comparator)) {
-      d._collapse = true;
-    }
-  });
+function collapseTree2(options, config, firstTime) {
+  const root = config.root;
 
-  // 2.run: collapse nodes in post-order traversal
   root.eachAfter(node => {
-    if (node._collapse) {
+    if (collapseNode(node, options)) {
       if (options.nodeCollapsePropagate) {
         node.eachAfter(_node => collapse(_node));
       } else {
         collapse(node);
       }
-      node._collapse = null;
+      if (!firstTime) {
+        update(node, options, config);
+      }
     }
   });
+  if (firstTime) {
+    update(root, options, config);
+  }
 }
 
 function collapse(node) {
@@ -908,32 +921,34 @@ function collapse(node) {
   }
 }
 
-function expandTree(options, root) {
-  // 1. run: flag affected nodes
-  root.each(d => { 
-    const comparator = options.nodeExpandProperty === "key" ? d.data[options.keyField] : d[options.nodeExpandProperty];
-    if (options.nodeExpandArray.includes(comparator)) {
-      d._expand = true;
-    }
-  });
-
-  // 2.run: expand nodes in pre-order traversal
-  root.eachAfter(node => {
-    if (node._expand) {
-      expand(node, options.nodeExpandPropagate);
-      node._expand = null;
+function expandTree2(options, config) {
+  const root = config.root;
+  root.eachBefore(node => {
+    if (expandNode(node, options)) {
+      expand(node, options);
+      update(node, options, config);
     }
   });
 }
 
-function expand(node, propagate) {
+function expandNode(node, options) {
+  const comparator = options.nodeExpandProperty === "key" ? node.data[options.keyField] : node[options.nodeExpandProperty];
+  return (options.nodeExpandArray.includes(comparator));
+}
+
+function collapseNode(node, options) {
+  const comparator = options.nodeCollapseProperty === "key" ? node.data[options.keyField] : node[options.nodeCollapseProperty];
+  return (options.nodeCollapseArray.includes(comparator));
+}
+
+function expand(node, options) {
   if (!node.children) {
     node.children = node._children;
     node._children = null;
   }
-  if (propagate && node.children) {
-    node.children.forEach(d => expand(d, true));
-  }
+  if (node.children && (options.nodeExpandPropagate || expandNode(node.children, options))) {
+    node.children.forEach(d => expand(d, options));
+  } 
 }
 
 function click(d, options, config){
@@ -951,6 +966,8 @@ function click(d, options, config){
 
 function update(source, options, config){
   if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
+  console.log("update");
+  /** 3
   if (options.nodeCollapse) {
     collapseTree(options, config.root);
     options.nodeCollapse = false;
@@ -958,6 +975,8 @@ function update(source, options, config){
     expandTree(options, config.root);
     options.nodeExpand = false;
   }
+  3 **/
+
   // Compute the new tree layout.
   let nodes = config.tree(config.root);
   let nodesSort = [];
@@ -1105,9 +1124,10 @@ function update(source, options, config){
       }
     });
 
-  nodeEnter.append("svg:title").text(function (d) {
-    return d.data[options.nodeLabelField];
-  });
+  if (options.nodeTitleOn)
+    nodeEnter.append("svg:title").text(function (d) {
+      return (options.nodeTitleField === "" || !d.data[options.nodeTitleField]) ? d.data[options.nodeLabelField] : d.data[options.nodeTitleField];
+    });
 
   nodeEnter.style("visibility", "hidden");
 
@@ -1146,8 +1166,10 @@ function update(source, options, config){
     .transition(trans)
     .duration(options.transitionDuration);
   
-  console.log("transition: " + trans);
-  console.log("nodeUpdate.size: " + nodeUpdate.size());
+  if (options.debugOn) {
+    console.log("transition: " + trans);
+    console.log("nodeUpdate.size: " + nodeUpdate.size());
+  }
 
   nodeUpdate
     .attr("transform", d => "translate(" + d.y + "," + d.x + ") scale(1,1)");
@@ -1277,6 +1299,9 @@ function d3_template_reusable (_dataSpec) {
   options.nodeExpandArray = [];
   options.nodeExpandProperty = "key"; // "height" , "depth", "id"
   options.nodeExpandPropagate = true;
+
+  options.nodeTitleOn = true;
+  options.nodeTitleField = ""; // default: options.nodeLabelField which will be set later
 
   options.linkHeight = 20;
 
@@ -1462,7 +1487,8 @@ function d3_template_reusable (_dataSpec) {
     options.nodeCollapseArray = _;
     options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty; 
     options.nodeCollapsePropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeCollapsePropagate;
-    if (typeof options.updateDefault === "function") options.updateDefault();
+    // if (typeof options.updateDefault === "function") options.updateDefault();
+    if (typeof options.updateCollapse === "function") options.updateCollapse();
     return chartAPI;
   };
 
@@ -1473,9 +1499,24 @@ function d3_template_reusable (_dataSpec) {
     options.nodeExpandArray = _;
     options.nodeExpandProperty = _options.property || options.nodeExpandProperty; 
     options.nodeExpandPropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeExpandPropagate;
-    if (typeof options.updateDefault === "function") options.updateDefault();
+    // if (typeof options.updateDefault === "function") options.updateDefault();
+    if (typeof options.updateExpand === "function") options.updateExpand();
     return chartAPI;
   };
+  
+  chartAPI.nodeTitle = function(_ = options.nodeTitleOn) {
+    if (!arguments.length) return options.nodeTitleOn;
+    options.nodeTitleField = false;
+
+    if (typeof(_)  === "string")  {
+      options.nodeTitleField = _; 
+      options.nodeTitleOn = true;
+    } else if (typeof(_)  === "boolean") {
+      options.nodeTitleOn = _;
+    }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  }; 
 
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;

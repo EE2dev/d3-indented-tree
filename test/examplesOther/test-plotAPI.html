@@ -9,40 +9,48 @@
   
   <body>
     <script>
-      const dataSpec = {
-        source: "../data/plotAPI12.json",
-        key: "name",
-      };
-      const myScale = d3.scaleOrdinal()
-          .domain(["mark constructor", "options"])
-          .range(['green', "blue"])
-          .unknown("lightGrey");
-
-      const myChart = d3.indentedTree(dataSpec)
-        //.debugOn(true)
-        .nodeImageFile(d => d.data.url ? `../images/plot/${d.data.url}` : null, { width: 16, height: 16, setBackground: true})
-        .linkLabel("type")
-        .linkWidth(150)
-        //.linkColor("type", {scale: myScale})
-        .nodeTitle("info")
-        .nodeCollapse([1], { property: "depth", propagate: true})
-       // .nodeCollapse([".barY()"], { property: "key", propagate: true})
-      /*  
-        .margin({top: 50, right: 10, bottom: 20, left: 300})
-        .nodeImageFile(d => d.data.flag, {width: 23, height: 15, })
-        .nodeLabelPadding(15)
-        .propagateValue("density")
-        .linkWidth("population_2019")
-        .linkLabel("population_2019", {format: "+,.2%"})
-        .nodeSort("population_2019")
-        //.nodeCollapse(["World$Asia","World$Europe"])
-        // .nodeCollapse([2,1], { property: "depth", propagate: false})
-        .nodeCollapse(["World"])//, { property: "key", propagate: false})
-        //.debugOn(true);
-        */
-      ;
       
-      showChart(myChart);
+      d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {
+
+        const marks = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "mark constructor")};
+
+        const dataSpec = {
+          // source: "https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json",
+          // source: plotAPI,
+          source: marks,
+          key: "name",
+        };
+        const myScale = d3.scaleOrdinal()
+            .domain(["mark constructor", "options"])
+            .range(['green', "blue"])
+            .unknown("lightGrey");
+
+        const myChart = d3.indentedTree(dataSpec)
+          //.debugOn(true)
+          .nodeImageFile(d => d.data.url ? `https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/icons/${d.data.url}` : null, { width: 16, height: 16, setBackground: true})
+          .linkLabel("type")
+          .linkWidth(150)
+          //.linkColor("type", {scale: myScale})
+          .nodeTitle("info")
+          .nodeCollapse([1], { property: "depth", propagate: true})
+        // .nodeCollapse([".barY()"], { property: "key", propagate: true})
+        /*  
+          .margin({top: 50, right: 10, bottom: 20, left: 300})
+          .nodeImageFile(d => d.data.flag, {width: 23, height: 15, })
+          .nodeLabelPadding(15)
+          .propagateValue("density")
+          .linkWidth("population_2019")
+          .linkLabel("population_2019", {format: "+,.2%"})
+          .nodeSort("population_2019")
+          //.nodeCollapse(["World$Asia","World$Europe"])
+          // .nodeCollapse([2,1], { property: "depth", propagate: false})
+          .nodeCollapse(["World"])//, { property: "key", propagate: false})
+          //.debugOn(true);
+          */
+        ;
+        
+        showChart(myChart);
+    });
 
       /*
       for (let i = 0; i < 3; i++) {

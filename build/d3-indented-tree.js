@@ -272,10 +272,8 @@ linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField
     return "";
   } 
   else if (isNaN(d.data[labelField]) || typeof d.data[labelField] === "string") {
-    console.log("1: " + d.data[labelField]);
     return d.data[labelField];
   } else {
-    console.log(d.data[labelField]);
     return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
   }
 };
