@@ -270,10 +270,12 @@ linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
   if (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") {
     return "";
-  } // else if (typeof d.data[labelField] === "string") {
-  else if (isNaN(d.data[labelField])) {
+  } 
+  else if (isNaN(d.data[labelField]) || typeof d.data[labelField] === "string") {
+    console.log("1: " + d.data[labelField]);
     return d.data[labelField];
   } else {
+    console.log(d.data[labelField]);
     return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
   }
 };
@@ -296,8 +298,9 @@ linksAPI.getLinkTextTween = function(d) {
 };
 
 function isNumber(num) {
-  // return typeof(num) === "number";
-  return !isNaN(num);
+  // return !isNaN(num);
+  return !isNaN(num) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(num)); // ...and ensure strings of whitespace fail
 }
 
 linksAPI.getLinkRTranslate = function (d) {
@@ -1502,6 +1505,20 @@ function d3_template_reusable (_dataSpec) {
     if (typeof options.updateExpand === "function") options.updateExpand();
     return chartAPI;
   };
+  
+  chartAPI.nodeTitle = function(_ = options.nodeTitleOn) {
+    if (!arguments.length) return options.nodeTitleOn;
+    options.nodeTitleField = false;
+
+    if (typeof(_)  === "string")  {
+      options.nodeTitleField = _; 
+      options.nodeTitleOn = true;
+    } else if (typeof(_)  === "boolean") {
+      options.nodeTitleOn = _;
+    }
+    if (typeof options.updateDefault === "function") options.updateDefault();
+    return chartAPI;
+  }; 
 
   chartAPI.linkHeight = function(_) {
     if (!arguments.length) return options.linkHeight;
@@ -1572,20 +1589,6 @@ function d3_template_reusable (_dataSpec) {
     options.linkColorField = _;
     options.linkColorScale = _options.scale || options.linkColorScale;
     options.linkColorInherit = (typeof (_options.inherit) !== "undefined") ? _options.inherit : options.linkColorInherit;
-    if (typeof options.updateDefault === "function") options.updateDefault();
-    return chartAPI;
-  }; 
-
-  chartAPI.nodeTitle = function(_ = options.nodeTitleOn) {
-    if (!arguments.length) return options.nodeTitleOn;
-    options.nodeTitleField = false;
-
-    if (typeof(_)  === "string")  {
-      options.nodeTitleField = _; 
-      options.nodeTitleOn = true;
-    } else if (typeof(_)  === "boolean") {
-      options.nodeTitleOn = _;
-    }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   }; 

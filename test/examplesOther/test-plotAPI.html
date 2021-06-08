@@ -10,65 +10,23 @@
   <body>
     <script>
       const dataSpec = {
-        source: "../data/plotAPI.json",
+        source: "../data/plotAPI12.json",
         key: "name",
       };
+      const myScale = d3.scaleOrdinal()
+          .domain(["mark constructor", "options"])
+          .range(['green', "blue"])
+          .unknown("lightGrey");
+
       const myChart = d3.indentedTree(dataSpec)
-        .nodeImageFile(d => { // icons from https://github.com/twitter/twemoji
-          switch (d.data.name) {
-            case "Plot.barX()":
-              return "../images/plot/barX.png";
-              break;
-            case "Plot.barY()":
-              return "../images/plot/barY.png";
-              break;
-            case "Plot.rectX()":
-              return "../images/plot/rectX.png";
-              break;
-            case "Plot.rectY()":
-              return "../images/plot/rectY.png";
-              break;
-            case "Plot.dot()":
-              return "../images/plot/dot.png";
-              break;
-            case "Plot.line()":
-              return "../images/plot/line.png";
-              break;
-            case "Plot.area()":
-              return "../images/plot/area.png";
-              break;
-            case "Plot.frame()":
-              return "../images/plot/frame.png";
-              break;
-            case "Plot.cell()":
-              return "../images/plot/cell.png";
-              break;
-            case "Plot.text()":
-              return "../images/plot/text.png";
-              break;
-            case "Plot.ruleX()":
-              return "../images/plot/ruleX.png";
-              break;
-            case "Plot.ruleY()":
-              return "../images/plot/ruleY.png";
-              break;
-            case "Plot.link()":
-              return "../images/plot/link.png";
-              break;
-            case "Plot.tickY()":
-              return "../images/plot/tickY.png";
-              break;
-            case "Plot.tickX()":
-              return "../images/plot/tickX.png";
-              break;
-            default:
-              return ""; 
-          }
-        }, { width: 16, height: 16})
+        //.debugOn(true)
+        .nodeImageFile(d => d.data.url ? `../images/plot/${d.data.url}` : null, { width: 16, height: 16, setBackground: true})
         .linkLabel("type")
         .linkWidth(150)
+        //.linkColor("type", {scale: myScale})
         .nodeTitle("info")
-        .nodeCollapse(["Plot.barY()"], { property: "key", propagate: true})
+        .nodeCollapse([1], { property: "depth", propagate: true})
+       // .nodeCollapse([".barY()"], { property: "key", propagate: true})
       /*  
         .margin({top: 50, right: 10, bottom: 20, left: 300})
         .nodeImageFile(d => d.data.flag, {width: 23, height: 15, })

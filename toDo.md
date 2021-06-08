@@ -128,6 +128,8 @@ https://gitlab.com/snippets/1703535
   [ok] update main example
 
   [ok] nodeImageFile : if no image is provided, e.g. for internal nodes, fall back to default svg node
+
+  [bug] linkLabel if "" or undefined -> 0 not ""
   [] nodeImageFile : allow default size
   [] country example
   [] country correct percentages as decimal (also in readme)

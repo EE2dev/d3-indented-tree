@@ -86,8 +86,8 @@ linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
 linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
   if (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") {
     return "";
-  } // else if (typeof d.data[labelField] === "string") {
-  else if (isNaN(d.data[labelField])) {
+  } 
+  else if (isNaN(d.data[labelField]) || typeof d.data[labelField] === "string") {
     return d.data[labelField];
   } else {
     return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
@@ -112,8 +112,9 @@ linksAPI.getLinkTextTween = function(d) {
 };
 
 function isNumber(num) {
-  // return typeof(num) === "number";
-  return !isNaN(num);
+  // return !isNaN(num);
+  return !isNaN(num) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(num)); // ...and ensure strings of whitespace fail
 }
 
 linksAPI.getLinkRTranslate = function (d) {
