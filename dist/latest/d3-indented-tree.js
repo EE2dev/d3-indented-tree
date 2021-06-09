@@ -896,15 +896,17 @@ function createUpdateFunctions(options, config, data){
 
 function collapseTree2(options, config, firstTime) {
   const root = config.root;
+  let alreadyCollapsed = false;
 
   root.eachAfter(node => {
     if (collapseNode(node, options)) {
+      alreadyCollapsed = node.children ? false : true;
       if (options.nodeCollapsePropagate) {
         node.eachAfter(_node => collapse(_node));
       } else {
         collapse(node);
       }
-      if (!firstTime) {
+      if (!firstTime && !alreadyCollapsed) {
         update(node, options, config);
       }
     }
