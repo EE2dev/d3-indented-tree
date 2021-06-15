@@ -126,9 +126,12 @@ https://gitlab.com/snippets/1703535
   [ok] update Readme
   [ok] update blocks
   [ok] update main example
-
   [ok] nodeImageFile : if no image is provided, e.g. for internal nodes, fall back to default svg node
+  [ok] fixed wrong end position of collapse
 
+  [] blocks for expand, collapse, set level
+  [] slow collapse performance
+  [] add collapse/ expand example in readme
   [] nodeImageFile : allow default size
   [] country example
   [] country correct percentages as decimal (also in readme)
@@ -151,6 +154,7 @@ https://gitlab.com/snippets/1703535
   - nfl super bowl
   - luka doncics playoff run
   - Bayern Munich
+  - plotAPI
 
 [1] - linkLabel transition like node-bars ( and inner condition numStar * num <0 && watch)-> transition values, change text-anchor
 [2] set range + domain of scale of linkWidth like nodeBar

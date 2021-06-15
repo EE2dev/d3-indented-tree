@@ -141,7 +141,7 @@ function createUpdateFunctions(options, config, data){
 function collapseTree2(options, config, firstTime) {
   const root = config.root;
   let alreadyCollapsed = false;
-
+  const t0 = performance.now();
   root.eachAfter(node => {
     if (collapseNode(node, options)) {
       alreadyCollapsed = node.children ? false : true;
@@ -158,6 +158,8 @@ function collapseTree2(options, config, firstTime) {
   if (firstTime) {
     update(root, options, config);
   }
+  const t1 = performance.now();
+  console.log("1 - Call to doSomething took " + (t1 - t0) + " milliseconds.");
 }
 
 function collapse(node) {

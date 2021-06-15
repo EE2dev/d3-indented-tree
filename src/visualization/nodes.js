@@ -86,6 +86,7 @@ nodesAPI.appendNodeImage = function (selection) {
     .attr("xlink:href", options.nodeImageFileAppend)
     .attr("width", options.nodeImageWidth)
     .attr("height", options.nodeImageHeight)
+    .attr("preserveAspectRatio", options.nodeImagePreserveAspectRatio)
     .attr("x", options.nodeImageX)
     .attr("y", options.nodeImageY);
 

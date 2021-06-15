@@ -517,6 +517,7 @@ nodesAPI.appendNodeImage = function (selection) {
     .attr("xlink:href", options$1.nodeImageFileAppend)
     .attr("width", options$1.nodeImageWidth)
     .attr("height", options$1.nodeImageHeight)
+    .attr("preserveAspectRatio", options$1.nodeImagePreserveAspectRatio)
     .attr("x", options$1.nodeImageX)
     .attr("y", options$1.nodeImageY);
 
@@ -897,7 +898,7 @@ function createUpdateFunctions(options, config, data){
 function collapseTree2(options, config, firstTime) {
   const root = config.root;
   let alreadyCollapsed = false;
-
+  const t0 = performance.now();
   root.eachAfter(node => {
     if (collapseNode(node, options)) {
       alreadyCollapsed = node.children ? false : true;
@@ -914,6 +915,8 @@ function collapseTree2(options, config, firstTime) {
   if (firstTime) {
     update(root, options, config);
   }
+  const t1 = performance.now();
+  console.log("1 - Call to doSomething took " + (t1 - t0) + " milliseconds.");
 }
 
 function collapse(node) {
@@ -1266,6 +1269,7 @@ function d3_template_reusable (_dataSpec) {
   options.nodeImageHeight = 10;
   options.nodeImageX = options.nodeImageWidth / 2;
   options.nodeImageY = options.nodeImageHeight / 2;
+  options.nodeImagePreserveAspectRatio = undefined;
   options.nodeImageSelectionAppend = undefined;
   options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
 
@@ -1454,6 +1458,7 @@ function d3_template_reusable (_dataSpec) {
     options.nodeImageHeight = _options.height || options.nodeImageHeight;
     options.nodeImageX = _options.x || -1 * options.nodeImageWidth / 2;
     options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
+    options.nodeImagePreserveAspectRatio = _options.preserveAspectRatio || options.nodeImagePreserveAspectRatio;
     // options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
     options.nodeImageSetBackground = (typeof (_options.setBackground) !== "undefined") ? _options.setBackground : options.nodeImageSetBackground;
     options.nodeImageDefault = (typeof (_options.default) !== "undefined") ? _options.default : options.nodeImageDefault;

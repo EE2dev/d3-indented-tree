@@ -49,6 +49,7 @@ export default function (_dataSpec) {
   options.nodeImageHeight = 10;
   options.nodeImageX = options.nodeImageWidth / 2;
   options.nodeImageY = options.nodeImageHeight / 2;
+  options.nodeImagePreserveAspectRatio = undefined;
   options.nodeImageSelectionAppend = undefined;
   options.nodeImageSelectionUpdate = undefined; // if node changes depending on it is expandable or not
 
@@ -238,6 +239,7 @@ export default function (_dataSpec) {
     options.nodeImageHeight = _options.height || options.nodeImageHeight;
     options.nodeImageX = _options.x || -1 * options.nodeImageWidth / 2;
     options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
+    options.nodeImagePreserveAspectRatio = _options.preserveAspectRatio || options.nodeImagePreserveAspectRatio;
     // options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
     options.nodeImageSetBackground = (typeof (_options.setBackground) !== "undefined") ? _options.setBackground : options.nodeImageSetBackground;
     options.nodeImageDefault = (typeof (_options.default) !== "undefined") ? _options.default : options.nodeImageDefault;

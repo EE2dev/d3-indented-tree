@@ -1,9 +1,9 @@
 <!DOCTYPE html>
   <meta charset="utf-8">
   <head>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
-    <!--script src="../../build/d3-indented-tree.js"></script-->
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script-->
+    <script src="../../build/d3-indented-tree.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
     <style>
       /*https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_button_group */
@@ -50,14 +50,16 @@
 
     <script>
       
-      d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {
-
+      // d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {
+        d3.json("../data/plotAPI26.json").then(plotAPI => {
+        
         const marks = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "mark constructor")};
+        const options = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "options")};
 
         const dataSpec = {
           // source: "https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json",
           // source: plotAPI,
-          source: marks,
+          source: options,
           key: "name",
         };
         const myScale = d3.scaleOrdinal()
@@ -67,7 +69,8 @@
 
         const myChart = d3.indentedTree(dataSpec)
           //.debugOn(true)
-          .nodeImageFile(d => d.data.url ? `https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/icons/${d.data.url}` : null, { width: 16, height: 16, setBackground: true})
+          .nodeImageFile(d => d.data.url ? `https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/icons/${d.data.url}` : null, {
+            width:20, height:20, preserveAspectRatio: "none" ,setBackground: true})
           .linkLabel("type")
           .linkWidth(150)
           //.linkColor("type", {scale: myScale})
@@ -110,7 +113,10 @@
         };
         const collapse = document.getElementById('input-collapse');
         collapse.onclick = function() {
-          _myChart.nodeCollapse([1], { property: "depth", propagate: true});
+          const t0 = performance.now();
+          _myChart.nodeCollapse([0], { property: "depth", propagate: false});
+          const t1 = performance.now();
+          console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
         };
       } 
 
