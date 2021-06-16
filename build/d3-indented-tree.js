@@ -1664,6 +1664,8 @@ function d3_template_reusable (_dataSpec) {
     myData.isJSON = typeof (myData.data) === "object";
     if (!myData.isJSON){
       myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
+    } else {
+      myData.fromFile = false;
     }
 
     options.keyField = myData.keyField;

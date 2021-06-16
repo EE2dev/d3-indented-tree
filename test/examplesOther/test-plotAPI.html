@@ -1,12 +1,10 @@
 <!DOCTYPE html>
   <meta charset="utf-8">
   <head>
-    <script src="https://d3js.org/d3.v6.js"></script>
-    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script-->
-    <script src="../../build/d3-indented-tree.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
     <style>
-      /*https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_button_group */
       div.header:after {
         content: "";
         display: table;
@@ -24,12 +22,12 @@
     <div class="header">
       <h1>The plot API</h1>
         <div class="input">
-          <label for="tree">Select Tree:</label>
+          <label for="tree">Select tree:</label>
           <select name="tree" id="tree">
-            <option value="marks">Marks</option>
-            <option value="transforms">Transforms</option>
-            <option value="format">Formats</option>
-            <option value="options">Options</option>
+            <option value="marks">marks</option>
+            <option value="transforms">transforms</option>
+            <option value="format">formats</option>
+            <option value="options">options</option>
           </select>
         </div>
         <div class="input">
@@ -43,89 +41,87 @@
           </select>
         </div>
         <div class="input">
-          <label for="collapse">Reduce tree:</label>
-          <button id="input-collapse">Collapse</button>
+          <label for="collapse">Reset tree:</label>
+          <button id="input-collapse">collapse</button>
         </div>
     </div>
 
-    <script>
-      
-      // d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {
-        d3.json("../data/plotAPI26.json").then(plotAPI => {
-        
-        const marks = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "mark constructor")};
-        const options = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "options")};
+    <div class="chart"></div>
 
-        const dataSpec = {
-          // source: "https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json",
-          // source: plotAPI,
-          source: options,
+    <script>
+      let myChart;
+      let settings = {};
+
+      d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {      
+        settings.marks = {};
+        settings.marks.data = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "mark constructor")};
+        settings.marks.nodeImageObject = { width: 16, height: 16, setBackground: true};
+        settings.marks.depth = 1;
+        settings.options = {};
+        settings.options.data = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "options")};
+        settings.options.nodeImageObject = {x: -35, width:40, height:16, preserveAspectRatio: "none" ,setBackground: true};
+        settings.options.depth = 3;
+        settings.format = {};
+        settings.format.data = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "format")};
+        settings.format.nodeImageObject = { width: 16, height: 16, setBackground: true};
+        settings.format.depth = 1;
+        settings.transforms = {};
+        settings.transforms.data = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "option transform")};
+        settings.transforms.nodeImageObject = { width: 16, height: 16, setBackground: true};
+        settings.transforms.depth = 1;
+
+        settings.dataSpec = {
+          source: settings.marks.data,
           key: "name",
         };
-        const myScale = d3.scaleOrdinal()
-            .domain(["mark constructor", "options"])
-            .range(['green', "blue"])
-            .unknown("lightGrey");
+        
+        initializeTree(settings.dataSpec, settings.marks.nodeImageObject, settings.marks.depth);
+        d3.select("div.chart").call(myChart);
+        initializeEventListeners(myChart);
+      });
 
-        const myChart = d3.indentedTree(dataSpec)
-          //.debugOn(true)
-          .nodeImageFile(d => d.data.url ? `https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/icons/${d.data.url}` : null, {
-            width:20, height:20, preserveAspectRatio: "none" ,setBackground: true})
+      function initializeTree(_dataSpec, _nodeImageObject, _depth) {
+        myChart = d3.indentedTree(settings.dataSpec)
+          .nodeImageFile(d => d.data.url ? `https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/icons/${d.data.url}` : null,  _nodeImageObject)
           .linkLabel("type")
           .linkWidth(150)
-          //.linkColor("type", {scale: myScale})
           .nodeTitle("info")
-          .nodeCollapse([1], { property: "depth", propagate: true})
-
-        // .nodeCollapse([".barY()"], { property: "key", propagate: true})
-        /*  
-          .margin({top: 50, right: 10, bottom: 20, left: 300})
-          .nodeImageFile(d => d.data.flag, {width: 23, height: 15, })
-          .nodeLabelPadding(15)
-          .propagateValue("density")
-          .linkWidth("population_2019")
-          .linkLabel("population_2019", {format: "+,.2%"})
-          .nodeSort("population_2019")
-          //.nodeCollapse(["World$Asia","World$Europe"])
-          // .nodeCollapse([2,1], { property: "depth", propagate: false})
-          .nodeCollapse(["World"])//, { property: "key", propagate: false})
-          //.debugOn(true);
-          */
-        ;
-        
-        showChart(myChart);
-        initializeEventListeners(myChart);
-    });
-
-      /*
-      for (let i = 0; i < 3; i++) {
-        window.setTimeout(function() {
-          myChart
-          .nodeExpand([i], { property: "depth", propagate: false})
-        }, ((i + 1) * 2000));
+          .nodeCollapse(_depth, { property: "depth", propagate: true});
       }
-      */
+
+      function showNewTree(_selection) {
+        myChart.nodeCollapse([0], { property: "depth", propagate: false});
+
+        d3.select("div.chart svg")
+          .transition()
+          .duration(750)
+          .style("opacity", 0)
+          .on("end", function() {
+            d3.select(this).remove();
+            settings.dataSpec.source = settings[_selection].data;
+            initializeTree(settings.dataSpec, settings[_selection].nodeImageObject, settings[_selection].depth);
+            d3.select("div.chart").call(myChart);
+          })
+      }        
+      
       function initializeEventListeners(_myChart) {
+        const tree = document.getElementById('tree');
+        tree.onchange = function() {
+          const selection = this.options[this.selectedIndex].value;
+          showNewTree(selection);
+        };
+
         const sort = document.getElementById('input-sort');
         sort.onchange = function() {
           const selection = this.options[this.selectedIndex].value.split("-");
-          _myChart.nodeSort(selection[0], {ascending: (selection[1] === "asc") ? true : false});
+          myChart.nodeSort(selection[0], {ascending: (selection[1] === "asc") ? true : false});
         };
+
         const collapse = document.getElementById('input-collapse');
         collapse.onclick = function() {
-          const t0 = performance.now();
-          _myChart.nodeCollapse([0], { property: "depth", propagate: false});
-          const t1 = performance.now();
-          console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
+          myChart.nodeCollapse([0], { property: "depth", propagate: true});
         };
-      } 
-
-      function showChart(_chart) {
-        d3.select("body")
-          .append("div")
-          .attr("class", "chart")
-          .call(_chart);
-      }           
+      }   
     </script>
   </body>
 </html>  
