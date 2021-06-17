@@ -788,7 +788,7 @@ function myChart(selection, data, options){
   // root.children.forEach(collapse);
   if (options.nodeCollapse) {
     // options.updateCollapse();
-    collapseTree2(options, config, true);
+    collapseTree(options, config, true);
   }
   update(config.root, options, config);
 }
@@ -882,11 +882,11 @@ function createUpdateFunctions(options, config, data){
 
   // 1
   options.updateCollapse = function() {
-    collapseTree2(options, config, false);
+    collapseTree(options, config, false);
   };
 
   options.updateExpand = function() {
-    expandTree2(options, config);
+    expandTree(options, config);
   };
   // end 1
 
@@ -895,11 +895,35 @@ function createUpdateFunctions(options, config, data){
   };
 }
 
+function collapseTree(options, config, firstTime) {
+  const root = [];
+  config.root.eachAfter(node => root.push(node));
+  let alreadyCollapsed = false;
+  for (let node of root) {
+    if (collapseNode(node, options)) {
+      alreadyCollapsed = node.children ? false : true;
+      if (options.nodeCollapsePropagate) {
+        node.eachAfter(_node => collapse(_node));
+      } else {
+        collapse(node);
+      }
+      if (!firstTime && !alreadyCollapsed) {
+        update(node, options, config);
+      }
+    }
+  }
+  if (firstTime) {
+    update(config.root, options, config);
+  }
+}
+
+/*
 function collapseTree2(options, config, firstTime) {
   const root = config.root;
   let alreadyCollapsed = false;
   const t0 = performance.now();
   root.eachAfter(node => {
+    console.log("root.length: " + root.ancestors.length);
     if (collapseNode(node, options)) {
       alreadyCollapsed = node.children ? false : true;
       if (options.nodeCollapsePropagate) {
@@ -918,6 +942,7 @@ function collapseTree2(options, config, firstTime) {
   const t1 = performance.now();
   console.log("1 - Call to doSomething took " + (t1 - t0) + " milliseconds.");
 }
+*/
 
 function collapse(node) {
   if (node.children) {
@@ -926,14 +951,15 @@ function collapse(node) {
   }
 }
 
-function expandTree2(options, config) {
-  const root = config.root;
-  root.eachBefore(node => {
+function expandTree(options, config) {
+  const root = [];
+  config.root.eachBefore(node => root.push(node));
+  for (let node of root) {
     if (expandNode(node, options)) {
       expand(node, options);
       update(node, options, config);
     }
-  });
+  }
 }
 
 function expandNode(node, options) {
@@ -951,8 +977,12 @@ function expand(node, options) {
     node.children = node._children;
     node._children = null;
   }
-  if (node.children && (options.nodeExpandPropagate || expandNode(node.children, options))) {
-    node.children.forEach(d => expand(d, options));
+  if (node.children) {
+    node.children.forEach(d => {
+      if (options.nodeExpandPropagate || expandNode(d, options)) { 
+        expand(d, options);
+      }
+    });
   } 
 }
 
@@ -1664,6 +1694,8 @@ function d3_template_reusable (_dataSpec) {
     myData.isJSON = typeof (myData.data) === "object";
     if (!myData.isJSON){
       myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
+    } else {
+      myData.fromFile = false;
     }
 
     options.keyField = myData.keyField;
