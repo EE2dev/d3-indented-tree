@@ -129,7 +129,7 @@ function createUpdateFunctions(options, config, data){
   };
 
   options.updateExpand = function() {
-    expandTree2(options, config);
+    expandTree(options, config);
   };
   // end 1
 
@@ -169,14 +169,15 @@ function collapse(node) {
   }
 }
 
-function expandTree2(options, config) {
-  const root = config.root;
-  root.eachBefore(node => {
+function expandTree(options, config) {
+  const root = [];
+  config.root.eachBefore(node => root.push(node));
+  for (let node of root) {
     if (expandNode(node, options)) {
       expand(node, options);
       update(node, options, config);
     }
-  });
+  }
 }
 
 function expandNode(node, options) {
@@ -194,10 +195,25 @@ function expand(node, options) {
     node.children = node._children;
     node._children = null;
   }
+  if (node.children) {
+    node.children.forEach(d => {
+      if (options.nodeExpandPropagate || expandNode(d, options)) { 
+        expand(d, options);
+      }
+    });
+  } 
+}
+/*
+function expand(node, options) {
+  if (!node.children) {
+    node.children = node._children;
+    node._children = null;
+  }
   if (node.children && (options.nodeExpandPropagate || expandNode(node.children, options))) {
     node.children.forEach(d => expand(d, options));
   } 
 }
+*/
 
 function click(d, options, config){
   if (d.children) {
