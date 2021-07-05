@@ -2,8 +2,7 @@
   <meta charset="utf-8">
   <head>
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    <!--script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script-->
-    <script src="../../build/d3-indented-tree.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
     <style>
       div.header:after {
@@ -38,7 +37,7 @@
   
   <body>
     <div class="header">
-      <h1>The plot API</h1>
+      <h1>The plot API v0.1.0</h1>
         <div class="input">
           <label for="tree">Select tree:</label>
           <select name="tree" id="tree">
@@ -73,7 +72,8 @@
       let myChart;
       let settings = {};
 
-      d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {      
+      // d3.json("https://cdn.jsdelivr.net/gh/EE2dev/plotAPI/plotAPI.json").then(plotAPI => {
+        d3.json("../data/plotAPI34.json").then(plotAPI => {      
         settings.marks = {};
         settings.marks.data = { name: "Plot", children: plotAPI.children.filter((d) => d.type === "mark constructor")};
         settings.marks.nodeImageObject = { width: 16, height: 16, setBackground: true};
@@ -112,30 +112,16 @@
 
       function showNewTree(_selection) {
         myChart.nodeCollapse([0], { property: "depth", propagate: false});
-
-        setTimeout(function(){ 
-          d3.select("div.chart svg").remove(); 
-          settings.dataSpec.source = settings[_selection].data;
-          // initializeTree(settings.dataSpec, settings[_selection].nodeImageObject, settings[_selection].depth);
-          initializeTree(settings.dataSpec, settings[_selection].nodeImageObject, 0);
-          myChart.transitionDuration(0);
-          d3.select("div.chart").call(myChart); 
-          myChart.transitionDuration(750).nodeExpand(settings[_selection].depth, { property: "depth", propagate: true});;
-        }, 750);
-          
-        
-        /*
         d3.select("div.chart svg")
-          .transition()
-          .duration(750)
-          //.style("opacity", 0)
-          .on("end", function() {
-            // d3.select(this).remove();
-            settings.dataSpec.source = settings[_selection].data;
-            initializeTree(settings.dataSpec, settings[_selection].nodeImageObject, settings[_selection].depth);
-            d3.select("div.chart").call(myChart);
-          })
-          */
+        .transition()
+        .duration(750)
+        .style("opacity", 0)
+        .on("end", function() {
+          d3.select(this).remove();
+          settings.dataSpec.source = settings[_selection].data;
+          initializeTree(settings.dataSpec, settings[_selection].nodeImageObject, settings[_selection].depth);
+          d3.select("div.chart").call(myChart);
+        })
       }        
       
       function initializeEventListeners(_myChart) {

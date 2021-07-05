@@ -8,6 +8,7 @@ This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mb
 ## Examples
 
 - [d3-indented-tree - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
+- [Plot API](https://ee2dev.github.io/plot/)
 
 More examples demonstrating specific API calls:
 
