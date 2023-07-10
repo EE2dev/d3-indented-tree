@@ -3,68 +3,68 @@
 Visualizing a hierarchy with a configurable indented tree.
 
 ## Credits
-This approach is based on [this bl.ock from Mike Bostock](https://bl.ocks.org/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
+This approach is based on [this bl.ock from Mike Bostock](https://blocks.roadtolarissa.com/mbostock/1093025) and [this codepen by Brendan Dougan](https://codepen.io/brendandougan/pen/PpEzRp) and is implemented with [d3-template](https://github.com/EE2dev/d3-template) as a reusable d3 chart.
 
 ## Examples
 
-- [d3-indented-tree - showcase](https://bl.ocks.org/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
+- [d3-indented-tree - showcase](https://blocks.roadtolarissa.com/EE2dev/62d28e7f41a5c37cdfef99a021a42972)
 - [Plot API](https://ee2dev.github.io/plot/)
 
 More examples demonstrating specific API calls:
 
 #### Data Format examples
 
-- [data format - JSON file (readme example)](https://bl.ocks.org/EE2dev/2dac1c1714b456bc427bb7f5beaeca87)
-- [data format - hierarchical csv file (readme example)](https://bl.ocks.org/EE2dev/eb865fd642723365272c89f94e52e48f)
-- [data format - relational csv file (readme example)](https://bl.ocks.org/EE2dev/08d87f3b57e25aa8311e857b8a582575)
-- [data format - JSON data from variable](https://bl.ocks.org/EE2dev/c5abbb6eb05564512ebf3b630440c0f7)
-- [data format - relational csv file](https://bl.ocks.org/EE2dev/9b1959d2631892656f36d849a614e6ba)
-- [data format - relational csv file - 2](https://bl.ocks.org/EE2dev/baf7343706b595ec9e49758ec4ab0437)
-- [data format - relational csv data embedded](https://bl.ocks.org/EE2dev/c823a392791797a1a021e3eb268a1502)
-- [data format - hierarchical csv file](https://bl.ocks.org/EE2dev/06652de4cf888e2a8bb16c76642ee05f)
-- [data format - hierarchical csv file, different key](https://bl.ocks.org/EE2dev/f671f8f70ac355950572a45fa0cde022)
-- [data format - hierarchical csv data embedded](https://bl.ocks.org/EE2dev/93fa64a7ad4c1d24a0be845c5c1f5f0b)
-- [data format - hierarchical csv data embedded, different key](https://bl.ocks.org/EE2dev/4fadf0f3bac11206ba2185c626a508b7)
+- [data format - JSON file (readme example)](https://blocks.roadtolarissa.com/EE2dev/2dac1c1714b456bc427bb7f5beaeca87)
+- [data format - hierarchical csv file (readme example)](https://blocks.roadtolarissa.com/EE2dev/eb865fd642723365272c89f94e52e48f)
+- [data format - relational csv file (readme example)](https://blocks.roadtolarissa.com/EE2dev/08d87f3b57e25aa8311e857b8a582575)
+- [data format - JSON data from variable](https://blocks.roadtolarissa.com/EE2dev/c5abbb6eb05564512ebf3b630440c0f7)
+- [data format - relational csv file](https://blocks.roadtolarissa.com/EE2dev/9b1959d2631892656f36d849a614e6ba)
+- [data format - relational csv file - 2](https://blocks.roadtolarissa.com/EE2dev/baf7343706b595ec9e49758ec4ab0437)
+- [data format - relational csv data embedded](https://blocks.roadtolarissa.com/EE2dev/c823a392791797a1a021e3eb268a1502)
+- [data format - hierarchical csv file](https://blocks.roadtolarissa.com/EE2dev/06652de4cf888e2a8bb16c76642ee05f)
+- [data format - hierarchical csv file, different key](https://blocks.roadtolarissa.com/EE2dev/f671f8f70ac355950572a45fa0cde022)
+- [data format - hierarchical csv data embedded](https://blocks.roadtolarissa.com/EE2dev/93fa64a7ad4c1d24a0be845c5c1f5f0b)
+- [data format - hierarchical csv data embedded, different key](https://blocks.roadtolarissa.com/EE2dev/4fadf0f3bac11206ba2185c626a508b7)
 
 #### API examples to customize the links
 
-- [myChart.linkColor()](https://bl.ocks.org/EE2dev/54fe30f1213b216575dcf300ee3ad4c0)
-- [myChart.linkColor() - 2](https://bl.ocks.org/EE2dev/c0fd7569102e194013e68855a7bb1076)
-- [myChart.linkHeight()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
-- [myChart.linkLabel()](https://bl.ocks.org/EE2dev/423d4e8c040bed8d96e9b72e65ae8999)
-- [myChart.linkLabel() - 2](https://bl.ocks.org/EE2dev/e17f3e4930eb8b35cce66cf7aa0b462f)
-- [myChart.linkLabel() - 3](https://bl.ocks.org/EE2dev/10a3dba82372163a96de6632ca72c7a0)
-- [myChart.linkLabel() - 4](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
-- [myChart.linkLabel() - 5](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
-- [myChart.linkStrength()](https://bl.ocks.org/EE2dev/813d21f53643acce75c1794141746245)
-- [myChart.linkStrength() - 2](https://bl.ocks.org/EE2dev/84e22c8fa7a4b5fb202f7ce6fdb93b6e)
-- [myChart.linkStrength() - 3](https://bl.ocks.org/EE2dev/d2cf606e3a86bb268c5016a32f7ec9a7)
-- [myChart.linkWidth()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
-- [myChart.linkWidth() - 2](https://bl.ocks.org/EE2dev/3896ed6a6e221762355a15fbf7c49832)
+- [myChart.linkColor()](https://blocks.roadtolarissa.com/EE2dev/54fe30f1213b216575dcf300ee3ad4c0)
+- [myChart.linkColor() - 2](https://blocks.roadtolarissa.com/EE2dev/c0fd7569102e194013e68855a7bb1076)
+- [myChart.linkHeight()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.linkLabel()](https://blocks.roadtolarissa.com/EE2dev/423d4e8c040bed8d96e9b72e65ae8999)
+- [myChart.linkLabel() - 2](https://blocks.roadtolarissa.com/EE2dev/e17f3e4930eb8b35cce66cf7aa0b462f)
+- [myChart.linkLabel() - 3](https://blocks.roadtolarissa.com/EE2dev/10a3dba82372163a96de6632ca72c7a0)
+- [myChart.linkLabel() - 4](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.linkLabel() - 5](https://blocks.roadtolarissa.com/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
+- [myChart.linkStrength()](https://blocks.roadtolarissa.com/EE2dev/813d21f53643acce75c1794141746245)
+- [myChart.linkStrength() - 2](https://blocks.roadtolarissa.com/EE2dev/84e22c8fa7a4b5fb202f7ce6fdb93b6e)
+- [myChart.linkStrength() - 3](https://blocks.roadtolarissa.com/EE2dev/d2cf606e3a86bb268c5016a32f7ec9a7)
+- [myChart.linkWidth()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.linkWidth() - 2](https://blocks.roadtolarissa.com/EE2dev/3896ed6a6e221762355a15fbf7c49832)
 
 #### API examples to customize the nodes
 
-- [myChart.nodeBar()](https://bl.ocks.org/EE2dev/43cb20a616ebce5c968ab73306935cc8)
-- [myChart.nodeBar() - 2](https://bl.ocks.org/EE2dev/74caee55c7ceafdd51ffcbd0a84bbf4d)
-- [myChart.nodeBar() - 3](https://bl.ocks.org/EE2dev/6a7b128ebc25b5e84a90e5af73c117ec)
-- [myChart.nodeBar() - 4](https://bl.ocks.org/EE2dev/01878dc1794f0c0a28e53328d8f040a2)
-- [myChart.nodeImageFile()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
-- [myChart.nodeImageFile() - 2](https://bl.ocks.org/EE2dev/ca01964c928a37de65bd429f8f094a1c)
-- [myChart.nodeImageSelection()](https://bl.ocks.org/EE2dev/43fffd334158b6d10454e5b8c6689786)
-- [myChart.nodeImageSelection() - 2](https://bl.ocks.org/EE2dev/cd5567cccdecb65d59a6cab1fd6ecab2)
-- [myChart.nodeLabelPadding()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
-- [myChart.nodeSort()](https://bl.ocks.org/EE2dev/0e65cb00f7a55f9f5944e5f7e6ded08c)
-- [myChart.nodeSort() - 2](https://bl.ocks.org/EE2dev/7d866c0fd487fd42402832f9c8d3c6c3)
-- [myChart.nodeSort() - 3](https://bl.ocks.org/EE2dev/bacefc18f4e714db1fa7b44f9c5cf677)
+- [myChart.nodeBar()](https://blocks.roadtolarissa.com/EE2dev/43cb20a616ebce5c968ab73306935cc8)
+- [myChart.nodeBar() - 2](https://blocks.roadtolarissa.com/EE2dev/74caee55c7ceafdd51ffcbd0a84bbf4d)
+- [myChart.nodeBar() - 3](https://blocks.roadtolarissa.com/EE2dev/6a7b128ebc25b5e84a90e5af73c117ec)
+- [myChart.nodeBar() - 4](https://blocks.roadtolarissa.com/EE2dev/01878dc1794f0c0a28e53328d8f040a2)
+- [myChart.nodeImageFile()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.nodeImageFile() - 2](https://blocks.roadtolarissa.com/EE2dev/ca01964c928a37de65bd429f8f094a1c)
+- [myChart.nodeImageSelection()](https://blocks.roadtolarissa.com/EE2dev/43fffd334158b6d10454e5b8c6689786)
+- [myChart.nodeImageSelection() - 2](https://blocks.roadtolarissa.com/EE2dev/cd5567cccdecb65d59a6cab1fd6ecab2)
+- [myChart.nodeLabelPadding()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.nodeSort()](https://blocks.roadtolarissa.com/EE2dev/0e65cb00f7a55f9f5944e5f7e6ded08c)
+- [myChart.nodeSort() - 2](https://blocks.roadtolarissa.com/EE2dev/7d866c0fd487fd42402832f9c8d3c6c3)
+- [myChart.nodeSort() - 3](https://blocks.roadtolarissa.com/EE2dev/bacefc18f4e714db1fa7b44f9c5cf677)
 
 #### Other examples
 
-- [custom convertTypes function](https://bl.ocks.org/EE2dev/bacefc18f4e714db1fa7b44f9c5cf677)
-- [myChart.alignLeaves()](https://bl.ocks.org/EE2dev/6b2875538761cc8828a62275aea9456d)
-- [myChart.defaultColor()](https://bl.ocks.org/EE2dev/530af345027f9bf4e63fe845d7173efa)
-- [myChart.formatDefaultLocale()](https://bl.ocks.org/EE2dev/10a3dba82372163a96de6632ca72c7a0)
-- [myChart.margin()](https://bl.ocks.org/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
-- [myChart.propagateValue()](https://bl.ocks.org/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
+- [custom convertTypes function](https://blocks.roadtolarissa.com/EE2dev/bacefc18f4e714db1fa7b44f9c5cf677)
+- [myChart.alignLeaves()](https://blocks.roadtolarissa.com/EE2dev/6b2875538761cc8828a62275aea9456d)
+- [myChart.defaultColor()](https://blocks.roadtolarissa.com/EE2dev/530af345027f9bf4e63fe845d7173efa)
+- [myChart.formatDefaultLocale()](https://blocks.roadtolarissa.com/EE2dev/10a3dba82372163a96de6632ca72c7a0)
+- [myChart.margin()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
+- [myChart.propagateValue()](https://blocks.roadtolarissa.com/EE2dev/ce4aca1b40c8d73b239909719e8bef86)
 
 
 ## 1. How to use d3-indented-tree
