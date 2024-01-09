@@ -129,6 +129,9 @@ https://gitlab.com/snippets/1703535
   [ok] nodeImageFile : if no image is provided, e.g. for internal nodes, fall back to default svg node
   [ok] fixed wrong end position of collapse
 
+--- 09.01.2024
+ [deferred] when switching from d3.jsv6.0 to v6.7. scaleLinear returns null for scale(null) (previous 0), causing an error for nodeBars for the root node (no further effect
+
   [] blocks for expand, collapse, set level
   [] slow collapse performance
   [] add collapse/ expand example in readme
