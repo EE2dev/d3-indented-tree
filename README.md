@@ -421,7 +421,7 @@ Collapses the tree at the specified nodes.
 
 2. argument: (optional):
     * An *object* with the following properties can be used to further specify the mapping: 
-        * `property` specifies the node property node image (default is `"key"`). Note that `"key"` might deviate from the displayed node name. Other options are:
+        * `property` specifies the node property (default is `"key"`). Note that `"key"` might deviate from the displayed node name. Other options are:
           * `"id"`: the node id
           * `"depth"`: the depth of the node. The depth is zero for the root node, and increasing by one for each descendant generation.
           * `"height"`: the height of the node. The height is zero for leaf nodes, and the greatest distance from any descendant leaf for internal nodes.
@@ -439,7 +439,7 @@ Expands the tree at the specified nodes.
 
 2. argument: (optional):
     * An *object* with the following properties can be used to further specify the mapping: 
-        * `property` specifies the node property node image (default is `"key"`). Note that `"key"` might deviate from the displayed node name. Other options are:
+        * `property` specifies the node property (default is `"key"`). Note that `"key"` might deviate from the displayed node name. Other options are:
           * `"id"`: the node id
           * `"depth"`: the depth of the node. The depth is zero for the root node, and increasing by one for each descendant generation.
           * `"height"`: the height of the node. The height is zero for leaf nodes, and the greatest distance from any descendant leaf for internal nodes.
