@@ -1,11 +1,19 @@
 ## to do
 
+--- 09.01.2024 
+[ok] when switching from d3.jsv6.0 to v6.7. scaleLinear returns null for scale(null) (previous 0), causing an error for nodeBars for the root node (no further effect
+[ok] with no visible node having node bars setting nodeBars("col") does not work correctly. When expanding nodes with nodeBars no bars are shown 
+[ok] changing barNode column for collapsed tree leads to resetting linkWidth to default
+[ok] nodeExpand with barNodes leads to very long connectors to barNodes
 [bug] : partially collapsed tree doesn't work with myChart.linkWidth("value", d3.scaleLog(), [20, 100]), text: 'myChart.linkWidth("value, d3.scaleLog(), [20, 100]")'});
 [bug] sometimes link Label moved to left
 [bug] chainedTransitions -> fill nodesAPI.getNodeBarRectFill gets called to change to wrong color
 --> nodeSort can be chained after linkLabel/nodeBar.tween without jump and if nodeSort is called before not after
+[] import d3 as module
+[] load flag from vatican, afganistan with updated link in countries7
 
-[ok] convert tree to reusable
+
+[ok] convert tree to reusable 
 [ok] read json file
 [ok] linkStrength function or number
 [ok] put d3.hierarchy (in vis to data processing)
@@ -129,10 +137,7 @@ https://gitlab.com/snippets/1703535
   [ok] nodeImageFile : if no image is provided, e.g. for internal nodes, fall back to default svg node
   [ok] fixed wrong end position of collapse
 
---- 09.01.2024
- [deferred] when switching from d3.jsv6.0 to v6.7. scaleLinear returns null for scale(null) (previous 0), causing an error for nodeBars for the root node (no further effect
-[bug] changing barNode column for collapsed tree leads to resetting linkWidth to default
-[bug] nodeExpand with barNodes leads to very long connectors to barNodes
+
 
   [] blocks for expand, collapse, set level
   [] slow collapse performance
