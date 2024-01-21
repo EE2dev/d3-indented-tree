@@ -104,7 +104,7 @@ export default function (_dataSpec) {
   // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
   options.linkWidthStatic = true; 
   options.linkWidthValue = 30;
-  options.linkWidthScale = d3.scaleLinear();
+  options.linkWidthScale = d3.scaleLinear().clamp(true);
   options.linkWidthField = "value";
   options.linkWidthRange = [15, 100];
 
