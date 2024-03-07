@@ -1,6 +1,6 @@
 ## to do
 
---- 09.01.2024 
+--- 22.01.2024 
 [ok] when switching from d3.jsv6.0 to v6.7. scaleLinear returns null for scale(null) (previous 0), causing an error for nodeBars for the root node (no further effect
 [ok] with no visible node having node bars setting nodeBars("col") does not work correctly. When expanding nodes with nodeBars no bars are shown 
 [ok] changing barNode column for collapsed tree leads to resetting linkWidth to default
