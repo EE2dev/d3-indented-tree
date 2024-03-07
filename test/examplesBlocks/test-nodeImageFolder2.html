@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <!-- folder icons from https://github.com/KDE/oxygen-icons?tab=readme-ov-file -->
+    <aside id="data"> 
+key,parent,size,image1,image2
+webapps,,100,"../images/folder.png","../images/folder_open.png"
+docs,webapps,100,"../images/folder.png","../images/folder_open.png"
+examples,webapps,1000,"../images/folder.png","../images/folder_open.png"
+HelloWeb,webapps,600,"../images/folder.png","../images/folder_open.png"
+META-INF,HelloWeb,590,"../images/folder.png","../images/folder_open.png"
+context.xml,META-INF,300,"../images/ie9.svg","../images/ie9.svg"
+      </aside>
+  
+    <script>
+      const dataSpec = {
+        source: "aside#data",  
+      };
+      const myChart = hierarchyExplorer.chart(dataSpec)
+        .nodeImageFile(d => d._children ? d.data.image1 : d.data.image2 , { width: 20, height: 20}) 
+        .linkLabel("size",{unit: " MB", format: ",.0f", locale: "DE"})
+        .linkWidth("size",{range: [80, 200]})
+       .nodeLabelPadding(20)
+      ;
+
+      showChart();
+      
+      function showChart() {
+        const selection = d3.select("body")
+          .append("div")
+          .attr("class", "chart");
+        selection.call(myChart);
+      }         
+    </script>
+  </body>
+</html>  
