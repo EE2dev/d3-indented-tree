@@ -50,6 +50,8 @@ More examples demonstrating specific API calls:
 - [myChart.nodeBar() - 4](https://blocks.roadtolarissa.com/EE2dev/01878dc1794f0c0a28e53328d8f040a2)
 - [myChart.nodeImageFile()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)
 - [myChart.nodeImageFile() - 2](https://blocks.roadtolarissa.com/EE2dev/ca01964c928a37de65bd429f8f094a1c)
+- [myChart.nodeImageFile() - 3](https://blocks.roadtolarissa.com/EE2dev/71d6d17bc016e4037350158c2875893f)
+- [myChart.nodeImageFile() - 4](https://blocks.roadtolarissa.com/EE2dev/d6ad615b0197c2813fc231d2784fd6c9)
 - [myChart.nodeImageSelection()](https://blocks.roadtolarissa.com/EE2dev/43fffd334158b6d10454e5b8c6689786)
 - [myChart.nodeImageSelection() - 2](https://blocks.roadtolarissa.com/EE2dev/cd5567cccdecb65d59a6cab1fd6ecab2)
 - [myChart.nodeLabelPadding()](https://blocks.roadtolarissa.com/EE2dev/d9f2fbc1487b2bf89fd9ccab183c052c)

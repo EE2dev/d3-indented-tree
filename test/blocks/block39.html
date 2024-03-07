@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+  <meta charset="utf-8">
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+  </head>
+  
+  <body>
+    <!-- paste data in aside tag -->
+    <!-- folder icons from https://github.com/KDE/oxygen-icons?tab=readme-ov-file -->
+    <aside id="data"> 
+key,parent,image1,image2
+webapps,,"../images/folder.png","../images/folder_open.png"
+docs,webapps,"../images/folder.png","../images/folder_open.png"
+examples,webapps,"../images/folder.png","../images/folder_open.png"
+HelloWeb,webapps,"../images/folder.png","../images/folder_open.png"
+META-INF,HelloWeb,"../images/folder.png","../images/folder_open.png"
+context.xml,META-INF,"../images/ie9.svg","../images/ie9.svg"
+      </aside>
+  
+    <script>
+      const url = "https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/test/blocks/";
+      const dataSpec = {
+        source: "aside#data",  
+      };
+      const myChart = hierarchyExplorer.chart(dataSpec)
+       .nodeImageFile(d => d._children ? url + d.data.image1 : url + d.data.image2 , { width: 20, height: 20}) 
+       .nodeLabelPadding(20)
+      ;
+
+      showChart();
+      
+      function showChart() {
+        const selection = d3.select("body")
+          .append("div")
+          .attr("class", "chart");
+        selection.call(myChart);
+      }         
+    </script>
+  </body>
+</html>  
