@@ -1,4 +1,4 @@
-// https://github.com/EE2dev/d3-indented-tree v0.6.0 Copyright 2021 Mihael Ankerst
+// https://github.com/EE2dev/d3-indented-tree v0.6.0 Copyright 2024 Mihael Ankerst
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3')) :
 typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) :
@@ -822,9 +822,10 @@ function createScales(options, config) {
       .domain(d3.extent(nodes, d => +d.data[options.linkStrengthField]))
       .range(options.linkStrengthRange);
   }
-  if (!options.linkWidthStatic) {    
+  if (!options.linkWidthStatic) {   
+    const extent = d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]); 
     options.linkWidthScale
-      .domain(d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]))
+      .domain(extent[0] === extent[1] ? [extent[0], extent[0] + 1] : extent) // for extent [0,0] range[0] should be picked
       .range(options.linkWidthRange);
   }
   if (options.nodeBarOn && options.nodeBarUpdateScale) { 
@@ -908,41 +909,16 @@ function collapseTree(options, config, firstTime) {
         collapse(node);
       }
       if (!firstTime && !alreadyCollapsed) {
+        createScales(options, config);
         update(node, options, config);
       }
     }
   }
   if (firstTime) {
+    createScales(options, config);
     update(config.root, options, config);
   }
 }
-
-/*
-function collapseTree2(options, config, firstTime) {
-  const root = config.root;
-  let alreadyCollapsed = false;
-  const t0 = performance.now();
-  root.eachAfter(node => {
-    console.log("root.length: " + root.ancestors.length);
-    if (collapseNode(node, options)) {
-      alreadyCollapsed = node.children ? false : true;
-      if (options.nodeCollapsePropagate) {
-        node.eachAfter(_node => collapse(_node));
-      } else {
-        collapse(node);
-      }
-      if (!firstTime && !alreadyCollapsed) {
-        update(node, options, config);
-      }
-    }
-  });
-  if (firstTime) {
-    update(root, options, config);
-  }
-  const t1 = performance.now();
-  console.log("1 - Call to doSomething took " + (t1 - t0) + " milliseconds.");
-}
-*/
 
 function collapse(node) {
   if (node.children) {
@@ -957,6 +933,7 @@ function expandTree(options, config) {
   for (let node of root) {
     if (expandNode(node, options)) {
       expand(node, options);
+      createScales(options, config);
       update(node, options, config);
     }
   }
@@ -995,6 +972,7 @@ function click(d, options, config){
     d._children = null;
   }
   options.transitionDuration = options.transitionDurationClick;
+  createScales(options, config);
   update(d, options, config);
   options.transitionDuration = options.transitionDurationDefault;
 }
@@ -1030,9 +1008,11 @@ function update(source, options, config){
     }
   });
 
+  /*
   d3.select("svg").transition()
     .duration(options.transitionDuration)
     .attr("height", config.height);
+    */
 
   // 1. Update the links…
   const l = linksAPI;
@@ -1221,19 +1201,20 @@ function update(source, options, config){
     .attr("display", options.nodeBarOn ? "inline" : "none");
 
   if (options.nodeBarOn) {
-    nodeUpdate.selectAll(".node-bar.box")
+    const nodeBarUpdate = nodeUpdate.filter(d => d.data[options.nodeBarField] !== null);
+    nodeBarUpdate.selectAll(".node-bar.box")
       .attr("class", n.setNodeBarDefaultClass)
       .style("fill", n.getNodeBarRectFill)
       .style("stroke", n.getNodeBarRectStroke)
       .attr("x", n.getXNodeBarRect)
       .attr("width", n.getWidthNodeBarRect);
-    nodeUpdate.selectAll(".node-bar.bar-label")
+    nodeBarUpdate.selectAll(".node-bar.bar-label")
       //.style("text-anchor", n.getNodeBarTextAnchor)
       .style("fill", n.getNodeBarTextFill)
       .call(sel => sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
       //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
       .attr("x", n.getXNodeBarText);
-    nodeUpdate.selectAll(".node-bar.connector")
+    nodeBarUpdate.selectAll(".node-bar.connector")
       .attr("d", n.getNodeBarD);
   }
 
@@ -1353,7 +1334,7 @@ function d3_template_reusable (_dataSpec) {
   // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
   options.linkWidthStatic = true; 
   options.linkWidthValue = 30;
-  options.linkWidthScale = d3.scaleLinear();
+  options.linkWidthScale = d3.scaleLinear().clamp(true);
   options.linkWidthField = "value";
   options.linkWidthRange = [15, 100];
 

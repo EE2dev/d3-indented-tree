@@ -163,33 +163,6 @@ function collapseTree(options, config, firstTime) {
   }
 }
 
-/*
-function collapseTree2(options, config, firstTime) {
-  const root = config.root;
-  let alreadyCollapsed = false;
-  const t0 = performance.now();
-  root.eachAfter(node => {
-    console.log("root.length: " + root.ancestors.length);
-    if (collapseNode(node, options)) {
-      alreadyCollapsed = node.children ? false : true;
-      if (options.nodeCollapsePropagate) {
-        node.eachAfter(_node => collapse(_node));
-      } else {
-        collapse(node);
-      }
-      if (!firstTime && !alreadyCollapsed) {
-        update(node, options, config);
-      }
-    }
-  });
-  if (firstTime) {
-    update(root, options, config);
-  }
-  const t1 = performance.now();
-  console.log("1 - Call to doSomething took " + (t1 - t0) + " milliseconds.");
-}
-*/
-
 function collapse(node) {
   if (node.children) {
     node._children = node.children;
@@ -278,9 +251,11 @@ function update(source, options, config){
     }
   });
 
+  /*
   d3.select("svg").transition()
     .duration(options.transitionDuration)
     .attr("height", config.height);
+    */
 
   // 1. Update the links…
   const l = linksAPI;

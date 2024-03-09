@@ -1,9 +1,9 @@
 <!DOCTYPE html>
   <meta charset="utf-8">
   <head>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/EE2dev/hierarchy-explorer/dist/v10/hierarchyExplorer.css">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/EE2dev/d3-indented-tree/dist/latest/d3-indented-tree.css">
   </head>
   
   <body>
@@ -24,7 +24,7 @@ context.xml,META-INF,300,"../images/ie9.svg","../images/ie9.svg"
       const dataSpec = {
         source: "aside#data",  
       };
-      const myChart = hierarchyExplorer.chart(dataSpec)
+      const myChart = d3.indentedTree(dataSpec)
         .nodeImageFile(d => d._children ? url + d.data.image1 : url + d.data.image2 , { width: 20, height: 20}) 
         .linkLabel("size",{unit: " MB", format: ",.0f", locale: "DE"})
         .linkWidth("size",{range: [80, 200]})
