@@ -1008,11 +1008,9 @@ function update(source, options, config){
     }
   });
 
-  /*
-  d3.select("svg").transition()
+  config.svg.transition()
     .duration(options.transitionDuration)
     .attr("height", config.height);
-    */
 
   // 1. Update the links…
   const l = linksAPI;
