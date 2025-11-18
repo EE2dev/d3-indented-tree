@@ -1,9 +1,131 @@
-// https://github.com/EE2dev/d3-indented-tree v0.6.0 Copyright 2024 Mihael Ankerst
+// https://github.com/EE2dev/d3-indented-tree v0.6.0 Copyright 2025 Mihael Ankerst
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3')) :
 typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) :
-(factory((global.d3 = global.d3 || {}),global.d3));
-}(this, (function (exports,d3) { 'use strict';
+(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.d3 = global.d3 || {}, global.d3));
+})(this, (function (exports, d3) { 'use strict';
+
+function _interopNamespaceDefault(e) {
+var n = Object.create(null);
+if (e) {
+Object.keys(e).forEach(function (k) {
+if (k !== 'default') {
+var d = Object.getOwnPropertyDescriptor(e, k);
+Object.defineProperty(n, k, d.get ? d : {
+enumerable: true,
+get: function () { return e[k]; }
+});
+}
+});
+}
+n.default = e;
+return Object.freeze(n);
+}
+
+var d3__namespace = /*#__PURE__*/_interopNamespaceDefault(d3);
+
+function _arrayLikeToArray(r, a) {
+  (null == a || a > r.length) && (a = r.length);
+  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+  return n;
+}
+function _arrayWithHoles(r) {
+  if (Array.isArray(r)) return r;
+}
+function _createForOfIteratorHelper(r, e) {
+  var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+  if (!t) {
+    if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e) {
+      t && (r = t);
+      var n = 0,
+        F = function () {};
+      return {
+        s: F,
+        n: function () {
+          return n >= r.length ? {
+            done: true
+          } : {
+            done: false,
+            value: r[n++]
+          };
+        },
+        e: function (r) {
+          throw r;
+        },
+        f: F
+      };
+    }
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  var o,
+    a = true,
+    u = false;
+  return {
+    s: function () {
+      t = t.call(r);
+    },
+    n: function () {
+      var r = t.next();
+      return a = r.done, r;
+    },
+    e: function (r) {
+      u = true, o = r;
+    },
+    f: function () {
+      try {
+        a || null == t.return || t.return();
+      } finally {
+        if (u) throw o;
+      }
+    }
+  };
+}
+function _iterableToArrayLimit(r, l) {
+  var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+  if (null != t) {
+    var e,
+      n,
+      i,
+      u,
+      a = [],
+      f = true,
+      o = false;
+    try {
+      if (i = (t = t.call(r)).next, 0 === l) ; else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
+    } catch (r) {
+      o = true, n = r;
+    } finally {
+      try {
+        if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
+      } finally {
+        if (o) throw n;
+      }
+    }
+    return a;
+  }
+}
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _slicedToArray(r, e) {
+  return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
+}
+function _typeof(o) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, _typeof(o);
+}
+function _unsupportedIterableToArray(r, a) {
+  if (r) {
+    if ("string" == typeof r) return _arrayLikeToArray(r, a);
+    var t = {}.toString.call(r).slice(8, -1);
+    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+  }
+}
 
 ////////////////////////////////////////////////////
 // Processing data                                //
@@ -11,119 +133,137 @@ typeof define === 'function' && define.amd ? define(['exports', 'd3'], factory) 
 
 // XHR to load data   
 function readData(myData, selection, options, createChart) {
-  const debugOn = options.debugOn;
-  if (myData.fromFile) { // read data from file 
-    if (myData.data.endsWith(".json")) { // JSON Format
-      d3.json(myData.data).then(function(data){
-        if (debugOn) { console.log("Initial Data: ");console.log(data);}
-        const hierarchy = d3.hierarchy(data);
-        if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
+  var debugOn = options.debugOn;
+  if (myData.fromFile) {
+    // read data from file 
+    if (myData.data.endsWith(".json")) {
+      // JSON Format
+      d3__namespace.json(myData.data).then(function (data) {
+        if (debugOn) {
+          console.log("Initial Data: ");
+          console.log(data);
+        }
+        var hierarchy = d3__namespace.hierarchy(data);
+        if (debugOn) {
+          console.log("hierarchy: ");
+          console.log(hierarchy);
+        }
         createChart(selection, hierarchy);
       });
     } else if (myData.data.endsWith(".csv")) {
-      d3.dsv(myData.delimiter, myData.data, myData.autoConvert ? myData.convertTypesFunction : undefined)
-        .then(function(data) {
-          if (debugOn) { console.log(data);}
-          if (myData.flatData) {
-            data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
-              , myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
-          }
-          const hierarchy = createHierarchy(data, myData.keyField);
-          if (debugOn) { console.log("hierarchy: "); console.log(hierarchy);}
-          createChart(selection, hierarchy);
-        });
+      d3__namespace.dsv(myData.delimiter, myData.data, myData.autoConvert ? myData.convertTypesFunction : undefined).then(function (data) {
+        if (debugOn) {
+          console.log(data);
+        }
+        if (myData.flatData) {
+          data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
+        }
+        var hierarchy = createHierarchy(data, myData.keyField);
+        if (debugOn) {
+          console.log("hierarchy: ");
+          console.log(hierarchy);
+        }
+        createChart(selection, hierarchy);
+      });
     } else {
       console.log("File must end with .json or .csv");
     }
-  } 
-  else { // read data from DOM or JSON variable
-    let hierarchy;
+  } else {
+    // read data from DOM or JSON variable
+    var hierarchy;
     if (myData.isJSON) {
-      hierarchy = d3.hierarchy(myData.data);
+      hierarchy = d3__namespace.hierarchy(myData.data);
     } else {
-      const convert = myData.flatData ? false : myData.autoConvert; // for flat data the autoconvert is applied with createLinkedData()
-      let data = readDataFromDOM(myData.delimiter, myData.data, convert, myData.convertTypesFunction);
+      var convert = myData.flatData ? false : myData.autoConvert; // for flat data the autoconvert is applied with createLinkedData()
+      var data = readDataFromDOM(myData.delimiter, myData.data, convert, myData.convertTypesFunction);
       if (myData.flatData) {
-        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField
-          , myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
+        data = createLinkedData(data, myData.hierarchyLevels, myData.keyField, myData.delimiter, myData.separator, options, myData.autoConvert, myData.convertTypesFunction); // csv Format 1
       }
       hierarchy = createHierarchy(data, myData.keyField); // csv format 2
-      if (debugOn) { console.log("embedded data: "); console.log(hierarchy);}
+      if (debugOn) {
+        console.log("embedded data: ");
+        console.log(hierarchy);
+      }
     }
     createChart(selection, hierarchy);
   }
 }
-
-function readDataFromDOM(delimiter, selector = "aside#data", autoConvert = true, convertTypesFunction) {
-  const inputData = d3.select(selector).text();
-  const inputData_cleaned = inputData.trim();
-  const parser = d3.dsvFormat(delimiter);
-  const file = parser.parse(inputData_cleaned, autoConvert ? convertTypesFunction : undefined);
-  return file; 
+function readDataFromDOM(delimiter) {
+  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "aside#data";
+  var autoConvert = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var convertTypesFunction = arguments.length > 3 ? arguments[3] : undefined;
+  var inputData = d3__namespace.select(selector).text();
+  var inputData_cleaned = inputData.trim();
+  var parser = d3__namespace.dsvFormat(delimiter);
+  var file = parser.parse(inputData_cleaned, autoConvert ? convertTypesFunction : undefined);
+  return file;
 }
-
 function createHierarchy(data, key) {
-  let root = d3.stratify()
-    .id(function(d) { return d[key]; })
-    .parentId(function(d) { return d.parent; })(data);
+  var root = d3__namespace.stratify().id(function (d) {
+    return d[key];
+  }).parentId(function (d) {
+    return d.parent;
+  })(data);
   return root;
 }
-
-function buildKey(row, keys, keyIndex, delimiter, keySeparator){
-  let parent = getParent(row, keys, keyIndex, keySeparator);
-  let child = parent + keySeparator + row[keys[keyIndex]];
-  const pcKey = parent + delimiter + child;
+function buildKey(row, keys, keyIndex, delimiter, keySeparator) {
+  var parent = getParent(row, keys, keyIndex, keySeparator);
+  var child = parent + keySeparator + row[keys[keyIndex]];
+  var pcKey = parent + delimiter + child;
   return pcKey;
-} 
-
-function getParent(row, keys, keyIndex, keySeparator){
-  let parent = (keyIndex === 1) ? keys[0] : row[keys[keyIndex-1]];
-  for (let i = 0; i < keyIndex; i++) {
-    if (i === 0) { parent = keys[0];}
-    else {
+}
+function getParent(row, keys, keyIndex, keySeparator) {
+  var parent = keyIndex === 1 ? keys[0] : row[keys[keyIndex - 1]];
+  for (var i = 0; i < keyIndex; i++) {
+    if (i === 0) {
+      parent = keys[0];
+    } else {
       parent += keySeparator + row[keys[i]];
     }
   }
   return parent;
 }
+function createLinkedData(data, keys, keyField, delimiter, keySeparator, options, autoConvert, convertTypesFunction) {
+  var debugOn = options.debugOn;
+  var nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
 
-function createLinkedData(data, keys, keyField, delimiter, keySeparator
-  , options, autoConvert, convertTypesFunction) {
-  const debugOn = options.debugOn;
-  const nodeLabel = options.nodeLabelFieldFlatData; //"__he_name";
-  
-  let linkedDataString;
-  let linkedDataArray;
-  let parentChild = new Map();
-  let pcKey;
-  let pcValue;
-  let setAll = (obj, val) => Object.keys(obj).forEach(k => obj[k] = val);
-  let setNull = obj => setAll(obj, "");
-  let newRow;
-  let rowString;
-  let proceed = true;
-
-  data.forEach((row) => {
+  var linkedDataString;
+  var linkedDataArray;
+  var parentChild = new Map();
+  var pcKey;
+  var pcValue;
+  var setAll = function setAll(obj, val) {
+    return Object.keys(obj).forEach(function (k) {
+      return obj[k] = val;
+    });
+  };
+  var setNull = function setNull(obj) {
+    return setAll(obj, "");
+  };
+  var newRow;
+  var rowString;
+  var proceed = true;
+  data.forEach(function (row) {
     proceed = true;
-    keys.forEach( (key, j) => {
+    keys.forEach(function (key, j) {
       if (j > 0 && proceed) {
-        pcValue = {};      
-        if (debugOn && row[key]) { 
-          console.log("row[key]: "); 
-          console.log(row); 
+        pcValue = {};
+        if (debugOn && row[key]) {
+          console.log("row[key]: ");
+          console.log(row);
           console.log("key: ");
-          console.log(key); 
-        }  
-        if (j === keys.length-1) { 
-          pcKey = buildKey( row, keys, j, delimiter, keySeparator);
+          console.log(key);
+        }
+        if (j === keys.length - 1) {
+          pcKey = buildKey(row, keys, j, delimiter, keySeparator);
           if (!parentChild.get(pcKey)) {
             Object.assign(pcValue, row);
             pcValue[nodeLabel] = row[key];
             parentChild.set(pcKey, pcValue);
           }
-        } else  {
-          pcKey = buildKey( row, keys, j, delimiter, keySeparator);
-          if (!row[keys[j+1]]) {
+        } else {
+          pcKey = buildKey(row, keys, j, delimiter, keySeparator);
+          if (!row[keys[j + 1]]) {
             Object.assign(pcValue, row);
             pcValue[nodeLabel] = row[key];
             parentChild.set(pcKey, pcValue);
@@ -137,86 +277,100 @@ function createLinkedData(data, keys, keyField, delimiter, keySeparator
             }
           }
         }
-      } 
+      }
     });
   });
 
   // build the String in the linked data format
   // add column names to string
-  if (debugOn) { console.log(parentChild); }
-  
+  if (debugOn) {
+    console.log(parentChild);
+  }
   rowString = "parent" + delimiter + keyField;
-  Object.keys(data[0]).forEach( (key) => { rowString += delimiter + key; });
+  Object.keys(data[0]).forEach(function (key) {
+    rowString += delimiter + key;
+  });
   rowString += delimiter + nodeLabel;
-
   linkedDataString = rowString + "\n";
 
   // add root node to string
   rowString = delimiter + keys[0] + delimiter;
   rowString += delimiter.repeat(Object.keys(data[0]).length);
-  if (keys[0] !== keySeparator) { rowString += keys[0]; } 
+  if (keys[0] !== keySeparator) {
+    rowString += keys[0];
+  }
   linkedDataString += rowString + "\n";
 
   // all other nodes
-  for (var [key, value] of parentChild) {
-    rowString = key;
-    newRow = Object.values(value);
-    newRow.forEach(d => { rowString += delimiter + d;});
-    linkedDataString += rowString + "\n";
+  var _iterator = _createForOfIteratorHelper(parentChild),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _step$value = _slicedToArray(_step.value, 2),
+        key = _step$value[0],
+        value = _step$value[1];
+      rowString = key;
+      newRow = Object.values(value);
+      newRow.forEach(function (d) {
+        rowString += delimiter + d;
+      });
+      linkedDataString += rowString + "\n";
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
   }
-
   if (debugOn) {
     console.log("converted linked Data:");
     console.log(linkedDataString);
   }
-
-  const parser = d3.dsvFormat(delimiter);
+  var parser = d3__namespace.dsvFormat(delimiter);
   linkedDataArray = parser.parse(linkedDataString, autoConvert ? convertTypesFunction : undefined);
   // if nodeLabel === " " it was converted to null, so here its changed to " "  
-  linkedDataArray.map(ele => { ele[nodeLabel] = ele[nodeLabel] ? ele[nodeLabel] : " ";});
-
+  linkedDataArray.map(function (ele) {
+    ele[nodeLabel] = ele[nodeLabel] ? ele[nodeLabel] : " ";
+  });
   if (debugOn) {
     console.log("converted linked Data array:");
     console.log(linkedDataArray);
   }
-
   return linkedDataArray;
 }
 
 // import { nodesAPI } from "./nodes.js";
 
-let linksAPI = {};
-let options;
-let oldLabelField , newLabelField;
+var linksAPI = {};
+var options$1;
+var oldLabelField$1, newLabelField$1;
 // let labelDimensions;
 
-linksAPI.initialize = function(_options) { 
-  options = _options; 
-  oldLabelField = newLabelField;
-  newLabelField = options.linkLabelOn ? options.linkLabelField : undefined;
-  if (options.debugOn) {
+linksAPI.initialize = function (_options) {
+  options$1 = _options;
+  oldLabelField$1 = newLabelField$1;
+  newLabelField$1 = options$1.linkLabelOn ? options$1.linkLabelField : undefined;
+  if (options$1.debugOn) {
     console.log("oldLabel:");
-    console.log(oldLabelField);
+    console.log(oldLabelField$1);
     console.log("newLabel:");
-    console.log(newLabelField);
+    console.log(newLabelField$1);
   }
 };
-
-linksAPI.getLinkD = function (d, direction, updatePattern = false) {
-  const linkStrengthParent = linksAPI.getLinkStrength(d.parent, options);
-  const linkStrength = linksAPI.getLinkStrength(d, options);
-  let path;
-  if (direction === "vertical"){
-    if (updatePattern) { // for updated links use .x of last child to support resorted nodes/links
-      const xLastChild = d.parent.children[d.parent.children.length - 1].x;
-      path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (xLastChild + linkStrength / 2 - d.parent.x);
+linksAPI.getLinkD = function (d, direction) {
+  var updatePattern = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var linkStrengthParent = linksAPI.getLinkStrength(d.parent, options$1);
+  var linkStrength = linksAPI.getLinkStrength(d, options$1);
+  var path;
+  if (direction === "vertical") {
+    if (updatePattern) {
+      // for updated links use .x of last child to support resorted nodes/links
+      var xLastChild = d.parent.children[d.parent.children.length - 1].x;
+      path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (xLastChild + linkStrength / 2 - d.parent.x);
     } else {
-      path = "M 0 " + (-1 * Math.floor(linkStrengthParent / 2)) + " V" + (d.x + linkStrength / 2 - d.parent.x);
+      path = "M 0 " + -1 * Math.floor(linkStrengthParent / 2) + " V" + (d.x + linkStrength / 2 - d.parent.x);
     }
-  } else if (direction === "horizontal"){
-    const m = (d.y >= d.parent.y) ? 
-      (d.y - (d.parent.y + linkStrengthParent / 2)) 
-      : (d.y - (d.parent.y - linkStrengthParent / 2));
+  } else if (direction === "horizontal") {
+    var m = d.y >= d.parent.y ? d.y - (d.parent.y + linkStrengthParent / 2) : d.y - (d.parent.y - linkStrengthParent / 2);
     path = "M 0 0" + "H" + m;
     /*
     if (options.debugOn) { 
@@ -227,113 +381,106 @@ linksAPI.getLinkD = function (d, direction, updatePattern = false) {
   }
   return path;
 };
-
 linksAPI.getDy = function (d) {
-  if (options.linkLabelOnTop) { return "0.35em";}
-  else {
-    return Math.ceil((-.5) * linksAPI.getLinkStrength(d) -3);
+  if (options$1.linkLabelOnTop) {
+    return "0.35em";
+  } else {
+    return Math.ceil(-0.5 * linksAPI.getLinkStrength(d) - 3);
   }
 };
 
 // initialize to support switch from labelonTop to labelabove and vice versa
 // otherwise transition throws error when trying "0.35em" --> 1 or 1 --> "0.35em" 
-linksAPI.getInitialDy = function () { 
-  if (!d3.select(this).attr("dy")) { return null;}
-  if (options.linkLabelOnTop) { 
-    return (d3.select(this).attr("dy").endsWith("em")) ? d3.select(this).attr("dy") : "0.35em";
+linksAPI.getInitialDy = function () {
+  if (!d3__namespace.select(this).attr("dy")) {
+    return null;
   }
-  else {
-    return (d3.select(this).attr("dy").endsWith("em")) ? 0 : d3.select(this).attr("dy");
+  if (options$1.linkLabelOnTop) {
+    return d3__namespace.select(this).attr("dy").endsWith("em") ? d3__namespace.select(this).attr("dy") : "0.35em";
+  } else {
+    return d3__namespace.select(this).attr("dy").endsWith("em") ? 0 : d3__namespace.select(this).attr("dy");
   }
 };
-
 linksAPI.getLinkStrength = function (d) {
   if (!d.data) return 0;
-  const s = options.linkStrengthStatic ? options.linkStrengthValue 
-    : options.linkStrengthScale(d.data[options.linkStrengthField]); 
+  var s = options$1.linkStrengthStatic ? options$1.linkStrengthValue : options$1.linkStrengthScale(d.data[options$1.linkStrengthField]);
   return s;
 };
-
 linksAPI.getLinkStroke = function (d) {
-  return options.linkColorStatic ? options.defaultColor : options.linkColorScale(d.data[options.linkColorField]);
+  return options$1.linkColorStatic ? options$1.defaultColor : options$1.linkColorScale(d.data[options$1.linkColorField]);
 };
-
 linksAPI.getLinkStrokeWidth = function (d) {
   return linksAPI.getLinkStrength(d) + "px";
 };
-
-linksAPI.getLinkLabel = function(d, labelField = options.linkLabelField) {
-  return (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined" || d.data[labelField] === null)
-    ? "" : d.data[labelField]; 
+linksAPI.getLinkLabel = function (d) {
+  var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options$1.linkLabelField;
+  return !options$1.linkLabelOn || typeof d.data[labelField] === "undefined" || d.data[labelField] === null ? "" : d.data[labelField];
 };
-
-linksAPI.getLinkLabelFormatted = function(d, labelField = options.linkLabelField) {
-  if (!options.linkLabelOn || typeof (d.data[labelField]) === "undefined") {
+linksAPI.getLinkLabelFormatted = function (d) {
+  var labelField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options$1.linkLabelField;
+  if (!options$1.linkLabelOn || typeof d.data[labelField] === "undefined") {
     return "";
-  } 
-  else if (isNaN(d.data[labelField]) || typeof d.data[labelField] === "string") {
+  } else if (isNaN(d.data[labelField]) || typeof d.data[labelField] === "string") {
     return d.data[labelField];
   } else {
-    return options.linkLabelFormat(d.data[labelField]) + options.linkLabelUnit; 
+    return options$1.linkLabelFormat(d.data[labelField]) + options$1.linkLabelUnit;
   }
 };
-
-linksAPI.getLinkTextTween = function(d) { 
-  const selection = d3.select(this);
-  if (!options.linkLabelOn || d.data[newLabelField] === null) {
-    return function() { selection.text(""); };
-  } 
-  const numberStart = linksAPI.getLinkLabel(d, oldLabelField);
-  const numberEnd = linksAPI.getLinkLabel(d, newLabelField);
-
-  if (!isNumber(numberStart) || !isNumber(numberEnd)) {
-    return function() { selection.text(numberEnd); };
+linksAPI.getLinkTextTween = function (d) {
+  var selection = d3__namespace.select(this);
+  if (!options$1.linkLabelOn || d.data[newLabelField$1] === null) {
+    return function () {
+      selection.text("");
+    };
   }
-  const i = d3.interpolateNumber(numberStart, numberEnd);
-  return function(t) { 
-    selection.text(options.linkLabelFormat(i(t)) + options.linkLabelUnit); 
+  var numberStart = linksAPI.getLinkLabel(d, oldLabelField$1);
+  var numberEnd = linksAPI.getLinkLabel(d, newLabelField$1);
+  if (!isNumber(numberStart) || !isNumber(numberEnd)) {
+    return function () {
+      selection.text(numberEnd);
+    };
+  }
+  var i = d3__namespace.interpolateNumber(numberStart, numberEnd);
+  return function (t) {
+    selection.text(options$1.linkLabelFormat(i(t)) + options$1.linkLabelUnit);
   };
 };
-
 function isNumber(num) {
   // return !isNaN(num);
-  return !isNaN(num) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-         !isNaN(parseFloat(num)); // ...and ensure strings of whitespace fail
+  return !isNaN(num) &&
+  // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+  !isNaN(parseFloat(num)); // ...and ensure strings of whitespace fail
 }
-
 linksAPI.getLinkRTranslate = function (d) {
-  const shift = (d.y >= d.parent.y) ? 
-    linksAPI.getLinkStrength(d.parent) / 2
-    : -1 * linksAPI.getLinkStrength(d.parent) / 2;
+  var shift = d.y >= d.parent.y ? linksAPI.getLinkStrength(d.parent) / 2 : -1 * linksAPI.getLinkStrength(d.parent) / 2;
   return "translate(" + shift + " " + (d.x - d.parent.x) + ")";
   // return "translate(" + (linksAPI.getLinkStrength(d.parent) / 2) + " " + (d.x - d.parent.x) + ")";
 };
-
 linksAPI.getLinkLabelColor = function (d) {
-  if (!options.linkLabelColor) {
-    return d3.select(this).style("fill");
-  } else { 
-    return options.linkLabelColor(linksAPI.getLinkLabel(d, oldLabelField));
+  if (!options$1.linkLabelColor) {
+    return d3__namespace.select(this).style("fill");
+  } else {
+    return options$1.linkLabelColor(linksAPI.getLinkLabel(d, oldLabelField$1));
   }
 };
 
 /* aligned: x center position of the shortest link + half the extent of the longest label of siblings */
 // linksAPI.getLinkTextPositionX = d => (options.linkLabelAlignment === "aligned")? d.linkLabel.pos : (d.y - d.parent.y) / 2;
-linksAPI.getLinkTextPositionX = d => {
-  let ret;
-  switch(options.linkLabelAlignment) {
-  case "aligned":
-    ret = d.linkLabel.pos;
-    break;
-  case "start":
-    ret = (d.y >= d.parent.y) ? 10 : (d.y - d.parent.y) + 10;
-    break;
-  case "middle":
-    ret = (d.y - d.parent.y) / 2;
-    break;
-  case "end":
-    ret = (d.y >= d.parent.y) ? (d.y - d.parent.y) - 10 : - 10;
-    break;
+linksAPI.getLinkTextPositionX = function (d) {
+  var ret;
+  switch (options$1.linkLabelAlignment) {
+    case "aligned":
+      ret = d.linkLabel.pos;
+      break;
+    case "start":
+      ret = d.y >= d.parent.y ? 10 : d.y - d.parent.y + 10;
+      break;
+    case "middle":
+      ret = (d.y - d.parent.y) / 2;
+      break;
+    case "end":
+      ret = d.y >= d.parent.y ? d.y - d.parent.y - 10 : -10;
+      break;
   }
   return ret;
 };
@@ -343,212 +490,175 @@ linksAPI.getLinkTextPositionX = d => {
   return shiftAlign;
 };
 */
-linksAPI.getLinkLabelAnchor = function(d) {
-  if (options.linkLabelAlignment === "aligned") {
+linksAPI.getLinkLabelAnchor = function (d) {
+  if (options$1.linkLabelAlignment === "aligned") {
     return d.linkLabel.anchor;
   } else {
-    return options.linkLabelAlignment; // "start", "middle" or "end"
+    return options$1.linkLabelAlignment; // "start", "middle" or "end"
   }
 };
-
 linksAPI.setupLabelDimensions = function (sel) {
-  const dimArray = computeLabelDimensions(sel);
+  var dimArray = computeLabelDimensions(sel);
   storeLinkLabelAnchor(sel, dimArray);
-
-  if (options.debugOn) {
+  if (options$1.debugOn) {
     console.log("dimensions:");
     console.log(dimArray);
   }
 };
-
 function computeLabelDimensions(sel) {
-  const dimArray = [];
-  const dimsPositive = new Map();
-  const dimsNegative = new Map(); // for link labels on links going to the left
-  let dims;
-  sel
-    .each(function(d) {
-      let dimProperties = {};
-      const height = d3.select(this).node().getBBox().height;
-      const width = d3.select(this).node().getBBox().width;
-      const text = d3.select(this).text();
-      
-      dims = (d.y >= d.parent.y) ? dimsPositive : dimsNegative;
-      if (width <= Math.abs(d.y - d.parent.y) - 15) {
-        if (!dims.get(d.parent.id)) {
+  var dimArray = [];
+  var dimsPositive = new Map();
+  var dimsNegative = new Map(); // for link labels on links going to the left
+  var dims;
+  sel.each(function (d) {
+    var dimProperties = {};
+    var height = d3__namespace.select(this).node().getBBox().height;
+    var width = d3__namespace.select(this).node().getBBox().width;
+    var text = d3__namespace.select(this).text();
+    dims = d.y >= d.parent.y ? dimsPositive : dimsNegative;
+    if (width <= Math.abs(d.y - d.parent.y) - 15) {
+      if (!dims.get(d.parent.id)) {
+        dimProperties.maxX = width;
+        dimProperties.minX = width;
+        dimProperties.maxY = height;
+        dimProperties.maxXText = text;
+        dimProperties.maxYText = text;
+        dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+        dims.set(d.parent.id, dimProperties);
+      } else {
+        dimProperties = dims.get(d.parent.id);
+        if (dimProperties.maxX < width) {
           dimProperties.maxX = width;
-          dimProperties.minX = width;
-          dimProperties.maxY = height;
           dimProperties.maxXText = text;
-          dimProperties.maxYText = text;
-          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-          dims.set(d.parent.id, dimProperties);
-        } else {  
-          dimProperties = dims.get(d.parent.id);
-          if (dimProperties.maxX < width) {   
-            dimProperties.maxX = width;
-            dimProperties.maxXText = text;
-          } 
-          if ((d.y >= d.parent.y) && dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
-            dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-          } else if ((d.y < d.parent.y) && dimProperties.posXCenter < (d.y - d.parent.y) / 2) {
-            dimProperties.posXCenter = (d.y - d.parent.y) / 2;
-          }
-          if (dimProperties.maxY < height) {
-            dimProperties.maxY = height;
-            dimProperties.maxYText = text;
-          } 
-          dims.set(d.parent.id, dimProperties);
         }
+        if (d.y >= d.parent.y && dimProperties.posXCenter > (d.y - d.parent.y) / 2) {
+          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+        } else if (d.y < d.parent.y && dimProperties.posXCenter < (d.y - d.parent.y) / 2) {
+          dimProperties.posXCenter = (d.y - d.parent.y) / 2;
+        }
+        if (dimProperties.maxY < height) {
+          dimProperties.maxY = height;
+          dimProperties.maxYText = text;
+        }
+        dims.set(d.parent.id, dimProperties);
       }
-    });
+    }
+  });
   dimArray.push(dimsPositive);
   dimArray.push(dimsNegative);
   return dimArray;
 }
-
 function storeLinkLabelAnchor(sel, dimArray) {
-  let dims;
-  sel.each(function(d) {
-    const width = d3.select(this).node().getBBox().width;
-    dims = (d.y >= d.parent.y) ? dimArray[0] : dimArray[1];
+  var dims;
+  sel.each(function (d) {
+    var width = d3__namespace.select(this).node().getBBox().width;
+    dims = d.y >= d.parent.y ? dimArray[0] : dimArray[1];
     d.linkLabel = {};
     d.linkLabel.anchor = "end";
     d.linkLabel.always = true;
     if (width <= Math.abs(d.y - d.parent.y) - 15) {
       d.linkLabel.pos = dims.get(d.parent.id).posXCenter + dims.get(d.parent.id).maxX / 2;
-    } else { // label too long to fit on link
+    } else {
+      // label too long to fit on link
       d.linkLabel.always = false;
-      if (d.y >= d.parent.y) { // link to the right
-        d.linkLabel.pos = (d.y - d.parent.y) - 10;
-      } else { // link to the left
-        d.linkLabel.pos =  (d.y - d.parent.y) + 10;
+      if (d.y >= d.parent.y) {
+        // link to the right
+        d.linkLabel.pos = d.y - d.parent.y - 10;
+      } else {
+        // link to the left
+        d.linkLabel.pos = d.y - d.parent.y + 10;
         d.linkLabel.anchor = "start";
-        d.linkLabel.width = (options.linkLabelAlways && options.linkLabelOnTop && options.linkLabelAlignment === "aligned")
-          ? width : 0;
+        d.linkLabel.width = options$1.linkLabelAlways && options$1.linkLabelOnTop && options$1.linkLabelAlignment === "aligned" ? width : 0;
         d.linkLabel.overlap = d.linkLabel.width ? d.linkLabel.pos + d.linkLabel.width : 0;
       }
     }
   });
 }
 
-let nodesAPI = {};
-let options$1;
-let oldLabelField$1 , newLabelField$1;
-
-nodesAPI.initialize = function(_options) { 
-  options$1 = _options; 
-  oldLabelField$1 = newLabelField$1;
-  newLabelField$1 = options$1.nodeBarOn ? options$1.nodeBarLabel : undefined;
+var nodesAPI = {};
+var options;
+var oldLabelField, newLabelField;
+nodesAPI.initialize = function (_options) {
+  options = _options;
+  oldLabelField = newLabelField;
+  newLabelField = options.nodeBarOn ? options.nodeBarLabel : undefined;
 };
-
 nodesAPI.appendNode = function (selection) {
-  if (options$1.nodeImageFile) {
+  if (options.nodeImageFile) {
     nodesAPI.appendNodeImage(selection);
   } else {
-    (options$1.nodeImageSelectionAppend && typeof options$1.nodeImageSelectionAppend === "function") 
-      ? options$1.nodeImageSelectionAppend(selection) 
-      : nodesAPI.appendNodeSVG(selection);
+    options.nodeImageSelectionAppend && typeof options.nodeImageSelectionAppend === "function" ? options.nodeImageSelectionAppend(selection) : nodesAPI.appendNodeSVG(selection);
   }
 };
-
 nodesAPI.updateNode = function (transition) {
-  if (options$1.nodeImageFile) {
+  if (options.nodeImageFile) {
     nodesAPI.updateNodeImage(transition);
   } else {
-    if (options$1.nodeImageSelectionUpdate && typeof options$1.nodeImageSelectionUpdate === "function") {
-      options$1.nodeImageSelectionUpdate(transition);
-    } else if (options$1.nodeImageSelectionAppend && typeof options$1.nodeImageSelectionAppend === "function") {
+    if (options.nodeImageSelectionUpdate && typeof options.nodeImageSelectionUpdate === "function") {
+      options.nodeImageSelectionUpdate(transition);
+    } else if (options.nodeImageSelectionAppend && typeof options.nodeImageSelectionAppend === "function") {
       return; // do nothing - custom SVG append provided but no custom SVG update  
-    } else { nodesAPI.updateNodeSVG(transition); }
+    } else {
+      nodesAPI.updateNodeSVG(transition);
+    }
   }
 };
-
 nodesAPI.appendNodeSVG = function (selection) {
-  selection.append("rect")
-    .attr("class", "node-image")
-    .attr("x", -5)
-    .attr("y", -5) 
-    .attr("width", 10)
-    .attr("height", 10);
-
-  const sel2 = selection;
-  sel2.append("line")
-    .attr("class", d => d._children ? "cross node-image" : "cross invisible")
-    .attr("x1", 0)
-    .attr("y1", -5) 
-    .attr("x2", 0)
-    .attr("y2", 5);
-
-  sel2.append("line")
-    .attr("class", d => d._children ? "cross node-image" : "cross invisible")
-    .attr("x1", -5)
-    .attr("y1", 0) 
-    .attr("x2", 5)
-    .attr("y2", 0);
+  selection.append("rect").attr("class", "node-image").attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
+  var sel2 = selection;
+  sel2.append("line").attr("class", function (d) {
+    return d._children ? "cross node-image" : "cross invisible";
+  }).attr("x1", 0).attr("y1", -5).attr("x2", 0).attr("y2", 5);
+  sel2.append("line").attr("class", function (d) {
+    return d._children ? "cross node-image" : "cross invisible";
+  }).attr("x1", -5).attr("y1", 0).attr("x2", 5).attr("y2", 0);
 };
-
 nodesAPI.updateNodeSVG = function (transition) {
-  transition.selectAll("line.cross")
-    .attr("class", d => d._children ? "cross node-image" : "cross invisible");
+  transition.selectAll("line.cross").attr("class", function (d) {
+    return d._children ? "cross node-image" : "cross invisible";
+  });
 };
-
 nodesAPI.appendNodeImage = function (selection) {
-  let imageSelection = selection;
-  let noImageSelection = selection.filter(() => false);
-
-  if (typeof options$1.nodeImageFileAppend === "function") {
-    imageSelection = selection.filter(d => options$1.nodeImageFileAppend(d));
-    noImageSelection = selection.filter(d => !options$1.nodeImageFileAppend(d));
+  var imageSelection = selection;
+  var noImageSelection = selection.filter(function () {
+    return false;
+  });
+  if (typeof options.nodeImageFileAppend === "function") {
+    imageSelection = selection.filter(function (d) {
+      return options.nodeImageFileAppend(d);
+    });
+    noImageSelection = selection.filter(function (d) {
+      return !options.nodeImageFileAppend(d);
+    });
   }
-
-  if (options$1.nodeImageSetBackground) {
-    const col = d3.select("div.chart").style("background-color");
-    imageSelection.append("rect")
-      .attr("width", options$1.nodeImageWidth)
-      .attr("height", options$1.nodeImageHeight)
-      .attr("x", options$1.nodeImageX)
-      .attr("y", options$1.nodeImageY)
-      .style("stroke", col)
-      .style("fill", col);
+  if (options.nodeImageSetBackground) {
+    var col = d3__namespace.select("div.chart").style("background-color");
+    imageSelection.append("rect").attr("width", options.nodeImageWidth).attr("height", options.nodeImageHeight).attr("x", options.nodeImageX).attr("y", options.nodeImageY).style("stroke", col).style("fill", col);
   }
-  imageSelection.append("image")
-    .attr("class", "node-image")
-    .attr("xlink:href", options$1.nodeImageFileAppend)
-    .attr("width", options$1.nodeImageWidth)
-    .attr("height", options$1.nodeImageHeight)
-    .attr("preserveAspectRatio", options$1.nodeImagePreserveAspectRatio)
-    .attr("x", options$1.nodeImageX)
-    .attr("y", options$1.nodeImageY);
-
-  if (options$1.nodeImageDefault && noImageSelection.size() > 0) {
+  imageSelection.append("image").attr("class", "node-image").attr("xlink:href", options.nodeImageFileAppend).attr("width", options.nodeImageWidth).attr("height", options.nodeImageHeight).attr("preserveAspectRatio", options.nodeImagePreserveAspectRatio).attr("x", options.nodeImageX).attr("y", options.nodeImageY);
+  if (options.nodeImageDefault && noImageSelection.size() > 0) {
     nodesAPI.appendNodeSVG(noImageSelection);
   }
-
-  if (options$1.debugOn) {
+  if (options.debugOn) {
     console.log("imageSelection.size: " + imageSelection.size());
     console.log("noImageSelection.size: " + noImageSelection.size());
   }
 };
-
 nodesAPI.updateNodeImage = function (transition) {
-  transition
-    .select(".node-image")
-    .attr("xlink:href", options$1.nodeImageFileAppend);   
-    
+  transition.select(".node-image").attr("xlink:href", options.nodeImageFileAppend);
   nodesAPI.updateNodeSVG(transition); // in case there are fallback/default nodes with no images
 };
-
-nodesAPI.computeNodeExtend = function(sel) {
-  let alignmentAnchorArray = [];
-  let anchorXPos;
-  let maxLinkLabel = 0;
-
-  const l = linksAPI;
+nodesAPI.computeNodeExtend = function (sel) {
+  var alignmentAnchorArray = [];
+  var anchorXPos;
+  var maxLinkLabel = 0;
+  var l = linksAPI;
   // l.initialize(options);
 
-  const filteredSel = sel.filter(d => typeof(d.data[newLabelField$1]) !== "undefined" );
-  filteredSel.each(function(d) {
+  var filteredSel = sel.filter(function (d) {
+    return typeof d.data[newLabelField] !== "undefined";
+  });
+  filteredSel.each(function (d) {
     d.nodeBar = {};
     /*
     const labelBBox = d3.select(this).select(".node-label").node().getBBox();
@@ -559,148 +669,154 @@ nodesAPI.computeNodeExtend = function(sel) {
       nodeEnd + 5 
       : (d.parent.y - d.y) + l.getLinkStrength(d.parent, options) / 2 + 5;
       */
-    d.nodeBar.connectorStart = getConnectorStart(d3.select(this), d, l);
+    d.nodeBar.connectorStart = getConnectorStart(d3__namespace.select(this), d, l);
     // console.log(d.name + ": " + (d.nodeBar.connectorStart === d.nodeBar.connectorStart2) 
     //  + " " + d.nodeBar.connectorStart + " = " + d.nodeBar.connectorStart2);
 
-    d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField$1]);
+    d.nodeBar.labelWidth = getBarLabelWidth(d.data[newLabelField]);
     alignmentAnchorArray.push(getVerticalAlignmentRef(d, d.y + d.nodeBar.connectorStart));
-    maxLinkLabel = (d.linkLabel && d.linkLabel.width > maxLinkLabel) ? d.linkLabel.width : maxLinkLabel;
-    if (options$1.debugOn) { console.log("connctorStart: " + d.nodeBar.connectorStart);}
+    maxLinkLabel = d.linkLabel && d.linkLabel.width > maxLinkLabel ? d.linkLabel.width : maxLinkLabel;
+    if (options.debugOn) {
+      console.log("connctorStart: " + d.nodeBar.connectorStart);
+    }
   });
-
-  alignmentAnchorArray.anchor = Math.max(...alignmentAnchorArray);
-  anchorXPos = alignmentAnchorArray.anchor + options$1.nodeBarTranslateX + maxLinkLabel;
-
-  if (options$1.debugOn) {
+  alignmentAnchorArray.anchor = Math.max.apply(Math, alignmentAnchorArray);
+  anchorXPos = alignmentAnchorArray.anchor + options.nodeBarTranslateX + maxLinkLabel;
+  if (options.debugOn) {
     console.log("alignmentAnchorArray: " + alignmentAnchorArray);
-    console.log("options.nodeBarRange[1]: " + options$1.nodeBarRange[1]);
+    console.log("options.nodeBarRange[1]: " + options.nodeBarRange[1]);
     console.log("anchorXPos: " + anchorXPos);
   }
-
-  filteredSel.each(function(d) {
+  filteredSel.each(function (d) {
     d.nodeBar.anchor = anchorXPos - d.y;
-    d.nodeBar.negStart = d.nodeBar.anchor - options$1.nodeBarRange[1] / 2;
-
-    if (d.data[options$1.nodeBarField] < 0) { 
-      if (options$1.nodeBarLabelInside) {
+    d.nodeBar.negStart = d.nodeBar.anchor - options.nodeBarRange[1] / 2;
+    if (d.data[options.nodeBarField] < 0) {
+      if (options.nodeBarLabelInside) {
         d.nodeBar.textX = d.nodeBar.anchor - 5;
         // comparison if the label is left of bar because bar is too short
-        d.nodeBar.connectorLength = labelLargerThanNegBar(d) ?
-          (d.nodeBar.textX - d.nodeBar.labelWidth - 5) - d.nodeBar.connectorStart
-          : (d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5) 
-            - d.nodeBar.connectorStart;
-      } else { // labelInside === false
-        d.nodeBar.textX = d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) - 5;
-        d.nodeBar.connectorLength = (d.nodeBar.textX - d.nodeBar.labelWidth - 5) - d.nodeBar.connectorStart;
+        d.nodeBar.connectorLength = labelLargerThanNegBar(d) ? d.nodeBar.textX - d.nodeBar.labelWidth - 5 - d.nodeBar.connectorStart : d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5 - d.nodeBar.connectorStart;
+      } else {
+        // labelInside === false
+        d.nodeBar.textX = d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) - 5;
+        d.nodeBar.connectorLength = d.nodeBar.textX - d.nodeBar.labelWidth - 5 - d.nodeBar.connectorStart;
       }
-    } else { // d.data[options.nodeBarField] >= 0
-      if (options$1.nodeBarLabelInside) {
+    } else {
+      // d.data[options.nodeBarField] >= 0
+      if (options.nodeBarLabelInside) {
         d.nodeBar.textX = d.nodeBar.anchor + 5;
-        d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
+        d.nodeBar.connectorLength = d.nodeBar.anchor - 5 - d.nodeBar.connectorStart;
+      } else {
+        // labelInside === false
+        d.nodeBar.textX = options.nodeBarNeg ? d.nodeBar.negStart + options.nodeBarScale(d.data[options.nodeBarField]) + 5 : d.nodeBar.anchor + options.nodeBarScale(d.data[options.nodeBarField]) + 5;
+        d.nodeBar.connectorLength = d.nodeBar.anchor - 5 - d.nodeBar.connectorStart;
       }
-      else { // labelInside === false
-        d.nodeBar.textX = options$1.nodeBarNeg 
-          ? d.nodeBar.negStart + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5
-          : d.nodeBar.anchor + options$1.nodeBarScale(d.data[options$1.nodeBarField]) + 5;
-        d.nodeBar.connectorLength = (d.nodeBar.anchor - 5) - d.nodeBar.connectorStart;
-      }
-    } 
-
-    if (options$1.debugOn) { 
-      console.log("connector: " + d.nodeBar.connectorLength); 
+    }
+    if (options.debugOn) {
+      console.log("connector: " + d.nodeBar.connectorLength);
       console.log("nodesAPI.getWidthNodeBarRect(d): " + nodesAPI.getWidthNodeBarRect(d));
     }
   });
 };
-
-const getConnectorStart = function(sel, d, linkAPI){
-  const labelBBox = sel.select(".node-label").node().getBBox();
-  const imageBBox = sel.select(".node-image").node().getBBox();
-  let cs = 0;
-  if (!d.parent || d.y >= d.parent.y) { // 1 node to the right
-    if (labelBBox.width !== 0) { // 1.1 nodeImage + nodeLabel
-      cs = options$1.nodeLabelPadding + labelBBox.width;
-    } else { // 1.2 nodeImage - no nodeLabel
+var getConnectorStart = function getConnectorStart(sel, d, linkAPI) {
+  var labelBBox = sel.select(".node-label").node().getBBox();
+  var imageBBox = sel.select(".node-image").node().getBBox();
+  var cs = 0;
+  if (!d.parent || d.y >= d.parent.y) {
+    // 1 node to the right
+    if (labelBBox.width !== 0) {
+      // 1.1 nodeImage + nodeLabel
+      cs = options.nodeLabelPadding + labelBBox.width;
+    } else {
+      // 1.2 nodeImage - no nodeLabel
       cs = imageBBox.width / 2;
     }
-  } else { // 2 node to the left
-    if (d.linkLabel && d.linkLabel.overlap) { // 2.1 linkLabel to the right of node
-      cs = (imageBBox.width / 2) + 5 + d.linkLabel.width;
+  } else {
+    // 2 node to the left
+    if (d.linkLabel && d.linkLabel.overlap) {
+      // 2.1 linkLabel to the right of node
+      cs = imageBBox.width / 2 + 5 + d.linkLabel.width;
     } else {
-      cs = (d.parent.y - d.y) + linkAPI.getLinkStrength(d.parent, options$1) / 2;
+      cs = d.parent.y - d.y + linkAPI.getLinkStrength(d.parent, options) / 2;
     }
   }
   return cs + 5;
 };
-
-const labelLargerThanNegBar = d => d.nodeBar.labelWidth + 5 > nodesAPI.getWidthNodeBarRect(d);
+var labelLargerThanNegBar = function labelLargerThanNegBar(d) {
+  return d.nodeBar.labelWidth + 5 > nodesAPI.getWidthNodeBarRect(d);
+};
 
 // get the anchor (0) point of all node bars for alignment 
-const getVerticalAlignmentRef = function(d, pos) {
-  if (!options$1.nodeBarLabelInside && d.data[options$1.nodeBarField] < 0) {
+var getVerticalAlignmentRef = function getVerticalAlignmentRef(d, pos) {
+  if (!options.nodeBarLabelInside && d.data[options.nodeBarField] < 0) {
     pos += 5 + d.nodeBar.labelWidth;
-  } else if (options$1.nodeBarLabelInside && d.data[options$1.nodeBarField] < 0) {
+  } else if (options.nodeBarLabelInside && d.data[options.nodeBarField] < 0) {
     if (labelLargerThanNegBar(d)) {
       pos += d.nodeBar.labelWidth + 5 - nodesAPI.getWidthNodeBarRect(d);
     }
   }
-  pos += d.data[options$1.nodeBarField] < 0 ? 5 + nodesAPI.getWidthNodeBarRect(d) : 5;
+  pos += d.data[options.nodeBarField] < 0 ? 5 + nodesAPI.getWidthNodeBarRect(d) : 5;
   return pos;
 };
-
-const getBarLabelWidth = function(text) {
-  const sel = d3.select("g.node")
-    .append("text")
-    .style("visibility", "hidden")
-    .attr("class", "bar-label temp")
-    .text(isNaN(text) ? text : options$1.nodeBarFormat(text) + options$1.nodeBarUnit);
-
-  const w = sel.node().getBBox().width;
+var getBarLabelWidth = function getBarLabelWidth(text) {
+  var sel = d3__namespace.select("g.node").append("text").style("visibility", "hidden").attr("class", "bar-label temp").text(isNaN(text) ? text : options.nodeBarFormat(text) + options.nodeBarUnit);
+  var w = sel.node().getBBox().width;
   sel.remove();
   return w;
 };
 
 // transitions the node bar label through interpolation and adjust the class of the node bar, adjusts the text-anchor
 // when the sign of the node bar label changes
-nodesAPI.getNodeBarLabelTween = function(d) { 
-  const selection = d3.select(this);
-  if (!options$1.nodeBarOn) {
-    return function() { selection.text(""); };
-  } 
-  const numberStart = oldLabelField$1 ? d.data[oldLabelField$1] : d.data[newLabelField$1];
-  const numberEnd = d.data[newLabelField$1];
-  
-  selection.style("text-anchor", () => numberStart < 0 ? "end" : "start");
-  if (isNaN(numberStart) || isNaN(numberEnd)) { // typeof NumberStart or numberEnd == "string"
-    return function() { selection.text(numberEnd); };
+nodesAPI.getNodeBarLabelTween = function (d) {
+  var selection = d3__namespace.select(this);
+  if (!options.nodeBarOn) {
+    return function () {
+      selection.text("");
+    };
   }
-  
+  var numberStart = oldLabelField ? d.data[oldLabelField] : d.data[newLabelField];
+  var numberEnd = d.data[newLabelField];
+  selection.style("text-anchor", function () {
+    return numberStart < 0 ? "end" : "start";
+  });
+  if (isNaN(numberStart) || isNaN(numberEnd)) {
+    // typeof NumberStart or numberEnd == "string"
+    return function () {
+      selection.text(numberEnd);
+    };
+  }
   if (nodesAPI.sameBarLabel()) {
-    return function() { selection.text(options$1.nodeBarFormat(numberEnd) + options$1.nodeBarUnit); };
+    return function () {
+      selection.text(options.nodeBarFormat(numberEnd) + options.nodeBarUnit);
+    };
   }
-
-  const i = d3.interpolateNumber(numberStart, numberEnd);
-  const correspondingBar = d3.selectAll(".node-bar.box").filter((d2) => d2.id === d.id);
-  let checkSign = true;
-  
-  if (!numberStart) { // if numberStart === null or 0
-    correspondingBar.attr("class", () => numberEnd >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative");
+  var i = d3__namespace.interpolateNumber(numberStart, numberEnd);
+  var correspondingBar = d3__namespace.selectAll(".node-bar.box").filter(function (d2) {
+    return d2.id === d.id;
+  });
+  var checkSign = true;
+  if (!numberStart) {
+    // if numberStart === null or 0
+    correspondingBar.attr("class", function () {
+      return numberEnd >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+    });
   }
-  return function(t) { 
-    const num = i(t);
+  return function (t) {
+    var num = i(t);
     if (checkSign && numberStart * num <= 0) {
-      correspondingBar.attr("class", () => num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative");
-      selection.style("text-anchor", () => num < 0 ? "end" : "start");
+      correspondingBar.attr("class", function () {
+        return num >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+      });
+      selection.style("text-anchor", function () {
+        return num < 0 ? "end" : "start";
+      });
       checkSign = false;
     }
-    selection.text(options$1.nodeBarFormat(num) + options$1.nodeBarUnit); 
+    selection.text(options.nodeBarFormat(num) + options.nodeBarUnit);
   };
 };
-
-nodesAPI.sameBarLabel = () => {
-  console.log("sameBarlabel: " + (oldLabelField$1 === newLabelField$1));
-  return (oldLabelField$1 === newLabelField$1);
+nodesAPI.sameBarLabel = function () {
+  console.log("sameBarlabel: " + (oldLabelField === newLabelField));
+  return oldLabelField === newLabelField;
 };
 
 /*
@@ -726,36 +842,36 @@ nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connector
   nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h 
  ${(d.linkLabel && d.linkLabel.overlap) ? -d.nodeBar.connectorLength + d.linkLabel.overlap : -d.nodeBar.connectorLength}`;
 */
-nodesAPI.getNodeBarD = d => `M ${d.nodeBar.connectorLength + d.nodeBar.connectorStart} 0 h ${-d.nodeBar.connectorLength}`;
-
-nodesAPI.getXNodeBarRect = d => options$1.nodeBarNeg ?
-  d.nodeBar.negStart + options$1.nodeBarScale(Math.min(0, d.data[options$1.nodeBarField]))
-  : d.nodeBar.anchor;
-nodesAPI.getWidthNodeBarRect = d => Math.abs(options$1.nodeBarScale(d.data[options$1.nodeBarField]) - options$1.nodeBarScale(0));
-nodesAPI.getXNodeBarText = d => d.nodeBar.textX;
-
-nodesAPI.getNodeBarTextFill = function(d) {
-  return options$1.nodeBarTextFill ? options$1.nodeBarTextFill(d) : d3.select(this).style("fill");
+nodesAPI.getNodeBarD = function (d) {
+  return "M ".concat(d.nodeBar.connectorLength + d.nodeBar.connectorStart, " 0 h ").concat(-d.nodeBar.connectorLength);
 };
-
-nodesAPI.getNodeBarRectFill = function(d) {
-  return options$1.nodeBarRectFill ? options$1.nodeBarRectFill(d) : null;
+nodesAPI.getXNodeBarRect = function (d) {
+  return options.nodeBarNeg ? d.nodeBar.negStart + options.nodeBarScale(Math.min(0, d.data[options.nodeBarField])) : d.nodeBar.anchor;
+};
+nodesAPI.getWidthNodeBarRect = function (d) {
+  return Math.abs(options.nodeBarScale(d.data[options.nodeBarField]) - options.nodeBarScale(0));
+};
+nodesAPI.getXNodeBarText = function (d) {
+  return d.nodeBar.textX;
+};
+nodesAPI.getNodeBarTextFill = function (d) {
+  return options.nodeBarTextFill ? options.nodeBarTextFill(d) : d3__namespace.select(this).style("fill");
+};
+nodesAPI.getNodeBarRectFill = function (d) {
+  return options.nodeBarRectFill ? options.nodeBarRectFill(d) : null;
   // return options.nodeBarRectFill ? options.nodeBarRectFill(d) : d3.select(this).style("fill");
 };
-
-nodesAPI.getNodeBarRectStroke = function(d) {
-  return options$1.nodeBarRectStroke ? options$1.nodeBarRectStroke(d) : d3.select(this).style("stroke");
+nodesAPI.getNodeBarRectStroke = function (d) {
+  return options.nodeBarRectStroke ? options.nodeBarRectStroke(d) : d3__namespace.select(this).style("stroke");
 };
-
-nodesAPI.getNodeBarTextAnchor = function(d) {
-  return d.data[options$1.nodeBarField] < 0 ? "end" : "start";
+nodesAPI.getNodeBarTextAnchor = function (d) {
+  return d.data[options.nodeBarField] < 0 ? "end" : "start";
 };
-
-nodesAPI.setNodeBarDefaultClass = function(d) {
-  if (!oldLabelField$1 || oldLabelField$1 === newLabelField$1) { 
-    return d.data[options$1.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
+nodesAPI.setNodeBarDefaultClass = function (d) {
+  if (!oldLabelField || oldLabelField === newLabelField) {
+    return d.data[options.nodeBarField] >= 0 ? "node-bar box node-bar-positive" : "node-bar box node-bar-negative";
   } else {
-    return d3.select(this).attr("class");
+    return d3__namespace.select(this).attr("class");
   }
 };
 
@@ -763,10 +879,9 @@ nodesAPI.setNodeBarDefaultClass = function(d) {
 // add visualization specific processing here     //
 //////////////////////////////////////////////////// 
 
-let transCounter = 0;
-
-function myChart(selection, data, options){
-  let config = {};
+var transCounter = 0;
+function myChart(selection, data, options) {
+  var config = {};
   config.width = options.svgDimensions.width - options.margin.right - options.margin.left;
   config.height = options.svgDimensions.height - options.margin.top - options.margin.bottom;
   config.i = 0; // counter for numerical IDs
@@ -775,13 +890,7 @@ function myChart(selection, data, options){
   config.svg = undefined;
   config.counter = 0;
   config.labelDimensions = [];
-
-  config.svg = selection.append("svg")
-    .attr("width", config.width + options.margin.right + options.margin.left)
-    .attr("height", config.height + options.margin.top + options.margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
- 
+  config.svg = selection.append("svg").attr("width", config.width + options.margin.right + options.margin.left).attr("height", config.height + options.margin.top + options.margin.bottom).append("g").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
   createTree(options, config, data);
   createScales(options, config);
   createUpdateFunctions(options, config, data);
@@ -792,57 +901,66 @@ function myChart(selection, data, options){
   }
   update(config.root, options, config);
 }
-
 function createTree(options, config, data) {
-  config.tree = options.alignLeaves ? d3.cluster() : d3.tree();
-  config.tree.size([config.width, config.height]).nodeSize([0, options.linkWidthValue]);  
+  config.tree = options.alignLeaves ? d3__namespace.cluster() : d3__namespace.tree();
+  config.tree.size([config.width, config.height]).nodeSize([0, options.linkWidthValue]);
   config.root = config.tree(data);
-  if (options.propagate) { config.root.sum(d => d[options.propagateField]);}
-  
-  config.root.each((d)=> {
+  if (options.propagate) {
+    config.root.sum(function (d) {
+      return d[options.propagateField];
+    });
+  }
+  config.root.each(function (d) {
     d.name = d.id; //transferring name to a name variable
     d.id = config.i; //Assigning numerical Ids
     config.i++;
-    if (options.propagate) { d.data[options.propagateField] = d.value;}
+    if (options.propagate) {
+      d.data[options.propagateField] = d.value;
+    }
   });
   config.root.x0 = config.root.x;
   config.root.y0 = config.root.y;
-  if (options.propagate) { options.propagate = false; }
-
+  if (options.propagate) {
+    options.propagate = false;
+  }
   if (options.debugOn) {
-    console.log("Data:"); console.log(data);
-    console.log("Tree:"); console.log(config.root);
-  } 
+    console.log("Data:");
+    console.log(data);
+    console.log("Tree:");
+    console.log(config.root);
+  }
 }
-
 function createScales(options, config) {
-  let nodes = config.root.descendants();
-  if (!options.linkStrengthStatic) {    
-    options.linkStrengthScale
-      .domain(d3.extent(nodes, d => +d.data[options.linkStrengthField]))
-      .range(options.linkStrengthRange);
+  var nodes = config.root.descendants();
+  if (!options.linkStrengthStatic) {
+    options.linkStrengthScale.domain(d3__namespace.extent(nodes, function (d) {
+      return +d.data[options.linkStrengthField];
+    })).range(options.linkStrengthRange);
   }
-  if (!options.linkWidthStatic) {   
-    const extent = d3.extent(nodes.slice(1), d => +d.data[options.linkWidthField]); 
-    options.linkWidthScale
-      .domain(extent[0] === extent[1] ? [extent[0], extent[0] + 1] : extent) // for extent [0,0] range[0] should be picked
-      .range(options.linkWidthRange);
+  if (!options.linkWidthStatic) {
+    var extent = d3__namespace.extent(nodes.slice(1), function (d) {
+      return +d.data[options.linkWidthField];
+    });
+    options.linkWidthScale.domain(extent[0] === extent[1] ? [extent[0], extent[0] + 1] : extent) // for extent [0,0] range[0] should be picked
+    .range(options.linkWidthRange);
   }
-  if (options.nodeBarOn && options.nodeBarUpdateScale) { 
-    let dom;
-    if (!options.nodeBarDomain) { 
-      const extent = d3.extent(nodes, d => +d.data[options.nodeBarField]);
-      const maxExtent = Math.max(Math.abs(extent[0]), Math.abs(extent[1])); 
+  if (options.nodeBarOn && options.nodeBarUpdateScale) {
+    var dom;
+    if (!options.nodeBarDomain) {
+      var _extent = d3__namespace.extent(nodes, function (d) {
+        return +d.data[options.nodeBarField];
+      });
+      var maxExtent = Math.max(Math.abs(_extent[0]), Math.abs(_extent[1]));
       // options.nodeBarNeg = (extent[0] * extent[1] < 0); 
-      options.nodeBarNeg = (extent[0] < 0);
-      if (extent[0] >= 0 && extent[1] >= 0) {
-        dom = [0, maxExtent]; 
+      options.nodeBarNeg = _extent[0] < 0;
+      if (_extent[0] >= 0 && _extent[1] >= 0) {
+        dom = [0, maxExtent];
         if (options.nodeBarRangeAdjusted) {
           options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] / 2];
           options.nodeBarRangeAdjusted = false;
-        } 
-      } else if (extent[0] < 0 && extent[1] < 0) {
-        dom = [extent[0], 0];
+        }
+      } else if (_extent[0] < 0 && _extent[1] < 0) {
+        dom = [_extent[0], 0];
         if (options.nodeBarRangeAdjusted) {
           options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRange[1] / 2];
           options.nodeBarRangeAdjusted = false;
@@ -852,59 +970,57 @@ function createScales(options, config) {
         options.nodeBarRange = [options.nodeBarRange[0], options.nodeBarRangeUpperBound * 2];
         options.nodeBarRangeAdjusted = true;
       }
+    } else {
+      dom = options.nodeBarDomain;
     }
-    else { dom = options.nodeBarDomain;}
-    options.nodeBarScale
-      .domain(dom)
-      .range(options.nodeBarRange)
-      .clamp(true);
+    options.nodeBarScale.domain(dom).range(options.nodeBarRange).clamp(true);
   }
 }
-
-function createUpdateFunctions(options, config, data){
-  options.updateLinkWidth = function() {
-    if (options.linkWidthStatic) {  
+function createUpdateFunctions(options, config, data) {
+  options.updateLinkWidth = function () {
+    if (options.linkWidthStatic) {
       config.tree.nodeSize([0, options.linkWidthValue]);
     } else {
       createScales(options, config);
     }
     update(config.root, options, config);
   };
-
-  options.updateScales = function() {
+  options.updateScales = function () {
     createScales(options, config);
     update(config.root, options, config);
   };
-
-  options.updateAlignLeaves = function() {
+  options.updateAlignLeaves = function () {
     createTree(options, config, data);
     update(config.root, options, config);
   };
 
   // 1
-  options.updateCollapse = function() {
+  options.updateCollapse = function () {
     collapseTree(options, config, false);
   };
-
-  options.updateExpand = function() {
+  options.updateExpand = function () {
     expandTree(options, config);
   };
   // end 1
 
-  options.updateDefault = function() {
+  options.updateDefault = function () {
     update(config.root, options, config);
   };
 }
-
 function collapseTree(options, config, firstTime) {
-  const root = [];
-  config.root.eachAfter(node => root.push(node));
-  let alreadyCollapsed = false;
-  for (let node of root) {
+  var root = [];
+  config.root.eachAfter(function (node) {
+    return root.push(node);
+  });
+  var alreadyCollapsed = false;
+  for (var _i = 0, _root = root; _i < _root.length; _i++) {
+    var node = _root[_i];
     if (collapseNode(node, options)) {
       alreadyCollapsed = node.children ? false : true;
       if (options.nodeCollapsePropagate) {
-        node.eachAfter(_node => collapse(_node));
+        node.eachAfter(function (_node) {
+          return collapse(_node);
+        });
       } else {
         collapse(node);
       }
@@ -919,18 +1035,19 @@ function collapseTree(options, config, firstTime) {
     update(config.root, options, config);
   }
 }
-
 function collapse(node) {
   if (node.children) {
     node._children = node.children;
     node.children = null;
   }
 }
-
 function expandTree(options, config) {
-  const root = [];
-  config.root.eachBefore(node => root.push(node));
-  for (let node of root) {
+  var root = [];
+  config.root.eachBefore(function (node) {
+    return root.push(node);
+  });
+  for (var _i2 = 0, _root2 = root; _i2 < _root2.length; _i2++) {
+    var node = _root2[_i2];
     if (expandNode(node, options)) {
       expand(node, options);
       createScales(options, config);
@@ -938,32 +1055,28 @@ function expandTree(options, config) {
     }
   }
 }
-
 function expandNode(node, options) {
-  const comparator = options.nodeExpandProperty === "key" ? node.data[options.keyField] : node[options.nodeExpandProperty];
-  return (options.nodeExpandArray.includes(comparator));
+  var comparator = options.nodeExpandProperty === "key" ? node.data[options.keyField] : node[options.nodeExpandProperty];
+  return options.nodeExpandArray.includes(comparator);
 }
-
 function collapseNode(node, options) {
-  const comparator = options.nodeCollapseProperty === "key" ? node.data[options.keyField] : node[options.nodeCollapseProperty];
-  return (options.nodeCollapseArray.includes(comparator));
+  var comparator = options.nodeCollapseProperty === "key" ? node.data[options.keyField] : node[options.nodeCollapseProperty];
+  return options.nodeCollapseArray.includes(comparator);
 }
-
 function expand(node, options) {
   if (!node.children) {
     node.children = node._children;
     node._children = null;
   }
   if (node.children) {
-    node.children.forEach(d => {
-      if (options.nodeExpandPropagate || expandNode(d, options)) { 
+    node.children.forEach(function (d) {
+      if (options.nodeExpandPropagate || expandNode(d, options)) {
         expand(d, options);
       }
     });
-  } 
+  }
 }
-
-function click(d, options, config){
+function click(d, options, config) {
   if (d.children) {
     d._children = d.children;
     d.children = null;
@@ -976,9 +1089,10 @@ function click(d, options, config){
   update(d, options, config);
   options.transitionDuration = options.transitionDurationDefault;
 }
-
-function update(source, options, config){
-  if (options.nodeResort) { config.root.sort(options.nodeResortFunction); }
+function update(source, options, config) {
+  if (options.nodeResort) {
+    config.root.sort(options.nodeResortFunction);
+  }
   console.log("update");
   /** 3
   if (options.nodeCollapse) {
@@ -991,281 +1105,250 @@ function update(source, options, config){
   3 **/
 
   // Compute the new tree layout.
-  let nodes = config.tree(config.root);
-  let nodesSort = [];
+  var nodes = config.tree(config.root);
+  var nodesSort = [];
   nodes.eachBefore(function (n) {
     nodesSort.push(n);
   });
   config.height = Math.max(500, nodesSort.length * options.linkHeight + options.margin.top + options.margin.bottom);
-  let links = nodesSort.slice(1);
+  var links = nodesSort.slice(1);
   // Compute the "layout".
-  nodesSort.forEach ((n,i)=> {
+  nodesSort.forEach(function (n, i) {
     n.x = i * options.linkHeight;
-    if (!options.linkWidthStatic){
+    if (!options.linkWidthStatic) {
       if (i !== 0) {
         n.y = n.parent.y + options.linkWidthScale(+n.data[options.linkWidthField]);
-      } 
+      }
     }
   });
-
-  config.svg.transition()
-    .duration(options.transitionDuration)
-    .attr("height", config.height);
+  config.svg.transition().duration(options.transitionDuration).attr("height", config.height);
 
   // 1. Update the links…
-  const l = linksAPI;
+  var l = linksAPI;
   l.initialize(options);
-
-  const link = config.svg.selectAll("g.link")
-    .data(links, function (d) {
-      var id = d.id + "->" + d.parent.id;
-      return id;
-    });
+  var link = config.svg.selectAll("g.link").data(links, function (d) {
+    var id = d.id + "->" + d.parent.id;
+    return id;
+  });
 
   // Enter any new links at the parent's previous position.
-  const linkEnter = link.enter().insert("g", "g.node")
-    .attr("class", "link")
+  var linkEnter = link.enter().insert("g", "g.node").attr("class", "link")
   //  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ") scale(0.001, 0.001)");
-    .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
-
-  const origin = {x: source.x0, y: source.y0, parent: {x: source.x0, y: source.y0}};
+  .attr("transform", "translate(" + source.y0 + " " + source.x0 + ")");
+  var origin = {
+    x: source.x0,
+    y: source.y0,
+    parent: {
+      x: source.x0,
+      y: source.y0
+    }
+  };
   linkEnter // filter to just draw this connector link for last child of parent
-    .filter(function(d) { return d.id === d.parent.children[d.parent.children.length - 1].id;})
-    .lower() // with lower() vertical links are pushed to the root of the DOM,
-    // so link labels on horizontal links are further down and thus are visible when overlapping
-    .append("path")
-    .attr("class", "link vertical")
-    .attr("d", () => l.getLinkD(origin, "vertical"));
-   
-  linkEnter.append("path")
-    .attr("class", "link horizontal")
-    .attr("d", () => l.getLinkD(origin, "horizontal"));
+  .filter(function (d) {
+    return d.id === d.parent.children[d.parent.children.length - 1].id;
+  }).lower() // with lower() vertical links are pushed to the root of the DOM,
+  // so link labels on horizontal links are further down and thus are visible when overlapping
+  .append("path").attr("class", "link vertical").attr("d", function () {
+    return l.getLinkD(origin, "vertical");
+  });
+  linkEnter.append("path").attr("class", "link horizontal").attr("d", function () {
+    return l.getLinkD(origin, "horizontal");
+  });
+  linkEnter.append("text").style("opacity", 1e-6);
 
-  linkEnter
-    .append("text")   
-    .style("opacity", 1e-6);   
-  
   // update merged selection before transition
-  const linkMerge = link.merge(linkEnter);
-  linkMerge.select("text")
-    .attr("class", options.linkLabelOnTop ? "label ontop" : "label above")  
-    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("dy", l.getInitialDy)
-    .attr("id", d => "link-label-" + d.id)
-    .text(d => l.getLinkLabelFormatted(d)) // remove line!
-    .style("fill", l.getLinkLabelColor); 
+  var linkMerge = link.merge(linkEnter);
+  linkMerge.select("text").attr("class", options.linkLabelOnTop ? "label ontop" : "label above")
+  //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+  .attr("dy", l.getInitialDy).attr("id", function (d) {
+    return "link-label-" + d.id;
+  }).text(function (d) {
+    return l.getLinkLabelFormatted(d);
+  }) // remove line!
+  .style("fill", l.getLinkLabelColor);
 
   // Transition links to their new position.
-  const linkUpdate = linkMerge
-    .transition()
-    .duration(options.transitionDuration);
-  
-  l.setupLabelDimensions(d3.selectAll(".link text.label"));
+  var linkUpdate = linkMerge.transition().duration(options.transitionDuration);
+  l.setupLabelDimensions(d3__namespace.selectAll(".link text.label"));
 
   // linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ") scale(1,1)");
-  linkUpdate.attr("transform", d => "translate(" + d.parent.y + " " + d.parent.x + ")");
-
-  linkUpdate.select("path.link.vertical")
-    .attr("d", (d) => l.getLinkD(d, "vertical", true))
-    .style("stroke", (d) => options.linkColorInherit ? l.getLinkStroke(d.parent) : "")
-    .style("stroke-width", (d) => l.getLinkStrokeWidth(d.parent));
-
-  linkUpdate.select("path.link.horizontal")
-    .attr("d", (d) => l.getLinkD(d, "horizontal"))
-    .attr("transform", l.getLinkRTranslate)
-    .style("stroke", l.getLinkStroke)
-    .style("stroke-width", l.getLinkStrokeWidth);
-
-  linkUpdate
-    .select("text")  
-    .attr("dy", l.getDy)
-    //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
-    .attr("text-anchor", l.getLinkLabelAnchor) // remove and handle in tween
-    .attr("x", l.getLinkTextPositionX)
-    .attr("y", d => d.x - d.parent.x)
-    .call(sel => sel.tween("text", l.getLinkTextTween))
-    .style("opacity", d => (!options.linkLabelAlways && !d.linkLabel.always) ? 0 : 1); 
+  linkUpdate.attr("transform", function (d) {
+    return "translate(" + d.parent.y + " " + d.parent.x + ")";
+  });
+  linkUpdate.select("path.link.vertical").attr("d", function (d) {
+    return l.getLinkD(d, "vertical", true);
+  }).style("stroke", function (d) {
+    return options.linkColorInherit ? l.getLinkStroke(d.parent) : "";
+  }).style("stroke-width", function (d) {
+    return l.getLinkStrokeWidth(d.parent);
+  });
+  linkUpdate.select("path.link.horizontal").attr("d", function (d) {
+    return l.getLinkD(d, "horizontal");
+  }).attr("transform", l.getLinkRTranslate).style("stroke", l.getLinkStroke).style("stroke-width", l.getLinkStrokeWidth);
+  linkUpdate.select("text").attr("dy", l.getDy)
+  //.attr("text-anchor", options.linkLabelAligned ? "end" : "middle")
+  .attr("text-anchor", l.getLinkLabelAnchor) // remove and handle in tween
+  .attr("x", l.getLinkTextPositionX).attr("y", function (d) {
+    return d.x - d.parent.x;
+  }).call(function (sel) {
+    return sel.tween("text", l.getLinkTextTween);
+  }).style("opacity", function (d) {
+    return !options.linkLabelAlways && !d.linkLabel.always ? 0 : 1;
+  });
 
   // Transition exiting nodes to the parent's new position.
-  const linkExit = link.exit().transition()
-    .duration(options.transitionDuration)
-    .remove();
-
-  linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")"); 
-
-  const destination = {x: source.x, y: source.y, parent: {x: source.x, y: source.y}};
-  linkExit.selectAll("path.link.vertical")
-    .attr("d", () => l.getLinkD(destination, "vertical")); 
-
-  linkExit.selectAll("path.link.horizontal")
-    .attr("d", () => l.getLinkD(destination, "horizontal"))
-    .attr("transform", "translate(0 0)");
-
-  linkExit
-    .select("text")
-    .attr("x", 0)
-    .attr("y", 0)
-    .style("opacity", 1e-6);
+  var linkExit = link.exit().transition().duration(options.transitionDuration).remove();
+  linkExit.attr("transform", "translate(" + source.y + " " + source.x + ")");
+  var destination = {
+    x: source.x,
+    y: source.y,
+    parent: {
+      x: source.x,
+      y: source.y
+    }
+  };
+  linkExit.selectAll("path.link.vertical").attr("d", function () {
+    return l.getLinkD(destination, "vertical");
+  });
+  linkExit.selectAll("path.link.horizontal").attr("d", function () {
+    return l.getLinkD(destination, "horizontal");
+  }).attr("transform", "translate(0 0)");
+  linkExit.select("text").attr("x", 0).attr("y", 0).style("opacity", 1e-6);
 
   // 2. Update the nodes…
-  const n = nodesAPI;
+  var n = nodesAPI;
   n.initialize(options);
-
-  const node = config.svg.selectAll("g.node")
-    .data(nodesSort, function (d) {
-      return d.id || (d.id = ++config.i);
-    });
+  var node = config.svg.selectAll("g.node").data(nodesSort, function (d) {
+    return d.id || (d.id = ++config.i);
+  });
 
   // Enter any new nodes at the parent's previous position.
-  const nodeEnter = node.enter().append("g")
-    .attr("class", "node")
-    .style("visibility", "hidden")
-    .on("click", (event, d) => { return click (d, options, config); });
-
+  var nodeEnter = node.enter().append("g").attr("class", "node").style("visibility", "hidden").on("click", function (event, d) {
+    return click(d, options, config);
+  });
   nodeEnter.call(n.appendNode);
-
-  nodeEnter.append("text")
-    .attr("class", "node-label")
-    .attr("dy", ".35em")
-    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
-    .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end")
-    .text(function (d) {
-      if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
-        return d.data[options.nodeLabelField].substring(0, options.nodeLabelLength) + "...";
-      } else {
-        return d.data[options.nodeLabelField];
-      }
-    });
-
-  if (options.nodeTitleOn)
-    nodeEnter.append("svg:title").text(function (d) {
-      return (options.nodeTitleField === "" || !d.data[options.nodeTitleField]) ? d.data[options.nodeLabelField] : d.data[options.nodeTitleField];
-    });
-
+  nodeEnter.append("text").attr("class", "node-label").attr("dy", ".35em").attr("x", function (d) {
+    return !d.parent || d.y >= d.parent.y ? options.nodeLabelPadding : -options.nodeLabelPadding;
+  }).attr("text-anchor", function (d) {
+    return !d.parent || d.y >= d.parent.y ? "start" : "end";
+  }).text(function (d) {
+    if (d.data[options.nodeLabelField].length > options.nodeLabelLength) {
+      return d.data[options.nodeLabelField].substring(0, options.nodeLabelLength) + "...";
+    } else {
+      return d.data[options.nodeLabelField];
+    }
+  });
+  if (options.nodeTitleOn) nodeEnter.append("svg:title").text(function (d) {
+    return options.nodeTitleField === "" || !d.data[options.nodeTitleField] ? d.data[options.nodeLabelField] : d.data[options.nodeTitleField];
+  });
   nodeEnter.style("visibility", "hidden");
 
   // add nodeBar
-  const nodeBarEnter = nodeEnter
-    .append("g")
-    .attr("class", "node-bar")
-    .style("display", d => options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none");
-
-  nodeBarEnter.append("path")
-    .attr("class", "node-bar connector")
-    .attr("d", "M 0 0 h 0");
-  
-  nodeBarEnter.append("rect")
-    .attr("class", n.setNodeBarDefaultClass)
-    .attr("y", -8)
-    .attr("height", 16);
-
-  nodeBarEnter.append("text")
-    .attr("class", "node-bar bar-label")
-    .attr("dy", ".35em") ;
+  var nodeBarEnter = nodeEnter.append("g").attr("class", "node-bar").style("display", function (d) {
+    return options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none";
+  });
+  nodeBarEnter.append("path").attr("class", "node-bar connector").attr("d", "M 0 0 h 0");
+  nodeBarEnter.append("rect").attr("class", n.setNodeBarDefaultClass).attr("y", -8).attr("height", 16);
+  nodeBarEnter.append("text").attr("class", "node-bar bar-label").attr("dy", ".35em");
   // end nodeBar
 
-  let nodeMerge = node.merge(nodeEnter);
-  
-  nodeMerge.selectAll("g.node-bar").style("display", 
-    d => options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none");
-  if (options.nodeBarOn) { n.computeNodeExtend(nodeMerge); }
-
-  nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)")
-    .style("visibility", "visible");
+  var nodeMerge = node.merge(nodeEnter);
+  nodeMerge.selectAll("g.node-bar").style("display", function (d) {
+    return options.nodeBarOn && d.data[options.nodeBarField] !== null ? "inline" : "none";
+  });
+  if (options.nodeBarOn) {
+    n.computeNodeExtend(nodeMerge);
+  }
+  nodeEnter.attr("transform", "translate(" + source.y0 + "," + source.x0 + ") scale(0.001, 0.001)").style("visibility", "visible");
 
   // Transition nodes to their new position.
-  let trans = "trans" + transCounter++; 
-  let nodeUpdate = nodeMerge
-    .transition(trans)
-    .duration(options.transitionDuration);
-  
+  var trans = "trans" + transCounter++;
+  var nodeUpdate = nodeMerge.transition(trans).duration(options.transitionDuration);
   if (options.debugOn) {
     console.log("transition: " + trans);
     console.log("nodeUpdate.size: " + nodeUpdate.size());
   }
-
-  nodeUpdate
-    .attr("transform", d => "translate(" + d.y + "," + d.x + ") scale(1,1)");
-
+  nodeUpdate.attr("transform", function (d) {
+    return "translate(" + d.y + "," + d.x + ") scale(1,1)";
+  });
   nodeUpdate.call(n.updateNode);
-
-  
   nodeUpdate.selectAll(".node-label")
-    //.call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
-    .attr("x", d => (!d.parent || d.y >= d.parent.y) ? options.nodeLabelPadding : -options.nodeLabelPadding)
-    .attr("text-anchor", d => (!d.parent || d.y >= d.parent.y) ? "start" : "end");
-  
-  nodeUpdate.selectAll("g.node-bar")
-    .attr("display", options.nodeBarOn ? "inline" : "none");
-
+  //.call(sel => sel.tween("nodeLabel", n.getNodeLabelTween));
+  .attr("x", function (d) {
+    return !d.parent || d.y >= d.parent.y ? options.nodeLabelPadding : -options.nodeLabelPadding;
+  }).attr("text-anchor", function (d) {
+    return !d.parent || d.y >= d.parent.y ? "start" : "end";
+  });
+  nodeUpdate.selectAll("g.node-bar").attr("display", options.nodeBarOn ? "inline" : "none");
   if (options.nodeBarOn) {
-    const nodeBarUpdate = nodeUpdate.filter(d => d.data[options.nodeBarField] !== null);
-    nodeBarUpdate.selectAll(".node-bar.box")
-      .attr("class", n.setNodeBarDefaultClass)
-      .style("fill", n.getNodeBarRectFill)
-      .style("stroke", n.getNodeBarRectStroke)
-      .attr("x", n.getXNodeBarRect)
-      .attr("width", n.getWidthNodeBarRect);
+    var nodeBarUpdate = nodeUpdate.filter(function (d) {
+      return d.data[options.nodeBarField] !== null;
+    });
+    nodeBarUpdate.selectAll(".node-bar.box").attr("class", n.setNodeBarDefaultClass).style("fill", n.getNodeBarRectFill).style("stroke", n.getNodeBarRectStroke).attr("x", n.getXNodeBarRect).attr("width", n.getWidthNodeBarRect);
     nodeBarUpdate.selectAll(".node-bar.bar-label")
-      //.style("text-anchor", n.getNodeBarTextAnchor)
-      .style("fill", n.getNodeBarTextFill)
-      .call(sel => sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
-      //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
-      .attr("x", n.getXNodeBarText);
-    nodeBarUpdate.selectAll(".node-bar.connector")
-      .attr("d", n.getNodeBarD);
+    //.style("text-anchor", n.getNodeBarTextAnchor)
+    .style("fill", n.getNodeBarTextFill).call(function (sel) {
+      return sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween);
+    })
+    //.call(sel => n.sameBarLabel() ? null : sel.tween("nodeBarLabel" + transCounter, n.getNodeBarLabelTween))
+    .attr("x", n.getXNodeBarText);
+    nodeBarUpdate.selectAll(".node-bar.connector").attr("d", n.getNodeBarD);
   }
 
   // Transition exiting nodes to the parent's new position (and remove the nodes)
-  var nodeExit = node.exit().transition()
-    .duration(options.transitionDuration);
-  
-  nodeExit
-    .attr("transform", function () {
-      return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
-    })
-    .remove();
+  var nodeExit = node.exit().transition().duration(options.transitionDuration);
+  nodeExit.attr("transform", function () {
+    return "translate(" + source.y + "," + source.x + ") scale(0.001, 0.001)";
+  }).remove();
+  nodeExit.select(".node-label").style("fill-opacity", 1e-6);
 
-  nodeExit.select(".node-label")
-    .style("fill-opacity", 1e-6);
-  
   // Stash the old positions for transition.
   nodesSort.forEach(function (d) {
     d.x0 = d.x;
     d.y0 = d.y;
-  }); 
+  });
 }
 
 // import * as d3 from "d3-js";
 
 function d3_template_reusable (_dataSpec) {
-    
   ///////////////////////////////////////////////////
   // 1.0 ADD visualization specific variables here //
   ///////////////////////////////////////////////////
-  let options = {};
+  var options = {};
   // 1. ADD all options that should be accessible to caller
   options.debugOn = false;
-  options.margin = {top: 20, right: 10, bottom: 20, left: 10};
-  options.svgDimensions = {height: 800, width: 1400};
+  options.margin = {
+    top: 20,
+    right: 10,
+    bottom: 20,
+    left: 10
+  };
+  options.svgDimensions = {
+    height: 800,
+    width: 1400
+  };
   options.transitionDurationDefault = 750; // for all transitions except expand/collapse
   options.transitionDurationClick = 750; // for expand/collapse transitions and initial transition
   options.transitionDuration = options.transitionDurationDefault;
   options.locale = undefined;
-
   options.defaultColor = "grey";
-  
   options.nodeBarOn = false;
   options.nodeBarField = "value"; // for the width of the rect
   options.nodeBarLabel = options.nodeBarField; // for the text displayed
   options.nodeBarLabelInside = false; // display the label inside the bar?
+  options.nodeBarTextFill; // function for setting the label color based on the value.
+  options.nodeBarRectFill; // function for setting the fill color of the rectangle based on the value.
+  options.nodeBarRectStroke; // function for setting the stroke color of the rectangle based on the value.
   options.nodeBarUnit = "";
-  options.nodeBarFormatSpecifier = ",.0f"; 
-  options.nodeBarFormat = d3.format(options.nodeBarFormatSpecifier);
-  options.nodeBarScale = d3.scaleLinear();
+  options.nodeBarFormatSpecifier = ",.0f";
+  options.nodeBarFormat = d3__namespace.format(options.nodeBarFormatSpecifier);
+  options.nodeBarScale = d3__namespace.scaleLinear();
+  options.nodeBarDomain; // domain of the scale
   options.nodeBarRange = [0, 200];
   options.nodeBarRangeUpperBound = options.nodeBarRange[1];
   options.nodeBarRangeAdjusted = false; // true if range is doubled for pos + neg bars
+  options.nodeBarNeg; // true if nodeBarField has at least one negative value
   options.nodeBarUpdateScale = true; // update scale or use current scale
   options.nodeBarTranslateX = 50; // distance between node lebel end and start of minimal neg bar.
   options.nodeBarState = {}; // properties oldField and newField for transitions
@@ -1286,65 +1369,63 @@ function d3_template_reusable (_dataSpec) {
   options.nodeLabelFieldFlatData = "__he_name";
   options.nodeLabelLength = 50;
   options.nodeLabelPadding = 10;
-
   options.nodeResort = false;
   options.nodeResortAscending = false;
   options.nodeResortField = "value";
   options.nodeResortByHeight = false;
-  options.nodeResortFunction = 
-    function(a, b) { 
-      let ret = options.nodeResortByHeight ? b.height - a.height : 0 ;
-      if (ret === 0) {
-        if (typeof (a.data[options.nodeResortField]) === "string") {
-          ret = b.data[options.nodeResortField].localeCompare(a.data[options.nodeResortField]);
-        } else {
-          ret = b.data[options.nodeResortField] - a.data[options.nodeResortField];
-        }
+  options.nodeResortFunction = function (a, b) {
+    var ret = options.nodeResortByHeight ? b.height - a.height : 0;
+    if (ret === 0) {
+      if (typeof a.data[options.nodeResortField] === "string") {
+        ret = b.data[options.nodeResortField].localeCompare(a.data[options.nodeResortField]);
+      } else {
+        ret = b.data[options.nodeResortField] - a.data[options.nodeResortField];
       }
-      if (options.nodeResortAscending) { ret *= -1; }
-      return ret;
-    };
-
+    }
+    if (options.nodeResortAscending) {
+      ret *= -1;
+    }
+    return ret;
+  };
   options.nodeCollapse = false;
   options.nodeCollapseArray = [];
   options.nodeCollapseProperty = "key"; // "height" , "depth", "id"
   options.nodeCollapsePropagate = true;
-
   options.nodeExpand = false;
   options.nodeExpandArray = [];
   options.nodeExpandProperty = "key"; // "height" , "depth", "id"
   options.nodeExpandPropagate = true;
-
   options.nodeTitleOn = true;
   options.nodeTitleField = ""; // default: options.nodeLabelField which will be set later
 
   options.linkHeight = 20;
-
   options.linkLabelField = "value";
   options.linkLabelOn = false;
   options.linkLabelUnit = "";
   options.linkLabelOnTop = true;
   options.linkLabelAlignment = "aligned"; // "aligned", "start", "middle" or "end"
   options.linkLabelAlways = false; // always display link Label ? if false, lael is not displayed if longer than link
-  options.linkLabelFormatSpecifier = ",.0f"; 
-  options.linkLabelFormat = d3.format(options.linkLabelFormatSpecifier);
+  options.linkLabelFormatSpecifier = ",.0f";
+  options.linkLabelFormat = d3__namespace.format(options.linkLabelFormatSpecifier);
+  options.linkLabelColor; // function for setting the label color based on the value.
 
   // true if linkWidth is a fixed number, otherwise dynamically calculated from options.linkWidthField
-  options.linkWidthStatic = true; 
+  options.linkWidthStatic = true;
   options.linkWidthValue = 30;
-  options.linkWidthScale = d3.scaleLinear().clamp(true);
+  options.linkWidthScale = d3__namespace.scaleLinear().clamp(true);
   options.linkWidthField = "value";
   options.linkWidthRange = [15, 100];
 
   // true if linkStrength is a fixed number, otherwise dynamically calculated from options.linkStrengthField
-  options.linkStrengthStatic = true; 
+  options.linkStrengthStatic = true;
   options.linkStrengthValue = 1;
-  options.linkStrengthScale = d3.scaleLinear();
+  options.linkStrengthScale = d3__namespace.scaleLinear();
   options.linkStrengthField = "value";
   options.linkStrengthRange = [1, 10];
-
   options.linkColorStatic = true;
-  options.linkColorScale = (value) => value; // id function as default - assuming linkColorField contains colors
+  options.linkColorScale = function (value) {
+    return value;
+  }; // id function as default - assuming linkColorField contains colors
   options.linkColorField = "color";
   options.linkColorInherit = true; // vertical link inherits color from parent
 
@@ -1355,111 +1436,106 @@ function d3_template_reusable (_dataSpec) {
   options.keyField = "key";
 
   // 2. ADD getter-setter methods here
-  chartAPI.debugOn = function(_) {
+  chartAPI.debugOn = function (_) {
     if (!arguments.length) return options.debugOn;
     options.debugOn = _;
     return chartAPI;
-  }; 
-
-  chartAPI.defaultColor = function(_) {
+  };
+  chartAPI.defaultColor = function (_) {
     if (!arguments.length) return options.defaultColor;
     options.defaultColor = _;
     if (typeof options.updateLinkColor === "function") options.updateLinkColor();
     return chartAPI;
-  }; 
-  
-  chartAPI.margin = function(_) {
+  };
+  chartAPI.margin = function (_) {
     if (!arguments.length) return options.margin;
     options.margin = _;
     return chartAPI;
-  }; 
-
-  chartAPI.svgDimensions = function(_) {
+  };
+  chartAPI.svgDimensions = function (_) {
     if (!arguments.length) return options.svgDimensions;
     options.svgDimensions = _;
     return chartAPI;
-  }; 
-    
-  chartAPI.nodeLabelLength = function(_) {
+  };
+  chartAPI.nodeLabelLength = function (_) {
     if (!arguments.length) return options.nodeLabelLength;
     options.nodeLabelLength = _;
     return chartAPI;
   };
-
-  chartAPI.nodeLabelPadding = function(_) {
+  chartAPI.nodeLabelPadding = function (_) {
     if (!arguments.length) return options.nodeLabelPadding;
     options.nodeLabelPadding = _;
     return chartAPI;
   };
-
-  chartAPI.transitionDuration = function(_) {
+  chartAPI.transitionDuration = function (_) {
     if (!arguments.length) return options.transitionDuration;
     options.transitionDurationDefault = _;
     options.transitionDuration = _;
     return chartAPI;
-  };  
-
-  chartAPI.propagateValue = function(_) {
+  };
+  chartAPI.propagateValue = function (_) {
     if (!arguments.length) return options.propagate + ": " + options.propagateField;
     options.propagate = true;
     options.propagateField = _;
     return chartAPI;
-  }; 
-
-  chartAPI.formatDefaultLocale = function(_) {
+  };
+  chartAPI.formatDefaultLocale = function (_) {
     if (!arguments.length) return options.locale;
-    if (_ === "DE"){
+    if (_ === "DE") {
       _ = {
         "decimal": ",",
         "thousands": ".",
         "grouping": [3],
-        "currency": ["", " €"]   
+        "currency": ["", " €"]
       };
     }
-    options.locale = d3.formatDefaultLocale(_);
+    options.locale = d3__namespace.formatDefaultLocale(_);
     return chartAPI;
-  }; 
+  };
 
   // 3. ADD getter-setter methods with updateable functions here
-  chartAPI.nodeBar = function(_ = options.nodeBarField, _options = {}) { 
+  chartAPI.nodeBar = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeBarField;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.nodeBarField;
-
-    if (typeof(_)  === "string")  {
-      options.nodeBarField = _; 
+    if (typeof _ === "string") {
+      options.nodeBarField = _;
       options.nodeBarOn = true;
-    } else if (typeof(_)  === "boolean") {
+    } else if (typeof _ === "boolean") {
       options.nodeBarOn = _;
     }
     if (options.nodeBarOn) {
-      if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
+      if (_options.locale) {
+        chartAPI.formatDefaultLocale(_options.locale);
+      }
       options.nodeBarLabel = _options.label || options.nodeBarField;
       options.nodeBarState.oldField = options.nodeBarState.newField;
       options.nodeBarState.newField = options.nodeBarLabel;
-      options.nodeBarLabelInside = (typeof (_options.labelInside) !== "undefined") ? _options.labelInside : options.nodeBarLabelInside;
+      options.nodeBarLabelInside = typeof _options.labelInside !== "undefined" ? _options.labelInside : options.nodeBarLabelInside;
       options.nodeBarTextFill = _options.textFill || options.nodeBarTextFill;
       options.nodeBarRectFill = _options.rectFill || options.nodeBarRectFill;
       options.nodeBarRectStroke = _options.rectStroke || options.nodeBarRectStroke;
       options.nodeBarUnit = _options.unit || options.nodeBarUnit;
-      options.nodeBarFormat = (_options.format) ? d3.format(_options.format) : options.nodeBarFormat;
+      options.nodeBarFormat = _options.format ? d3__namespace.format(_options.format) : options.nodeBarFormat;
       options.nodeBarTranslateX = _options.translateX || options.nodeBarTranslateX;
-      options.nodeBarScale  = _options.scale || options.nodeBarScale;
+      options.nodeBarScale = _options.scale || options.nodeBarScale;
       //options.nodeBarRange = _options.range || options.nodeBarRange;
-      if (_options.range) { 
-        options.nodeBarRange = _options.range; 
+      if (_options.range) {
+        options.nodeBarRange = _options.range;
         options.nodeBarRangeAdjusted = false;
-        options.nodeBarRangeUpperBound = options.nodeBarRange[1]; 
+        options.nodeBarRangeUpperBound = options.nodeBarRange[1];
       }
       options.nodeBarDomain = _options.domain || options.nodeBarDomain;
-      if (typeof (_options.updateScale) !== "undefined") {
+      if (typeof _options.updateScale !== "undefined") {
         options.nodeBarUpdateScale = _options.updateScale;
-      } 
+      }
       // options.nodeBarUpdateScale = (typeof (_options.updateScale) !== "undefined") ? _options.updateScale : options.nodeBarUpdateScale;
     }
     if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;
   };
-
-  chartAPI.nodeImageFile = function(_callback, _options = {}) {
+  chartAPI.nodeImageFile = function (_callback) {
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.nodeImageFileAppend;
     options.nodeImageFile = true;
     options.nodeImageFileAppend = _callback;
@@ -1469,192 +1545,195 @@ function d3_template_reusable (_dataSpec) {
     options.nodeImageY = _options.y || -1 * options.nodeImageHeight / 2;
     options.nodeImagePreserveAspectRatio = _options.preserveAspectRatio || options.nodeImagePreserveAspectRatio;
     // options.nodeImageSetBackground = _options.setBackground || options.nodeImageSetBackground;
-    options.nodeImageSetBackground = (typeof (_options.setBackground) !== "undefined") ? _options.setBackground : options.nodeImageSetBackground;
-    options.nodeImageDefault = (typeof (_options.default) !== "undefined") ? _options.default : options.nodeImageDefault;
+    options.nodeImageSetBackground = typeof _options.setBackground !== "undefined" ? _options.setBackground : options.nodeImageSetBackground;
+    options.nodeImageDefault = typeof _options["default"] !== "undefined" ? _options["default"] : options.nodeImageDefault;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
-
-  chartAPI.nodeImageSelection = function(_append, _update) {
+  chartAPI.nodeImageSelection = function (_append, _update) {
     if (!arguments.length) return options.nodeImageSelectionAppend;
-    options.nodeImageSelectionAppend = (_append === false) ? function() {} : _append;
+    options.nodeImageSelectionAppend = _append === false ? function () {} : _append;
     options.nodeImageSelectionUpdate = _update;
     options.nodeImageFile = false;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
-
-  chartAPI.nodeSort = function(_ = options.nodeSortField, _options = {}) {
+  chartAPI.nodeSort = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeSortField;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.nodeSortField;
-    if (typeof(_)  === "string")  {
+    if (typeof _ === "string") {
       options.nodeResort = true;
-      options.nodeResortAscending = (typeof (_options.ascending) !== "undefined") ? _options.ascending : options.nodeResortAscending;
-      options.nodeResortByHeight = (typeof (_options.sortByHeight) !== "undefined") ? _options.sortByHeight : options.nodeResortByHeight;
+      options.nodeResortAscending = typeof _options.ascending !== "undefined" ? _options.ascending : options.nodeResortAscending;
+      options.nodeResortByHeight = typeof _options.sortByHeight !== "undefined" ? _options.sortByHeight : options.nodeResortByHeight;
       options.nodeResortField = _;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
-
-  chartAPI.nodeCollapse = function(_ = options.nodeCollapseArray, _options = {}) {
+  chartAPI.nodeCollapse = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeCollapseArray;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.nodeCollapseArray;
-    if (!Array.isArray(_))  { _ = [_];}
+    if (!Array.isArray(_)) {
+      _ = [_];
+    }
     options.nodeCollapse = true;
     options.nodeCollapseArray = _;
-    options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty; 
-    options.nodeCollapsePropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeCollapsePropagate;
+    options.nodeCollapseProperty = _options.property || options.nodeCollapseProperty;
+    options.nodeCollapsePropagate = typeof _options.propagate !== "undefined" ? _options.propagate : options.nodeCollapsePropagate;
     // if (typeof options.updateDefault === "function") options.updateDefault();
     if (typeof options.updateCollapse === "function") options.updateCollapse();
     return chartAPI;
   };
-
-  chartAPI.nodeExpand = function(_ = options.nodeExpandArray, _options = {}) {
+  chartAPI.nodeExpand = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeExpandArray;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.nodeExpandArray;
-    if (!Array.isArray(_))  { _ = [_];}
+    if (!Array.isArray(_)) {
+      _ = [_];
+    }
     options.nodeExpand = true;
     options.nodeExpandArray = _;
-    options.nodeExpandProperty = _options.property || options.nodeExpandProperty; 
-    options.nodeExpandPropagate = (typeof (_options.propagate) !== "undefined") ? _options.propagate : options.nodeExpandPropagate;
+    options.nodeExpandProperty = _options.property || options.nodeExpandProperty;
+    options.nodeExpandPropagate = typeof _options.propagate !== "undefined" ? _options.propagate : options.nodeExpandPropagate;
     // if (typeof options.updateDefault === "function") options.updateDefault();
     if (typeof options.updateExpand === "function") options.updateExpand();
     return chartAPI;
   };
-  
-  chartAPI.nodeTitle = function(_ = options.nodeTitleOn) {
+  chartAPI.nodeTitle = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.nodeTitleOn;
     if (!arguments.length) return options.nodeTitleOn;
     options.nodeTitleField = false;
-
-    if (typeof(_)  === "string")  {
-      options.nodeTitleField = _; 
+    if (typeof _ === "string") {
+      options.nodeTitleField = _;
       options.nodeTitleOn = true;
-    } else if (typeof(_)  === "boolean") {
+    } else if (typeof _ === "boolean") {
       options.nodeTitleOn = _;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
-  }; 
-
-  chartAPI.linkHeight = function(_) {
+  };
+  chartAPI.linkHeight = function (_) {
     if (!arguments.length) return options.linkHeight;
     options.linkHeight = _;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
-
-  chartAPI.linkLabel = function(_ = options.linkLabelField, _options = {}) { 
+  chartAPI.linkLabel = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkLabelField;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.linkLabelField;
-
-    if (typeof(_)  === "string")  {
-      options.linkLabelField = _; 
+    if (typeof _ === "string") {
+      options.linkLabelField = _;
       options.linkLabelOn = true;
-    } else if (typeof(_)  === "boolean") {
+    } else if (typeof _ === "boolean") {
       options.linkLabelOn = _;
     }
     if (options.linkLabelOn) {
-      if (_options.locale) { chartAPI.formatDefaultLocale(_options.locale); }
+      if (_options.locale) {
+        chartAPI.formatDefaultLocale(_options.locale);
+      }
       options.linkLabelColor = _options.color || options.linkLabelColor;
       options.linkLabelUnit = _options.unit || options.linkLabelUnit;
-      options.linkLabelFormat = (_options.format) ? d3.format(_options.format) : options.linkLabelFormat;
-      options.linkLabelOnTop = (typeof (_options.onTop) !== "undefined") ? _options.onTop : options.linkLabelOnTop;
-      options.linkLabelAlways = (typeof (_options.always) !== "undefined") ? _options.always : options.linkLabelAlways;
+      options.linkLabelFormat = _options.format ? d3__namespace.format(_options.format) : options.linkLabelFormat;
+      options.linkLabelOnTop = typeof _options.onTop !== "undefined" ? _options.onTop : options.linkLabelOnTop;
+      options.linkLabelAlways = typeof _options.always !== "undefined" ? _options.always : options.linkLabelAlways;
       options.linkLabelAlignment = _options.align || options.linkLabelAlignment;
     }
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
   };
-
-  chartAPI.linkWidth = function(_ = options.linkWidthField, _options = {}) {
+  chartAPI.linkWidth = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkWidthField;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.linkWidthStatic ? options.linkWidthValue : options.linkWidthField;
-    if (typeof (_) === "number") { 
+    if (typeof _ === "number") {
       options.linkWidthStatic = true;
       options.linkWidthValue = _;
-    }
-    else if (typeof(_) === "string") {
+    } else if (typeof _ === "string") {
       options.linkWidthStatic = false;
       options.linkWidthField = _;
-      options.linkWidthScale  = _options.scale || options.linkWidthScale;
+      options.linkWidthScale = _options.scale || options.linkWidthScale;
       options.linkWidthRange = _options.range || options.linkWidthRange;
     }
-    
     if (typeof options.updateLinkWidth === "function") options.updateLinkWidth();
     return chartAPI;
   };
-
-  chartAPI.linkStrength = function(_ = options.linkStrengthField, _options = {}) {
+  chartAPI.linkStrength = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkStrengthField;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.linkStrengthValue;
-    if (typeof (_) === "number") { 
+    if (typeof _ === "number") {
       options.linkStrengthStatic = true;
       options.linkStrengthValue = _;
-    }
-    else if (typeof(_) === "string") {
+    } else if (typeof _ === "string") {
       options.linkStrengthStatic = false;
       options.linkStrengthField = _;
       options.linkStrengthScale = _options.scale || options.linkStrengthScale;
       options.linkStrengthRange = _options.range || options.linkStrengthRange;
     }
-    
     if (typeof options.updateScales === "function") options.updateScales();
     return chartAPI;
   };
-
-  chartAPI.linkColor = function(_ = options.linkColorField, _options = {}) {
+  chartAPI.linkColor = function () {
+    var _ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : options.linkColorField;
+    var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!arguments.length) return options.linkColorField;
     options.linkColorStatic = false;
     options.linkColorField = _;
     options.linkColorScale = _options.scale || options.linkColorScale;
-    options.linkColorInherit = (typeof (_options.inherit) !== "undefined") ? _options.inherit : options.linkColorInherit;
+    options.linkColorInherit = typeof _options.inherit !== "undefined" ? _options.inherit : options.linkColorInherit;
     if (typeof options.updateDefault === "function") options.updateDefault();
     return chartAPI;
-  }; 
-
-  chartAPI.alignLeaves = function(_) {
+  };
+  chartAPI.alignLeaves = function (_) {
     if (!arguments.length) return options.alignLeaves;
     options.alignLeaves = _;
     if (typeof options.updateAlignLeaves === "function") options.updateAlignLeaves();
     return chartAPI;
-  }; 
-  
+  };
+
   ////////////////////////////////////////////////////
   // API for external access                        //
   //////////////////////////////////////////////////// 
 
   // standard API for selection.call()
   function chartAPI(selection) {
-    selection.each( function (d) {
+    selection.each(function (d) {
       console.log(d);
-      console.log("dataSpec: "); console.log(_dataSpec);
-      if (typeof d !== "undefined") { // data processing from outside
+      console.log("dataSpec: ");
+      console.log(_dataSpec);
+      if (typeof d !== "undefined") {
+        // data processing from outside
         createChart(selection, d);
-      }
-      else { // data processing here
-        const myData = createDataInfo(_dataSpec);
+      } else {
+        // data processing here
+        var myData = createDataInfo(_dataSpec);
         readData(myData, selection, options, createChart);
       }
     });
-  }  
-
+  }
   function createDataInfo(dataSpec) {
-    let myData = {};
-
-    if (typeof dataSpec === "object"){ 
+    var myData = {};
+    if (_typeof(dataSpec) === "object") {
       myData.data = dataSpec.source;
       myData.hierarchyLevels = dataSpec.hierarchyLevels;
       myData.flatData = Array.isArray(myData.hierarchyLevels) ? true : false;
       myData.keyField = dataSpec.key ? dataSpec.key : "key";
       myData.delimiter = dataSpec.delimiter ? dataSpec.delimiter : ",";
-      myData.separator = dataSpec.separator ?  dataSpec.separator : "$";
-
-      myData.autoConvert = true; 
-      myData.convertTypesFunction = d3.autoType;
+      myData.separator = dataSpec.separator ? dataSpec.separator : "$";
+      myData.autoConvert = true;
+      myData.convertTypesFunction = d3__namespace.autoType;
       if (dataSpec.convertTypes === "none") {
         myData.autoConvert = false;
       } else {
-        if (typeof (dataSpec.convertTypes) === "function") {
+        if (typeof dataSpec.convertTypes === "function") {
           if (myData.flatData) {
             // add key, parent and __he_name as columns, since the conversion is applied
             // after the flat data is transformed to hierarchical data
-            const functionWrapper = function(d) {
-              let row = dataSpec.convertTypes(d);
+            var functionWrapper = function functionWrapper(d) {
+              var row = dataSpec.convertTypes(d);
               row.key = d.key;
               row.parent = d.parent;
               row.__he_name = d.__he_name;
@@ -1666,17 +1745,15 @@ function d3_template_reusable (_dataSpec) {
           }
         }
       }
-
     } else {
       console.log("dataspec is not an object!");
     }
-    myData.isJSON = typeof (myData.data) === "object";
-    if (!myData.isJSON){
-      myData.fromFile = (myData.data.endsWith(".json") || myData.data.endsWith(".csv")) ? true : false;
+    myData.isJSON = _typeof(myData.data) === "object";
+    if (!myData.isJSON) {
+      myData.fromFile = myData.data.endsWith(".json") || myData.data.endsWith(".csv") ? true : false;
     } else {
       myData.fromFile = false;
     }
-
     options.keyField = myData.keyField;
     options.nodeLabelField = myData.flatData ? options.nodeLabelFieldFlatData : myData.keyField;
     return myData;
@@ -1686,12 +1763,9 @@ function d3_template_reusable (_dataSpec) {
   function createChart(selection, data) {
     myChart(selection, data, options);
   }
-  
   return chartAPI;
 }
 
 exports.indentedTree = d3_template_reusable;
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+}));

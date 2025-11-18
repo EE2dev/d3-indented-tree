@@ -1,6 +1,7 @@
 {
   "name": "d3-indented-tree",
   "version": "0.6.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -19,20 +20,23 @@
   "author": "Mihael Ankerst",
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^5.16.0",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@rollup/plugin-babel": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-prettier": "^3.1.0",
     "lodash": ">=4.17.19",
-    "rollup": "^0.63.5",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "tap-spec": "^2.2.2",
+    "rollup": "^4.53.2",
+    "tap-spec": "^5.0.0",
     "tape": "^4.10.2",
-    "uglify-js": "^3.6.0"
+    "terser": "^5.24.0"
   },
   "dependencies": {
     "d3": "^7.8.5"
+  },
+  "overrides": {
+    "trim-newlines": "^3.0.1",
+    "trim": "^0.0.3"
   }
 }

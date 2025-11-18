@@ -1,7 +1,8 @@
 // rollup.config.js
-// import nodeResolve from 'rollup-plugin-node-resolve';
-import babel from "rollup-plugin-babel";
-import * as meta from "./package.json";
+// import nodeResolve from '@rollup/plugin-node-resolve';
+import { babel } from "@rollup/plugin-babel";
+import { readFileSync } from "fs";
+const meta = JSON.parse(readFileSync("./package.json", "utf-8"));
 
 export default {
   input: "index.js",
@@ -14,11 +15,13 @@ export default {
     extend: true,
     banner: `// ${meta.homepage} v${meta.version} Copyright ${(new Date).getFullYear()} ${meta.author}`,
     globals: {d3: "d3"},
-    plugins: [
-      babel({
-        exclude: "node_modules/**"})
-    ]
   },
+  plugins: [
+    babel({
+      exclude: "node_modules/**",
+      babelHelpers: "bundled"
+    })
+  ],
 };
 /*
 var globals = { 
